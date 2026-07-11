@@ -14,7 +14,7 @@
 |---|---|---|---|---|---|---|
 | 01 | [Cabeza de clasificación para el redshift](01-cabeza-clasificacion.md) | Fase 0 | 2–3 h | — | tests verdes + smoke run con la cabeza nueva | ✅ |
 | 02 | [Reentrenamiento v2 + antes/después](02-reentrenamiento-v2.md) | Fase 0 | 1 h activa + 3–4 h cómputo | 01 | checkpoint v2 + notebook re-ejecutado + tabla v1→v2 | ⬜ |
-| 03 | [Repo público en GitHub + CI](03-repo-publico-ci.md) | Nivel 1 | 1.5–2 h | — | repo público con Actions en verde | ⬜ |
+| 03 | [Repo público en GitHub + CI](03-repo-publico-ci.md) | Nivel 1 | 1.5–2 h | — | repo público con Actions en verde — <https://github.com/Julian0444/desi-spectra-fm> | ✅ |
 | 04 | [Checkpoint en Hugging Face Hub](04-checkpoint-hf-hub.md) | Nivel 1 | 1 h | 03 (ideal: 02) | model card pública + descarga funcionando | ⬜ |
 | 05 | [Demo Gradio en HF Spaces](05-demo-gradio.md) | Nivel 1 | 2–3 h | 04 | **link de demo en vivo** | ⬜ |
 | 06 | [API FastAPI + Docker](06-api-fastapi-docker.md) | Nivel 1 | 2–3 h | 04 | endpoint público respondiendo a `curl` | ⬜ |

@@ -1,5 +1,7 @@
 # DESI Spectra Foundation Model
 
+![ci](https://github.com/Julian0444/desi-spectra-fm/actions/workflows/ci.yml/badge.svg)
+
 A unimodal masked-token foundation model for astrophysical spectra, with the redshift mechanism redesigned per the project specification. Given a spectrum from **any instrument** (DESI or otherwise), the model predicts the redshift `z` and reconstructs masked spectral regions.
 
 **Course:** PHYS303 / CS486 / CS686 — Final Project
