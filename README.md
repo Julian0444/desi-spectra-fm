@@ -1,0 +1,205 @@
+# DESI Spectra Foundation Model
+
+A unimodal masked-token foundation model for astrophysical spectra, with the redshift mechanism redesigned per the project specification. Given a spectrum from **any instrument** (DESI or otherwise), the model predicts the redshift `z` and reconstructs masked spectral regions.
+
+**Course:** PHYS303 / CS486 / CS686 — Final Project
+**Student:** Julian Irusta Roure
+**Due:** May 19, 2026 (11 PM)
+
+> 📄 For full deliverable documentation (architecture, design decisions, metric progression), see [DELIVERABLE.md](DELIVERABLE.md).
+> 📄 For the Spanish-language development walkthrough, see [README.es.md](README.es.md).
+
+---
+
+## Quick start for graders (3 commands)
+
+### 1. Install
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 -m pip install -e .
+```
+
+Requirements: Python 3.9+, PyTorch 2.x (MPS / CUDA / CPU all supported).
+Inference uses only NumPy + PyTorch; no Hugging Face dependency.
+
+### 2. Verify the build
+
+```bash
+python3 -m pytest tests/ -v
+```
+
+Expected output: **`4 passed`**. This confirms the model loads, the forward pass works, and the redshift mechanism is information-leak-free.
+
+For the full evaluation with plots — metrics, bias/outlier analysis, reconstruction gallery, training curves, and a live inference demo — open the ready-to-run notebook [`notebooks/evaluation.ipynb`](notebooks/evaluation.ipynb). Sections 1–3 run offline from artifacts shipped in this repo; it ships pre-executed so the plots are visible without running anything.
+
+### 3. Run inference on your benchmark spectra
+
+```bash
+python3 -m desi_fm.predict \
+    --checkpoint runs/desi_50k_big/checkpoint_last.pt \
+    --input  YOUR_SPECTRA.npz \
+    --output predictions.npz
+```
+
+That's it. The script handles spectra from any instrument: it interpolates onto the model's internal log-λ grid, runs the forward pass, and interpolates the reconstruction back onto your input grid in your flux units.
+
+---
+
+## Input format
+
+`YOUR_SPECTRA.npz` is a NumPy `.npz` archive. **Required:**
+
+| key | dtype | shape | meaning |
+|---|---|---|---|
+| `flux` | float32 | `(N, P)` or `(P,)` | observed flux, any units |
+| `wavelength` | float32 | `(N, P)` or `(P,)` | wavelengths in Ångströms |
+
+**Optional:**
+
+| key | dtype | shape | meaning |
+|---|---|---|---|
+| `ivar` | float32 | `(N, P)` | inverse variance |
+| `mask` | bool | `(N, P)` | `True` = bad / unusable pixel |
+
+If `wavelength` is 1-D, the same grid is reused for every spectrum. A 1-D `flux` is treated as a single spectrum.
+
+---
+
+## Output format
+
+`predictions.npz` contains:
+
+| key | shape | meaning |
+|---|---|---|
+| `z_pred` | `(N,)` | predicted redshift |
+| `reconstruction_input_grid` | `(N, P)` | reconstruction on your wavelength grid, in your flux units |
+| `reconstruction_model_grid` | `(N, 7081)` | reconstruction on the model's internal log-λ grid |
+| `model_wavelength` | `(7081,)` | the model's internal wavelength grid (3600–9800 Å, log-spaced) |
+| `spectrum_mask` | `(N, 273)` bool | which of the 273 token positions were masked |
+| `center`, `scale` | `(N,)` | per-spectrum normalization stats applied internally |
+
+---
+
+## Reconstruction-benchmark mode
+
+By default the model receives the full input spectrum and is asked to predict `z`. To benchmark **masked-region reconstruction** (deliverable 1b), pass `--mask-ratio` to randomly mask that fraction of the 273 token positions before the forward pass:
+
+```bash
+python3 -m desi_fm.predict \
+    --checkpoint runs/desi_50k_big/checkpoint_last.pt \
+    --input  YOUR_SPECTRA.npz \
+    --output predictions.npz \
+    --mask-ratio 0.5
+```
+
+`spectrum_mask` in the output tells you exactly which 26-pixel patches were hidden, so you can compute reconstruction error against ground truth on those regions only.
+
+---
+
+## Python API (optional)
+
+```python
+import numpy as np
+from desi_fm.predict import predict_spectrum, predict_spectra_batch
+
+# Single spectrum
+result = predict_spectrum(
+    flux=flux_1d,
+    wavelength=wavelength_1d,
+    ivar=optional_ivar,
+    mask=optional_bad_pixel_mask,
+    checkpoint_path="runs/desi_50k_big/checkpoint_last.pt",
+)
+z_pred = result["z_pred"]                       # scalar
+recon  = result["reconstruction_input_grid"]    # same shape as flux_1d
+
+# Batch of N spectra
+batch = predict_spectra_batch(
+    fluxes=fluxes_2d,                # (N, P)
+    wavelengths=wavelengths,         # (N, P) or (P,)
+    checkpoint_path="runs/desi_50k_big/checkpoint_last.pt",
+)
+batch["z_pred"]                      # (N,)
+batch["reconstruction_input_grid"]   # (N, P)
+```
+
+---
+
+## Repository layout
+
+```
+src/desi_fm/
+  model.py            transformer encoder + reconstruction & redshift heads
+  data.py             spectrum preprocessing (interpolation, normalization, patching)
+  train.py            training loop
+  evaluate.py         validation metrics on DESI streaming data
+  predict.py          instrument-agnostic inference  ← use this for benchmarking
+  inspect_schema.py   sanity-check utility for the MMU/DESI dataset
+tests/                4 unit tests (shapes, no-leakage, log-grid, log-λ embedding)
+notebooks/
+  evaluation.ipynb    ready-to-run evaluation notebook (metrics, plots, live demo)
+runs/desi_50k_big/
+  checkpoint_last.pt        the shipped model (26 M parameters)
+  config.json               model configuration
+  metrics.jsonl             per-step training metrics
+  predictions.csv           validation predictions on 1000 DESI spectra
+  reconstructions.npz       validation reconstructions on 50 DESI spectra
+DELIVERABLE.md        full deliverable documentation
+README.md             this file (quick start for graders)
+README.es.md          Spanish development walkthrough
+RESUMEN.md            Spanish project summary
+COMO_FUNCIONA.md      Spanish code walkthrough
+```
+
+---
+
+## Achieved metrics
+
+Validation on 2,000 held-out DESI spectra (full table and progression in [DELIVERABLE.md §5](DELIVERABLE.md)):
+
+| metric | value |
+|---|---|
+| `redshift_mae` | 0.222 |
+| `redshift_mae_norm` = `mean(abs(z_pred - z) / (1 + z))` | 0.124 |
+| `reconstruction_rmse_masked` (pixel-weighted, arcsinh space) | 0.864 |
+| trainable parameters | 25,929,859 |
+
+---
+
+## How it handles non-DESI spectra (OOD)
+
+Positional information inside the model is **a sinusoidal embedding of physical `log(λ)`**, not an arbitrary token index. So when a non-DESI spectrum arrives:
+
+1. It is interpolated onto the model's internal `log(λ)` grid (3600–9800 Å, 7081 pixels).
+2. Pixels outside the new instrument's wavelength coverage are marked `valid=0` so the model knows to ignore them.
+3. The transformer reads the remaining valid tokens. Each token "knows" the physical wavelength it represents.
+4. The reconstruction is interpolated back to the caller's grid in original flux units.
+
+This is transparent to the caller — just pass any `(flux, wavelength)` arrays to `predict.py`.
+
+---
+
+## Design summary (one paragraph)
+
+Encoder-only transformer (8 layers, `d_model=512`, 8 heads, 25.9 M parameters) trained with masked-token prediction on 50,000 DESI EDR/SV3 spectra. Each spectrum is interpolated onto a log-λ grid, sliced into 273 continuous patches of 26 pixels, linearly projected to token embeddings, and augmented with a 274th always-masked redshift token. A sinusoidal log-λ positional embedding is added so the model can be applied to spectra from instruments with different wavelength coverage. Training jointly minimizes MSE on masked spectral patches and SmoothL1 on `log(1+z)`, with the redshift weighted 10× higher than reconstruction to compensate for being a single scalar against 273 patch targets. Both redesign approaches from the specification are implemented: a lightweight MLP redshift head trained jointly with the encoder (Approach A), and the redshift token forcibly masked on every training example (Approach B). Full design rationale and oral-question answers are in [DELIVERABLE.md §4](DELIVERABLE.md).
+
+---
+
+## Troubleshooting
+
+| symptom | fix |
+|---|---|
+| `RuntimeError: MPS backend …` | add `--device cpu` (slower but works on every machine) |
+| `KeyError: 'flux'` | input `.npz` must contain at least `flux` and `wavelength` arrays |
+| `RuntimeError: shape mismatch` | check that `flux` and `wavelength` have the same shape |
+| inference seems slow | the batch API loops per spectrum; expect a few hundred ms per spectrum on MPS, ~1 s on CPU |
+
+---
+
+## References
+
+- Project specification: PHYS303/CS486 final project (USF) — build and evaluate a self-supervised foundation model for DESI spectra with redshift prediction (course material, not distributed in this repo)
+- Multimodal Universe dataset: <https://github.com/MultimodalUniverse/MultimodalUniverse>
+- AION-1 (reference, not reproduced): <https://github.com/PolymathicAI/AION>
+- AION-1 checkpoints (not used at inference time): <https://huggingface.co/polymathic-ai/aion-base>

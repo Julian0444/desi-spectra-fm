@@ -1,0 +1,17 @@
+{
+  "n_pixels": 7081,
+  "n_tokens": 273,
+  "lambda_min": 3600.0,
+  "lambda_max": 9800.0,
+  "wavelength_grid": "log",
+  "d_model": 384,
+  "n_layers": 6,
+  "n_heads": 6,
+  "mlp_ratio": 4.0,
+  "dropout": 0.1,
+  "mask_ratio": 0.35,
+  "redshift_loss_weight": 2.0,
+  "reconstruction_loss_weight": 1.0,
+  "use_wavelength_embedding": true,
+  "use_learned_position": true
+}

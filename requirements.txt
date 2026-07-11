@@ -1,0 +1,7 @@
+numpy>=1.23
+torch>=2.0
+datasets>=2.18
+pyarrow>=14
+tqdm>=4.66
+pytest>=8
+matplotlib>=3.7

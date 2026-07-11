@@ -1,0 +1,15 @@
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.venv/
+external/
+*.zip
+*.docx
+# checkpoints nunca a git; artefactos livianos del run final sí
+runs/*
+!runs/desi_50k_big/
+!runs/desi_150k_classhead/
+runs/desi_50k_big/*.pt
+runs/desi_150k_classhead/*.pt
