@@ -29,6 +29,7 @@ class DESIFoundationModelConfig:
     n_z_bins: int = 0        # 0 = cabeza escalar (v1); >0 = clasificación sobre bins de log(1+z)
     z_max: float = 6.0       # techo del rango de bins
     z_label_smoothing: float = 0.05
+    normalize_redshift_ce: bool = False  # False preserva la semántica de v1/v2.0
 
     @property
     def patch_size(self) -> int:
@@ -277,19 +278,26 @@ class DESIFoundationModel(nn.Module):
                 target_bin = torch.bucketize(
                     self.encode_redshift(z), self.z_bin_edges[1:-1]
                 )
-                z_loss = F.cross_entropy(
+                z_loss_raw = F.cross_entropy(
                     z_logits,
                     target_bin,
                     weight=self.z_bin_weights,
                     label_smoothing=self.config.z_label_smoothing,
                 )
+                z_loss = (
+                    z_loss_raw / math.log(self.config.n_z_bins)
+                    if self.config.normalize_redshift_ce
+                    else z_loss_raw
+                )
             else:
-                z_loss = F.smooth_l1_loss(z_encoded_pred, self.encode_redshift(z))
+                z_loss_raw = F.smooth_l1_loss(z_encoded_pred, self.encode_redshift(z))
+                z_loss = z_loss_raw
             total = (
                 self.config.reconstruction_loss_weight * recon_loss
                 + self.config.redshift_loss_weight * z_loss
             )
             out["redshift_loss"] = z_loss
+            out["redshift_loss_raw"] = z_loss_raw
             out["loss"] = total
         else:
             out["loss"] = recon_loss

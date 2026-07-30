@@ -1,3 +1,5 @@
+import math
+
 import torch
 
 from desi_fm.data import SpectrumPreprocessConfig
@@ -62,6 +64,43 @@ def test_scalar_head_remains_default():
     out = DESIFoundationModel(config)(torch.randn(2, 64), torch.ones(2, 64),
                                       z=torch.tensor([0.1, 0.5]))
     assert "z_logits" not in out           # v1 intacta
+
+
+def test_classification_loss_can_be_normalized_by_log_bins():
+    config = DESIFoundationModelConfig(
+        n_pixels=64,
+        n_tokens=8,
+        d_model=32,
+        n_layers=1,
+        n_heads=4,
+        dropout=0.0,
+        n_z_bins=16,
+        z_max=6.0,
+        z_label_smoothing=0.0,
+        normalize_redshift_ce=True,
+        redshift_loss_weight=1.0,
+    )
+    model = DESIFoundationModel(config)
+    with torch.no_grad():
+        model.redshift_head[-1].weight.zero_()
+        model.redshift_head[-1].bias.zero_()
+
+    flux = torch.randn(4, config.n_pixels)
+    valid = torch.ones_like(flux)
+    mask = torch.zeros(4, config.n_tokens, dtype=torch.bool)
+    out = model(
+        flux,
+        valid,
+        z=torch.tensor([0.1, 0.4, 1.0, 2.0]),
+        spectrum_mask=mask,
+    )
+
+    assert torch.allclose(
+        out["redshift_loss_raw"],
+        torch.tensor(math.log(config.n_z_bins)),
+        atol=1e-5,
+    )
+    assert torch.allclose(out["redshift_loss"], torch.tensor(1.0), atol=1e-5)
 
 
 def test_default_preprocess_grid_is_log_spaced():
