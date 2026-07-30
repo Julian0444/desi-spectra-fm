@@ -74,6 +74,11 @@ def evaluate(model: DESIFoundationModel, loader: DataLoader, device: torch.devic
     total_abs_z_norm = 0.0
     total_recon_sse = 0.0
     total_recon_pixels = 0.0
+    total_abs_z_map = 0.0
+    total_abs_z_norm_map = 0.0
+    n_out15 = 0
+    n_out15_map = 0
+    has_map = False
     batches = 0
     examples = 0
     for batch in loader:
@@ -88,6 +93,14 @@ def evaluate(model: DESIFoundationModel, loader: DataLoader, device: torch.devic
         total_recon_sse += float(out["reconstruction_sse"].detach().cpu())
         total_recon_pixels += float(out["reconstruction_valid_pixels"].detach().cpu())
         dz = (out["z_pred"] - z).abs()
+        dzn = dz / (1.0 + z)
+        n_out15 += int((dzn > 0.15).sum().cpu())
+        if "z_pred_map" in out:
+            has_map = True
+            dz_map = (out["z_pred_map"] - z).abs()
+            total_abs_z_map += float(dz_map.sum().cpu())
+            total_abs_z_norm_map += float((dz_map / (1.0 + z)).sum().cpu())
+            n_out15_map += int(((dz_map / (1.0 + z)) > 0.15).sum().cpu())
         total_abs_z += float(dz.sum().detach().cpu())
         total_abs_z_norm += float((dz / (1.0 + z)).sum().detach().cpu())
         batches += 1
@@ -104,6 +117,13 @@ def evaluate(model: DESIFoundationModel, loader: DataLoader, device: torch.devic
         "redshift_loss": total_z / denom,
         "redshift_mae": total_abs_z / ex_denom,
         "redshift_mae_norm": total_abs_z_norm / ex_denom,
+        "examples": float(examples),
+        "eta15": n_out15 / ex_denom,
+        **({
+            "redshift_mae_map": total_abs_z_map / ex_denom,
+            "redshift_mae_norm_map": total_abs_z_norm_map / ex_denom,
+            "eta15_map": n_out15_map / ex_denom,
+        } if has_map else {}),
     }
 
 
@@ -269,10 +289,40 @@ def train(args: argparse.Namespace) -> None:
         use_learned_position=not args.no_learned_position,
         n_z_bins=args.n_z_bins,
         z_max=args.z_max,
+        z_label_smoothing=args.z_label_smoothing,
+        normalize_redshift_ce=args.normalize_redshift_ce,
     )
     (out_dir / "config.json").write_text(json.dumps(config.to_dict(), indent=2))
+    (out_dir / "training_args.json").write_text(
+        json.dumps(vars(args), indent=2, sort_keys=True)
+    )
 
     model = DESIFoundationModel(config).to(device)
+    if args.init_checkpoint:
+        report = load_compatible_checkpoint(
+            model,
+            Path(args.init_checkpoint),
+            device,
+        )
+        print("warm_start", json.dumps(report))
+
+    if args.z_weighting != "none":
+        if not args.z_histogram:
+            raise ValueError("--z-histogram is required when --z-weighting is enabled")
+        payload = np.load(args.z_histogram, allow_pickle=False)
+        counts = torch.from_numpy(payload["counts"])
+        if counts.numel() != args.n_z_bins:
+            raise ValueError(
+                f"histogram has {counts.numel()} bins; model uses {args.n_z_bins}"
+            )
+        weights = build_z_bin_weights(
+            counts,
+            mode=args.z_weighting,
+            min_weight=args.z_weight_min,
+            max_weight=args.z_weight_cap,
+        )
+        model.z_bin_weights.copy_(weights.to(model.z_bin_weights.device))
+
     if args.z_rebalance and args.n_z_bins > 0:
         import csv as _csv
         zs = [float(r["z_true"]) for r in _csv.DictReader(open("runs/desi_50k_big/predictions.csv"))]
@@ -292,6 +342,7 @@ def train(args: argparse.Namespace) -> None:
     step = 0
     start = time.time()
     last_epoch = 0
+    best_eta15_map = math.inf
     try:
         for epoch in range(args.epochs):
             last_epoch = epoch
@@ -329,6 +380,7 @@ def train(args: argparse.Namespace) -> None:
                         out["reconstruction_rmse"].detach().cpu()
                     ),
                     "redshift_loss": float(out["redshift_loss"].detach().cpu()),
+                    "redshift_loss_raw": float(out["redshift_loss_raw"].detach().cpu()),
                 }
                 progress.set_postfix(
                     loss=f"{train_metrics['loss']:.4f}",
@@ -359,6 +411,19 @@ def train(args: argparse.Namespace) -> None:
                     metrics_path,
                     {"phase": "validation", "epoch": epoch, "step": step, **metrics},
                 )
+                if is_better_checkpoint(metrics, best_score=best_eta15_map):
+                    best_eta15_map = metrics["eta15_map"]
+                    save_checkpoint(
+                        out_dir / "checkpoint_best.pt",
+                        model,
+                        optimizer,
+                        scheduler,
+                        config,
+                        step,
+                        epoch,
+                        save_optimizer=args.save_optimizer,
+                    )
+                    print(f"new_best eta15_map={best_eta15_map:.6f} step={step}")
 
             save_checkpoint(
                 out_dir / "checkpoint_last.pt",
@@ -424,6 +489,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--z-max", type=float, default=6.0)
     parser.add_argument("--z-rebalance", action="store_true",
                         help="pesos inverso-frecuencia por bin, estimados de runs/desi_50k_big/predictions.csv")
+    parser.add_argument("--z-label-smoothing", type=float, default=0.05)
+    parser.add_argument("--normalize-redshift-ce", action="store_true")
+    parser.add_argument(
+        "--z-weighting",
+        choices=["none", "sqrt_inverse"],
+        default="none",
+    )
+    parser.add_argument("--z-histogram", default="")
+    parser.add_argument("--z-weight-min", type=float, default=0.5)
+    parser.add_argument("--z-weight-cap", type=float, default=3.0)
+    parser.add_argument("--init-checkpoint", default="")
 
     parser.add_argument("--mask-ratio", type=float, default=0.35)
     parser.add_argument("--redshift-loss-weight", type=float, default=2.0)

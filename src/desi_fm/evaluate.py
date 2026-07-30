@@ -21,6 +21,14 @@ from .model import DESIFoundationModel, DESIFoundationModelConfig
 from .train import pick_device
 
 
+def write_metrics_json(metrics: dict[str, float], output: Path) -> None:
+    payload = json.dumps(metrics, indent=2, allow_nan=False) + "\n"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(f".{output.name}.tmp")
+    temporary.write_text(payload)
+    temporary.replace(output)
+
+
 def load_model(checkpoint_path: Path, device: torch.device) -> DESIFoundationModel:
     checkpoint = torch.load(checkpoint_path, map_location=device)
     config = DESIFoundationModelConfig(**checkpoint["config"])
@@ -52,6 +60,7 @@ def build_eval_loader(args: argparse.Namespace, config: DESIFoundationModelConfi
             split=args.split,
             data_dir=args.data_dir,
             max_examples=args.max_examples,
+            skip_examples=args.skip_examples,
             shuffle_buffer=0,
             seed=args.seed,
             preprocess=preprocess,
@@ -212,12 +221,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--max-examples", type=int, default=512)
+    parser.add_argument("--skip-examples", type=int, default=0,
+                        help="skip the first N stream examples (use the training count "
+                             "to evaluate on truly held-out spectra)")
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--lambda-min", type=float, default=3600.0)
     parser.add_argument("--lambda-max", type=float, default=9800.0)
     parser.add_argument("--predictions-csv", default="")
     parser.add_argument("--reconstructions-npz", default="")
     parser.add_argument("--num-reconstructions", type=int, default=8)
+    parser.add_argument(
+        "--metrics-json",
+        default="",
+        help="write the final metrics as standalone JSON; logs remain independent",
+    )
     return parser.parse_args()
 
 
@@ -235,6 +252,8 @@ def main() -> None:
         Path(args.reconstructions_npz) if args.reconstructions_npz else None,
         args.num_reconstructions,
     )
+    if args.metrics_json:
+        write_metrics_json(metrics, Path(args.metrics_json))
     print(json.dumps(metrics, indent=2))
 
 

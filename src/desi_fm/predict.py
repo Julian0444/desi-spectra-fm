@@ -220,7 +220,7 @@ def predict_spectrum(
         model_wavelength, recon_native, wavelength
     )
 
-    return {
+    result = {
         "z_pred": z_pred,
         "reconstruction_input_grid": recon_input_grid,
         "reconstruction_model_grid": recon_native,
@@ -232,6 +232,10 @@ def predict_spectrum(
         "center": center,
         "scale": scale,
     }
+    if "z_pred_map" in out:
+        result["z_pred_map"] = float(out["z_pred_map"].item())
+        result["z_confidence"] = float(out["z_confidence"].item())
+    return result
 
 
 def predict_spectra_batch(
@@ -295,6 +299,9 @@ def predict_spectra_batch(
     centers = np.zeros(n, dtype=np.float32)
     scales = np.zeros(n, dtype=np.float32)
     masks_used = np.zeros((n, model.config.n_tokens), dtype=bool)
+    has_map = model.config.n_z_bins > 0
+    z_pred_map = np.zeros(n, dtype=np.float32) if has_map else None
+    z_confidence = np.zeros(n, dtype=np.float32) if has_map else None
 
     model_wavelength: np.ndarray | None = None
 
@@ -315,11 +322,14 @@ def predict_spectra_batch(
         centers[i] = r["center"]
         scales[i] = r["scale"]
         masks_used[i] = r["spectrum_mask"]
+        if has_map:
+            z_pred_map[i] = r["z_pred_map"]
+            z_confidence[i] = r["z_confidence"]
         if model_wavelength is None:
             model_wavelength = r["model_wavelength"]
 
     assert model_wavelength is not None
-    return {
+    result = {
         "z_pred": z_pred,
         "reconstruction_input_grid": recon_input,
         "reconstruction_model_grid": recon_model,
@@ -331,6 +341,10 @@ def predict_spectra_batch(
         "scale": scales,
         "mask_ratio_used": np.float32(mask_ratio),
     }
+    if has_map:
+        result["z_pred_map"] = z_pred_map
+        result["z_confidence"] = z_confidence
+    return result
 
 
 # ---------------------------------------------------------------------------
