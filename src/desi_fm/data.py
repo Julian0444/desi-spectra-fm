@@ -44,6 +44,21 @@ def _as_bool_array(x: Any, length: int) -> np.ndarray:
     return np.asarray(x, dtype=bool)
 
 
+def extract_redshift(example: dict[str, Any]) -> float:
+    redshift_key = next(
+        (key for key in ("Z", "redshift", "z") if key in example),
+        None,
+    )
+    if redshift_key is None:
+        raise KeyError("Expected a redshift field named 'Z', 'redshift', or 'z'.")
+    return float(example[redshift_key])
+
+
+def has_valid_redshift(example: dict[str, Any]) -> bool:
+    redshift = extract_redshift(example)
+    return math.isfinite(redshift) and redshift >= 0.0
+
+
 def extract_mmu_desi_example(
     example: dict[str, Any],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, float]:
@@ -65,10 +80,7 @@ def extract_mmu_desi_example(
     wavelength = _as_float_array(spectrum[wavelength_key])
     mask = _as_bool_array(spectrum.get("mask"), len(flux))
 
-    redshift_key = next((key for key in ("Z", "redshift", "z") if key in example), None)
-    if redshift_key is None:
-        raise KeyError("Expected a redshift field named 'Z', 'redshift', or 'z'.")
-    redshift = float(example[redshift_key])
+    redshift = extract_redshift(example)
     return flux, ivar, wavelength, mask, redshift
 
 
@@ -171,9 +183,13 @@ class HFDESISpectra(IterableDataset):
         self.skip_examples = skip_examples
         self.shuffle_buffer = shuffle_buffer
         self.seed = seed
+        self.epoch = 0
         self.preprocess = preprocess or SpectrumPreprocessConfig()
 
-    def _load_stream(self) -> Iterable[dict[str, Any]]:
+    def set_epoch(self, epoch: int) -> None:
+        self.epoch = int(epoch)
+
+    def _load_base_stream(self) -> Iterable[dict[str, Any]]:
         try:
             from datasets import load_dataset
         except ImportError as exc:
@@ -184,30 +200,41 @@ class HFDESISpectra(IterableDataset):
         kwargs: dict[str, Any] = {"split": self.split, "streaming": True}
         if self.data_dir:
             kwargs["data_dir"] = self.data_dir
+        return load_dataset(self.dataset_name, **kwargs)
 
-        stream = load_dataset(self.dataset_name, **kwargs)
+    def _load_stream(self) -> Iterable[dict[str, Any]]:
+        # Orden deliberado: la membresía del split queda fija antes del shuffle,
+        # así el buffer nunca puede leer ejemplos del held-out.
+        stream = self._load_base_stream()
+        stream = stream.filter(has_valid_redshift)
+        if self.skip_examples > 0:
+            stream = stream.skip(self.skip_examples)
+        if self.max_examples is not None:
+            stream = stream.take(self.max_examples)
         if self.shuffle_buffer > 0:
-            stream = stream.shuffle(buffer_size=self.shuffle_buffer, seed=self.seed)
+            stream = stream.shuffle(
+                buffer_size=self.shuffle_buffer,
+                seed=self.seed + self.epoch,
+            )
         return stream
 
     def __iter__(self):
-        stream = self._load_stream()
-        emitted = 0
-        for idx, example in enumerate(stream):
-            if idx < self.skip_examples:
-                continue
-            flux, ivar, wavelength, mask, redshift = extract_mmu_desi_example(example)
-            processed = preprocess_spectrum(flux, ivar, wavelength, mask, self.preprocess)
-            if not math.isfinite(redshift) or redshift < 0:
-                continue
+        for example in self._load_stream():
+            flux, ivar, wavelength, mask, redshift = extract_mmu_desi_example(
+                example
+            )
+            processed = preprocess_spectrum(
+                flux,
+                ivar,
+                wavelength,
+                mask,
+                self.preprocess,
+            )
             yield {
                 "flux": processed["flux"],
                 "valid": processed["valid"],
                 "z": np.float32(redshift),
             }
-            emitted += 1
-            if self.max_examples is not None and emitted >= self.max_examples:
-                break
 
 
 class SyntheticSpectra(IterableDataset):

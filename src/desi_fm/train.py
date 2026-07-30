@@ -8,6 +8,7 @@ import sys
 import time
 from pathlib import Path
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -170,6 +171,79 @@ def count_parameters(model: torch.nn.Module) -> int:
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
+def compute_z_histogram(
+    redshifts: np.ndarray,
+    *,
+    n_bins: int,
+    z_max: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    values = np.asarray(redshifts, dtype=np.float64)
+    valid = np.isfinite(values) & (values >= 0.0)
+    encoded = np.log1p(np.minimum(values[valid], z_max))
+    edges = np.linspace(0.0, math.log1p(z_max), n_bins + 1)
+    counts, _ = np.histogram(encoded, bins=edges)
+    return counts.astype(np.int64), edges.astype(np.float64)
+
+
+def build_z_bin_weights(
+    counts: torch.Tensor,
+    *,
+    mode: str,
+    min_weight: float,
+    max_weight: float,
+) -> torch.Tensor:
+    counts = counts.float()
+    if counts.ndim != 1:
+        raise ValueError("counts must be one-dimensional")
+    if mode == "none":
+        return torch.ones_like(counts)
+    if mode != "sqrt_inverse":
+        raise ValueError(f"unknown z weighting mode: {mode}")
+    observed = counts > 0
+    if not bool(observed.any()):
+        raise ValueError("histogram has no observed bins")
+    mean_count = counts[observed].mean()
+    weights = torch.zeros_like(counts)
+    weights[observed] = torch.sqrt(mean_count / counts[observed]).clamp(
+        min=min_weight,
+        max=max_weight,
+    )
+    return weights
+
+
+def load_compatible_checkpoint(
+    model: DESIFoundationModel,
+    checkpoint_path: Path,
+    device: torch.device,
+) -> dict[str, object]:
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    source = dict(checkpoint["model"])
+    if "pos_embed" in source and "learned_pos_embed" not in source:
+        source["learned_pos_embed"] = source.pop("pos_embed")
+    target = model.state_dict()
+    compatible = {
+        key: value
+        for key, value in source.items()
+        if key in target and target[key].shape == value.shape
+    }
+    skipped = sorted(key for key in source if key not in compatible)
+    model.load_state_dict(compatible, strict=False)
+    return {"loaded": len(compatible), "skipped": skipped}
+
+
+def is_better_checkpoint(
+    metrics: dict[str, float],
+    *,
+    best_score: float,
+) -> bool:
+    return (
+        metrics.get("examples", 0.0) > 0
+        and "eta15_map" in metrics
+        and math.isfinite(metrics["eta15_map"])
+        and metrics["eta15_map"] < best_score
+    )
+
+
 def train(args: argparse.Namespace) -> None:
     torch.manual_seed(args.seed)
     device = pick_device(args.device)
@@ -222,6 +296,9 @@ def train(args: argparse.Namespace) -> None:
         for epoch in range(args.epochs):
             last_epoch = epoch
             model.train()
+            if hasattr(train_loader.dataset, "set_epoch"):
+                train_loader.dataset.set_epoch(epoch)
+            print(f"dataset_epoch={epoch} shuffle_seed={args.seed + epoch}")
             progress = tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}")
             for batch in progress:
                 flux = batch["flux"].to(device)
