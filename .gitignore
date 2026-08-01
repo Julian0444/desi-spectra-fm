@@ -11,5 +11,12 @@ external/
 runs/*
 !runs/desi_50k_big/
 !runs/desi_150k_classhead/
+!runs/desi_80k_classhead_v21/
+!runs/calibration/
 runs/desi_50k_big/*.pt
 runs/desi_150k_classhead/*.pt
+runs/desi_80k_classhead_v21/*.pt
+runs/desi_80k_classhead_v21/*.log
+runs/desi_80k_classhead_v21/train.pid
+runs/calibration/*.log
+runs/calibration/*.npz

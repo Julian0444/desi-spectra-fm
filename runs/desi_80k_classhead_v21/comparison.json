@@ -1,0 +1,55 @@
+{
+  "baseline_v1": {
+    "path": "runs/calibration/predictions_v1_heldout_canonical.csv",
+    "n": 2000,
+    "eta15": 0.226,
+    "sigma_nmad": 0.08259585465138945,
+    "mae_norm": 0.10724169602455393,
+    "eta15_high": 0.826530612244898,
+    "max_z_pred_map": 1.9997775554656982,
+    "reconstruction_rmse_masked": 0.8194146327308951
+  },
+  "release_thresholds": {
+    "eta15": 0.226,
+    "sigma_nmad": 0.08259585465138945,
+    "mae_norm": 0.10724169602455393,
+    "eta15_high": 0.5,
+    "reconstruction_rmse_masked": 0.9
+  },
+  "candidates": [
+    {
+      "path": "runs/desi_80k_classhead_v21/predictions_best.csv",
+      "n": 2000,
+      "eta15": 0.1515,
+      "sigma_nmad": 0.03150794805152244,
+      "mae_norm": 0.09673822180536937,
+      "eta15_high": 0.20408163265306123,
+      "max_z_pred_map": 3.5180492401123047,
+      "reconstruction_rmse_masked": 0.8158957522648325,
+      "passes_release_gate": true
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/predictions_last.csv",
+      "n": 2000,
+      "eta15": 0.1495,
+      "sigma_nmad": 0.03034938529754358,
+      "mae_norm": 0.09586133325238384,
+      "eta15_high": 0.23469387755102042,
+      "max_z_pred_map": 3.5180492401123047,
+      "reconstruction_rmse_masked": 0.8173721971320208,
+      "passes_release_gate": true
+    }
+  ],
+  "winner": {
+    "path": "runs/desi_80k_classhead_v21/predictions_last.csv",
+    "n": 2000,
+    "eta15": 0.1495,
+    "sigma_nmad": 0.03034938529754358,
+    "mae_norm": 0.09586133325238384,
+    "eta15_high": 0.23469387755102042,
+    "max_z_pred_map": 3.5180492401123047,
+    "reconstruction_rmse_masked": 0.8173721971320208,
+    "passes_release_gate": true
+  },
+  "decision": "promote_v2_1"
+}

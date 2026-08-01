@@ -18,18 +18,21 @@ For a longer Spanish-language walkthrough of the development process
 ## 1. Where the deliverables live
 
 
-| artifact                                     | path                                    |
-| -------------------------------------------- | --------------------------------------- |
-| Trained checkpoint (recommended)             | `runs/desi_50k_big/checkpoint_last.pt`  |
-| Model config (JSON)                          | `runs/desi_50k_big/config.json`         |
-| Per-step training metrics                    | `runs/desi_50k_big/metrics.jsonl`       |
-| Validation predictions (1000 DESI spectra)   | `runs/desi_50k_big/predictions.csv`     |
-| Validation reconstructions (50 DESI spectra) | `runs/desi_50k_big/reconstructions.npz` |
-| Inference entry point (Python + CLI)         | `src/desi_fm/predict.py`                |
+| artifact                                        | path                                              |
+| ----------------------------------------------- | ------------------------------------------------- |
+| Trained checkpoint (recommended, **v2.1**)      | `runs/desi_80k_classhead_v21/checkpoint_last.pt`  |
+| Model config (JSON)                             | `runs/desi_80k_classhead_v21/config.json`         |
+| Training args + per-step metrics                | `runs/desi_80k_classhead_v21/training_args.json`, `metrics.jsonl` |
+| Held-out predictions (2000 DESI spectra)        | `runs/desi_80k_classhead_v21/predictions.csv`     |
+| Held-out reconstructions (50 DESI spectra)      | `runs/desi_80k_classhead_v21/reconstructions.npz` |
+| v1 ↔ v2.1 gate comparison + release decision    | `runs/desi_80k_classhead_v21/comparison.json`     |
+| v1 baseline checkpoint (kept for comparison)    | `runs/desi_50k_big/checkpoint_last.pt`            |
+| Inference entry point (Python + CLI)            | `src/desi_fm/predict.py`                          |
 
 
-Earlier checkpoints from intermediate experiments are kept under `runs/`
-for the progression record.
+v2.1 is a **fine-tune of the v1 encoder** with a new redshift classification head —
+not a from-scratch model. Earlier checkpoints from intermediate experiments are kept
+under `runs/` for the progression record.
 
 ---
 
@@ -203,41 +206,60 @@ what wavelength each token corresponds to.
 
 ---
 
-## 5. Achieved metrics (validation, 2000 held-out DESI spectra)
+## 5. Achieved metrics (canonical held-out split, 2000 DESI spectra)
 
+The shipped checkpoint is **v2.1** (`runs/desi_80k_classhead_v21`): a **fine-tune of
+the v1 encoder** with a new 100-bin redshift classification head over `log(1+z)`
+(cross-entropy normalized by `log(n_bins)`, sqrt-inverse class weights from the real
+80k-label histogram, leak-free `filter → skip → take → shuffle(train-only)` split).
+Its official prediction is **`z_pred_map`** (posterior argmax). All numbers below are
+measured on the **canonical held-out split** — the 2,000 valid-label spectra after the
+80,000 used for training (`--skip-examples 80000`), never seen by v1 or v2.1.
 
-| metric                                                       | value      |
-| ------------------------------------------------------------ | ---------- |
-| `redshift_mae`                                               | 0.222      |
-| `redshift_mae_norm` = `mean(abs(z_pred - z) / (1 + z))`      | 0.124      |
-| `reconstruction_loss` (MSE on masked patches, arcsinh space) | 0.747      |
-| `reconstruction_rmse_masked` (pixel-weighted)                | 0.864      |
-| trainable parameters                                         | 25,929,859 |
+| metric (held-out, `z_pred_map` for v2.1)                     | v1 baseline | **v2.1 (shipped)** |
+| ------------------------------------------------------------ | ----------- | ------------------ |
+| catastrophic outlier fraction η₀.₁₅                          | 22.6 %      | **15.0 %**         |
+| σ_NMAD                                                       | 0.083       | **0.030**          |
+| `redshift_mae_norm` = `mean(abs(z_pred - z) / (1 + z))`      | 0.107       | **0.096**          |
+| η₀.₁₅ in z ∈ [1.5, 2.5)                                      | 82.7 %      | **23.5 %**         |
+| prediction ceiling (max z_pred)                              | 2.00        | **3.52**           |
+| `reconstruction_rmse_masked` (pixel-weighted, arcsinh space) | 0.819       | **0.817**          |
+| trainable parameters                                         | 25,929,859  | 25,980,646         |
 
+The machine-readable gate-by-gate comparison of both v2.1 checkpoints against the v1
+baseline is in `runs/desi_80k_classhead_v21/comparison.json`
+(`decision: promote_v2_1`).
 
 For comparison, the DESI pipeline reports `z` accuracies of order `1e-4`.
-Our model is ~3 orders of magnitude worse on `z`, which is the expected
-gap between a 26 M-parameter transformer trained on 50 k spectra for one
-epoch on a laptop and the DESI production pipeline. The point of the
-project is not to beat the pipeline but to show that a unimodal,
-spectrum-only transformer with the redshift mechanism redesigned can
-learn the task at all.
+Our model remains orders of magnitude worse on `z`, which is the expected
+gap between a 26 M-parameter transformer trained on 80 k spectra on a laptop
+and the DESI production pipeline. The point of the project is not to beat
+the pipeline but to show that a unimodal, spectrum-only transformer with
+the redshift mechanism redesigned can learn the task — and that the
+redesign measurably removes the diagnosed failure modes.
 
 ### Progression during the project
 
+Earlier rows were measured on differently-defined (partially seen) validation
+windows and are kept as the historical record; the two final rows are on the
+canonical held-out split described above.
 
-| run                                                   | data     | params   | `redshift_mae` | `redshift_mae_norm` | `recon_rmse_masked` |
-| ----------------------------------------------------- | -------- | -------- | -------------- | ------------------- | ------------------- |
-| smoke (500 ex, `w_z=2`, mask 0.35)                    | 500      | 11 M     | 0.537          | 0.282               | 0.968               |
-| 10 k, `w_z=20`, mask 0.35                             | 10 k     | 11 M     | 0.259          | 0.150               | 0.957               |
-| 10 k, `w_z=10`, mask 0.50                             | 10 k     | 11 M     | 0.259          | 0.146               | 0.950               |
-| 50 k, `w_z=10`, mask 0.50                             | 50 k     | 11 M     | 0.220          | 0.130               | 0.862               |
-| **50 k, `w_z=10`, mask 0.50, larger model** (shipped) | **50 k** | **26 M** | **0.222**      | **0.124**           | **0.864**           |
+| run                                                   | data     | params   | `redshift_mae_norm` | η₀.₁₅        | `recon_rmse_masked` |
+| ----------------------------------------------------- | -------- | -------- | ------------------- | ------------ | ------------------- |
+| smoke (500 ex, `w_z=2`, mask 0.35)                    | 500      | 11 M     | 0.282               | —            | 0.968               |
+| 10 k, `w_z=20`, mask 0.35                             | 10 k     | 11 M     | 0.150               | —            | 0.957               |
+| 10 k, `w_z=10`, mask 0.50                             | 10 k     | 11 M     | 0.146               | —            | 0.950               |
+| 50 k, `w_z=10`, mask 0.50                             | 50 k     | 11 M     | 0.130               | —            | 0.862               |
+| 50 k, `w_z=10`, mask 0.50, larger model (**v1**)      | 50 k     | 26 M     | 0.107 (held-out)    | 22.6 %       | 0.819               |
+| v2.0 experiment: 200 bins, cap-10 rebalance, `w_z=10` | 80 k     | 26 M     | 0.182 (MAP)         | 31.1 % (MAP) | 0.877               |
+| **v2.1 fine-tune: 100 bins, calibrated CE** (shipped) | **80 k** | **26 M** | **0.096 (MAP)**     | **15.0 %**   | **0.817**           |
 
-
-The trajectory confirms the architecture learns from data; the remaining
-gap to the DESI pipeline is a model-capacity / compute issue, not a
-structural one.
+The v2.0 experiment (kept in `runs/desi_150k_classhead/`, documented in
+`plan/02-reentrenamiento-v2.md`) validated the classification head directionally but
+mis-calibrated the loss (CE ≈ 98 % of the total) and over-rebalanced easy redshifts;
+v2.1 fixed both and passed every release gate. The trajectory confirms the
+architecture learns from data and that the remaining gap to the DESI pipeline is a
+capacity / compute issue, not a structural one.
 
 ---
 

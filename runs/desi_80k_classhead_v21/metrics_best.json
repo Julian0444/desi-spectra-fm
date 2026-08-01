@@ -1,0 +1,14 @@
+{
+  "loss": 1.1316996989250183,
+  "reconstruction_loss": 0.6655323832035065,
+  "reconstruction_rmse_masked": 0.8158957522648325,
+  "masked_valid_pixels": 7058904.0,
+  "redshift_loss": 0.4661673152446747,
+  "redshift_mae": 0.13717333069443702,
+  "redshift_mae_norm": 0.07928246313333512,
+  "eta15": 0.158,
+  "redshift_mae_map": 0.15949297684431077,
+  "redshift_mae_norm_map": 0.09673822242021561,
+  "eta15_map": 0.1515,
+  "mean_z_confidence": 0.5195026717185974
+}

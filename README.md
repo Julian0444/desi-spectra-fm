@@ -31,7 +31,7 @@ Inference uses only NumPy + PyTorch; no Hugging Face dependency.
 python3 -m pytest tests/ -v
 ```
 
-Expected output: **`4 passed`**. This confirms the model loads, the forward pass works, and the redshift mechanism is information-leak-free.
+Expected output: **`16 passed`**. This confirms the model loads, the forward pass works, the redshift mechanism is information-leak-free, and the train/held-out split is leak-free (disjointness, fixed membership, reproducible per-epoch order).
 
 For the full evaluation with plots — metrics, bias/outlier analysis, reconstruction gallery, training curves, and a live inference demo — open the ready-to-run notebook [`notebooks/evaluation.ipynb`](notebooks/evaluation.ipynb). Sections 1–3 run offline from artifacts shipped in this repo; it ships pre-executed so the plots are visible without running anything.
 
@@ -39,7 +39,7 @@ For the full evaluation with plots — metrics, bias/outlier analysis, reconstru
 
 ```bash
 python3 -m desi_fm.predict \
-    --checkpoint runs/desi_50k_big/checkpoint_last.pt \
+    --checkpoint runs/desi_80k_classhead_v21/checkpoint_last.pt \
     --input  YOUR_SPECTRA.npz \
     --output predictions.npz
 ```
@@ -74,7 +74,9 @@ If `wavelength` is 1-D, the same grid is reused for every spectrum. A 1-D `flux`
 
 | key | shape | meaning |
 |---|---|---|
-| `z_pred` | `(N,)` | predicted redshift |
+| `z_pred_map` | `(N,)` | **official predicted redshift** (posterior argmax; present for classification checkpoints like v2.1) |
+| `z_confidence` | `(N,)` | posterior concentration in [0, 1] (classification checkpoints) |
+| `z_pred` | `(N,)` | posterior-expectation redshift (kept for backward compatibility; the only prediction for v1) |
 | `reconstruction_input_grid` | `(N, P)` | reconstruction on your wavelength grid, in your flux units |
 | `reconstruction_model_grid` | `(N, 7081)` | reconstruction on the model's internal log-λ grid |
 | `model_wavelength` | `(7081,)` | the model's internal wavelength grid (3600–9800 Å, log-spaced) |
@@ -89,7 +91,7 @@ By default the model receives the full input spectrum and is asked to predict `z
 
 ```bash
 python3 -m desi_fm.predict \
-    --checkpoint runs/desi_50k_big/checkpoint_last.pt \
+    --checkpoint runs/desi_80k_classhead_v21/checkpoint_last.pt \
     --input  YOUR_SPECTRA.npz \
     --output predictions.npz \
     --mask-ratio 0.5
@@ -111,18 +113,19 @@ result = predict_spectrum(
     wavelength=wavelength_1d,
     ivar=optional_ivar,
     mask=optional_bad_pixel_mask,
-    checkpoint_path="runs/desi_50k_big/checkpoint_last.pt",
+    checkpoint_path="runs/desi_80k_classhead_v21/checkpoint_last.pt",
 )
-z_pred = result["z_pred"]                       # scalar
+z = result["z_pred_map"]                        # official prediction (v2.1)
+conf = result["z_confidence"]                   # posterior concentration [0, 1]
 recon  = result["reconstruction_input_grid"]    # same shape as flux_1d
 
 # Batch of N spectra
 batch = predict_spectra_batch(
     fluxes=fluxes_2d,                # (N, P)
     wavelengths=wavelengths,         # (N, P) or (P,)
-    checkpoint_path="runs/desi_50k_big/checkpoint_last.pt",
+    checkpoint_path="runs/desi_80k_classhead_v21/checkpoint_last.pt",
 )
-batch["z_pred"]                      # (N,)
+batch["z_pred_map"]                  # (N,) official prediction
 batch["reconstruction_input_grid"]   # (N, P)
 ```
 
@@ -138,15 +141,20 @@ src/desi_fm/
   evaluate.py         validation metrics on DESI streaming data
   predict.py          instrument-agnostic inference  ← use this for benchmarking
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
-tests/                4 unit tests (shapes, no-leakage, log-grid, log-λ embedding)
+tests/                16 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs)
 notebooks/
-  evaluation.ipynb    ready-to-run evaluation notebook (metrics, plots, live demo)
-runs/desi_50k_big/
-  checkpoint_last.pt        the shipped model (26 M parameters)
+  evaluation.ipynb            ready-to-run evaluation notebook for v2.1 (metrics, plots, live demo)
+  evaluation_v1_baseline.ipynb  the executed v1 "before" picture (bias/outlier diagnosis)
+runs/desi_80k_classhead_v21/
+  checkpoint_last.pt        the shipped model — v2.1 fine-tune of v1 (26 M parameters)
   config.json               model configuration
+  training_args.json        exact training flags of the run
   metrics.jsonl             per-step training metrics
-  predictions.csv           validation predictions on 1000 DESI spectra
-  reconstructions.npz       validation reconstructions on 50 DESI spectra
+  predictions.csv           held-out predictions on 2000 DESI spectra (z_pred_map official)
+  reconstructions.npz       held-out reconstructions on 50 DESI spectra
+  comparison.json           v1 ↔ v2.1 release gates + promote decision
+runs/desi_50k_big/
+  checkpoint_last.pt        the v1 baseline (kept for comparison)
 DELIVERABLE.md        full deliverable documentation
 README.md             this file (quick start for graders)
 README.es.md          Spanish development walkthrough
@@ -158,14 +166,22 @@ COMO_FUNCIONA.md      Spanish code walkthrough
 
 ## Achieved metrics
 
-Validation on 2,000 held-out DESI spectra (full table and progression in [DELIVERABLE.md §5](DELIVERABLE.md)):
+The shipped checkpoint is **v2.1**: a fine-tune of the v1 encoder with a new 100-bin
+redshift classification head (official prediction: `z_pred_map`). Measured on the
+**canonical held-out split** — 2,000 valid-label DESI spectra following the 80,000 used
+for training, never seen by either model (full table, gates and progression in
+[DELIVERABLE.md §5](DELIVERABLE.md); machine-readable decision in
+`runs/desi_80k_classhead_v21/comparison.json`):
 
-| metric | value |
-|---|---|
-| `redshift_mae` | 0.222 |
-| `redshift_mae_norm` = `mean(abs(z_pred - z) / (1 + z))` | 0.124 |
-| `reconstruction_rmse_masked` (pixel-weighted, arcsinh space) | 0.864 |
-| trainable parameters | 25,929,859 |
+| metric (2,000 held-out spectra) | v1 baseline | **v2.1 (shipped)** |
+|---|---|---|
+| catastrophic outlier fraction η₀.₁₅ | 22.6 % | **15.0 %** |
+| σ_NMAD | 0.083 | **0.030** |
+| `redshift_mae_norm` = `mean(abs(z_pred - z) / (1 + z))` | 0.107 | **0.096** |
+| η₀.₁₅ in z ∈ [1.5, 2.5) | 82.7 % | **23.5 %** |
+| prediction ceiling (max z_pred) | 2.00 | **3.52** |
+| `reconstruction_rmse_masked` (pixel-weighted, arcsinh space) | 0.819 | **0.817** |
+| trainable parameters | 25,929,859 | 25,980,646 |
 
 ---
 
@@ -184,7 +200,7 @@ This is transparent to the caller — just pass any `(flux, wavelength)` arrays 
 
 ## Design summary (one paragraph)
 
-Encoder-only transformer (8 layers, `d_model=512`, 8 heads, 25.9 M parameters) trained with masked-token prediction on 50,000 DESI EDR/SV3 spectra. Each spectrum is interpolated onto a log-λ grid, sliced into 273 continuous patches of 26 pixels, linearly projected to token embeddings, and augmented with a 274th always-masked redshift token. A sinusoidal log-λ positional embedding is added so the model can be applied to spectra from instruments with different wavelength coverage. Training jointly minimizes MSE on masked spectral patches and SmoothL1 on `log(1+z)`, with the redshift weighted 10× higher than reconstruction to compensate for being a single scalar against 273 patch targets. Both redesign approaches from the specification are implemented: a lightweight MLP redshift head trained jointly with the encoder (Approach A), and the redshift token forcibly masked on every training example (Approach B). Full design rationale and oral-question answers are in [DELIVERABLE.md §4](DELIVERABLE.md).
+Encoder-only transformer (8 layers, `d_model=512`, 8 heads, 26 M parameters) trained with masked-token prediction on DESI EDR/SV3 spectra. Each spectrum is interpolated onto a log-λ grid, sliced into 273 continuous patches of 26 pixels, linearly projected to token embeddings, and augmented with a 274th always-masked redshift token. A sinusoidal log-λ positional embedding is added so the model can be applied to spectra from instruments with different wavelength coverage. Both redesign approaches from the specification are implemented: a lightweight MLP redshift head trained jointly with the encoder (Approach A), and the redshift token forcibly masked on every training example (Approach B). The v1 checkpoint (50 k spectra) used a scalar SmoothL1 regression on `log(1+z)`; the shipped **v2.1 checkpoint fine-tunes v1** on the first 80 k spectra × 3 epochs with a **100-bin classification head over `log(1+z)`** — cross-entropy normalized by `log(n_bins)`, sqrt-inverse class weights from the real training-label histogram, 1:1 loss weighting with reconstruction, and a leak-free train/held-out split — which removes the regression-to-the-mean collapse and the z ≈ 2 prediction ceiling diagnosed in v1. Full design rationale and oral-question answers are in [DELIVERABLE.md §4–5](DELIVERABLE.md).
 
 ---
 
