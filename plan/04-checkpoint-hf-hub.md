@@ -8,6 +8,25 @@ Sacar el checkpoint de tu disco y ponerlo en HF Hub con una model card honesta. 
 
 **Modo sprint:** no esperes a la v2 — subí la **v1 hoy mismo** apenas cierres el plan 03 (desbloquea 05, 06 y 07). Cuando la v2 esté evaluada, repetí los mismos `hf upload` con `RUN=runs/desi_150k_classhead`: el Hub pisa el archivo y guarda historial de versiones. Actualizar la model card en ese mismo momento (columna v2 de la tabla).
 
+> **Handoff del plan 02R (2026-08-01) — la v2.1 quedó promovida; subir ESTA, no la v1 ni la v2.0:**
+>
+> - **Decisión:** `promote_v2_1` por gates conjuntos — reproducible en `runs/desi_80k_classhead_v21/comparison.json`.
+> - **Checkpoint exacto:** `runs/desi_80k_classhead_v21/checkpoint_last.pt` (ganador; pesos idénticos a `checkpoint_best.pt` porque el best disparó en la validación final, step 30000).
+> - **Métricas held-out canónicas** (2.000 labels válidos post-80k, `--skip-examples 80000`, predicción oficial `z_pred_map`): η₀.₁₅ **15.0 %** (v1 22.6 %) · σ_NMAD **0.030** (v1 0.083) · MAE_norm **0.096** (v1 0.107) · η₀.₁₅ z∈[1.5,2.5) **23.5 %** (v1 82.7 %) · techo z **3.52** (v1 2.00) · RMSE recon **0.817**.
+> - **Model card:** `model_card.md` ya está actualizada a v2.1 — subirla como `README.md` del repo HF.
+> - **Comandos** (reemplazan el RUN del paso 1):
+>
+>   ```bash
+>   RUN=runs/desi_80k_classhead_v21
+>   hf upload Julian0444/desi-spectra-fm $RUN/checkpoint_last.pt checkpoint_last.pt
+>   hf upload Julian0444/desi-spectra-fm $RUN/config.json config.json
+>   hf upload Julian0444/desi-spectra-fm $RUN/training_args.json training_args.json
+>   hf upload Julian0444/desi-spectra-fm $RUN/metrics.jsonl metrics.jsonl
+>   hf upload Julian0444/desi-spectra-fm model_card.md README.md
+>   ```
+>
+> - **Narrativa obligatoria:** v2.1 es *fine-tuning de v1 con una cabeza nueva de clasificación de redshift* — nunca "entrenada desde cero".
+
 ## Pasos
 
 ### 1. Crear el repo de modelo y subir

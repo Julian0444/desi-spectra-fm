@@ -109,3 +109,13 @@ python3 -m nbconvert --to notebook --execute --inplace notebooks/evaluation.ipyn
 - **El rebalanceo desestabiliza el entrenamiento** (loss de z oscila fuerte): bajar el cap de pesos de 10 a 5 en `train.py`, o entrenar 1ª época sin `--z-rebalance` y la 2ª con.
 - **Se queda sin disco** (checkpoints cada 5000 pasos ≈ varios GB): borrar los `checkpoint_step_*.pt` intermedios al terminar; solo importa `checkpoint_last.pt`.
 - **La v2 empeora la reconstrucción** (`reconstruction_rmse_masked` sube > 0.9): el peso 10 de la loss de z está dominando; probar `--redshift-loss-weight 5`.
+
+## Registro de intentos (2026-07-30)
+
+Contexto descubierto al ejecutar: el dataset `edr_sv3` rinde **~84.760 ejemplos** (no 150k), así que el split real es 80k train / ejemplos 80k–82k held-out (`--max-train-examples 80000`), y `evaluate.py` ganó `--skip-examples` para evaluar sin pisar datos de entrenamiento. Baseline honesto de la v1 sobre ese held-out: **η₀.₁₅ = 27.3 %, σ_NMAD = 0.093** (el 25.1 % histórico estaba medido sobre datos vistos).
+
+| intento | config | η₀.₁₅ | σ_NMAD | techo z | notas |
+|---|---|---|---|---|---|
+| v2.0 | 80k×2 ep, 200 bins, rebalance cap 10, zw 10 | esperanza 63.8 % / **MAP 31.1 %** | 0.220 / 0.111 | 1.89 / 2.36 | MAP gana siempre → predicción oficial. En z∈[1.5,2.5] mejora enorme vs v1 (η 87→32 %, bias −0.75→−0.26), pero el rebalance cap 10 sobrecorrige z<0.5 (bias +0.165) y hunde el global. Posteriors chatos (conf. media 0.19): faltó cocción. Además su train barajó antes del corte: pudo ver hasta ~2k del held-out → su 31.1 % es diagnóstico y posiblemente optimista, no baseline. |
+| v2.1 (propuesto, superseded) | ídem + rebalance cap 5 + 3 épocas | — | — | — | reemplazado por el rediseño del plan **02R** antes de lanzarse |
+| **v2.1 (02R, ejecutado 2026-08-01)** | **fine-tuning de v1**, 80k×3 ep, 100 bins, CE ÷ log(n_bins), pesos sqrt-inverse reales cap [0.5, 3.0], smoothing 0, zw 1, split `filter→skip→take→shuffle(train)` seeds 42/43/44, best por `eta15_map` | **MAP 15.0 %** (esperanza 15.8 %) | **0.030** | **3.52** | **PROMOVIDA** — pasa los 5 gates conjuntos contra el baseline v1 re-medido en el held-out canónico (η 22.6 %, σ 0.083, MAE_norm 0.107; el 27.3 % previo usaba la semántica vieja de skip por filas crudas). En z∈[1.5,2.5): η 82.7 %→23.5 %. Confianza media 0.52. RMSE recon 0.817 (v1 0.819). Ganador: `checkpoint_last.pt` (= pesos de best, step 30000). Decisión reproducible en `runs/desi_80k_classhead_v21/comparison.json`. |
