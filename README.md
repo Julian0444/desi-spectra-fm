@@ -14,6 +14,7 @@ A unimodal masked-token foundation model for astrophysical spectra, with the red
 > 📄 For the Spanish-language development walkthrough, see [README.es.md](README.es.md).
 > 🤗 Model weights (v2.1 checkpoint) are hosted on Hugging Face Hub: [jirustaroure/desi-spectra-fm](https://huggingface.co/jirustaroure/desi-spectra-fm).
 > 🔭 Live Gradio demo (HF Space): [jirustaroure/desi-spectra-fm-demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo) — app source in [`demo/`](demo/).
+> 📡 Live REST API (FastAPI + Swagger): [jirustaroure-desi-fm-api.hf.space/api/docs](https://jirustaroure-desi-fm-api.hf.space/api/docs) — source in [`api/`](api/), see [REST API](#rest-api-fastapi).
 
 ---
 
@@ -36,7 +37,7 @@ Inference itself uses only NumPy + PyTorch; `huggingface_hub` (in
 python3 -m pytest tests/ -v
 ```
 
-Expected output: **`16 passed`**. This confirms the model loads, the forward pass works, the redshift mechanism is information-leak-free, and the train/held-out split is leak-free (disjointness, fixed membership, reproducible per-epoch order).
+Expected output: **`24 passed`**. This confirms the model loads, the forward pass works, the redshift mechanism is information-leak-free, the train/held-out split is leak-free (disjointness, fixed membership, reproducible per-epoch order), and the REST API endpoints validate inputs correctly.
 
 For the full evaluation with plots — metrics, bias/outlier analysis, reconstruction gallery, training curves, and a live inference demo — open the ready-to-run notebook [`notebooks/evaluation.ipynb`](notebooks/evaluation.ipynb). Sections 1–3 run offline from artifacts shipped in this repo; it ships pre-executed so the plots are visible without running anything.
 
@@ -156,6 +157,48 @@ batch["reconstruction_input_grid"]   # (N, P)
 
 ---
 
+## REST API (FastAPI)
+
+**Public endpoint** — a free HF Space serving `desi_fm.api` (CPU inference; a request takes ~1-3 s, but the first one after idle may take ~30 s while the Space wakes up):
+
+```bash
+# health check
+curl -s https://jirustaroure-desi-fm-api.hf.space/api/healthz
+
+# redshifts for every spectrum in a .npz (flux + wavelength, optional ivar/mask)
+curl -s -F "file=@spectrum.npz" \
+  "https://jirustaroure-desi-fm-api.hf.space/api/predict?mask_ratio=0.0"
+# → {"n": 1, "z_pred_map": [0.2267], "z_confidence": [0.6376], "z_pred": [0.2314]}
+
+# a single spectrum as JSON lists
+curl -s -X POST https://jirustaroure-desi-fm-api.hf.space/api/predict_json \
+  -H "Content-Type: application/json" \
+  -d '{"flux": [/* P floats */], "wavelength": [/* P Angstroms */]}'
+```
+
+Interactive Swagger docs: **<https://jirustaroure-desi-fm-api.hf.space/api/docs>**.
+As everywhere in this project, the official prediction is `z_pred_map` (with its
+`z_confidence`); `z_pred` is the secondary posterior mean. Limits: 32 spectra /
+50 MB per request.
+
+**Run it yourself:**
+
+```bash
+pip install -e ".[api]"
+uvicorn desi_fm.api:app --port 7860      # checkpoint auto-downloads from the Hub
+
+# or containerized:
+docker build -t desi-fm-api .
+docker run -p 7860:7860 desi-fm-api
+```
+
+Set `DESI_FM_CKPT=/path/to/checkpoint_last.pt` to serve a local checkpoint
+instead of downloading. The deployed Space source is in [`api/`](api/) — it is
+a ZeroGPU *Gradio* Space wrapping the same FastAPI app (Docker Spaces need a
+PRO subscription; REST calls run on CPU and spend no ZeroGPU visitor quota).
+
+---
+
 ## Repository layout
 
 ```
@@ -165,9 +208,12 @@ src/desi_fm/
   train.py            training loop
   evaluate.py         validation metrics on DESI streaming data
   predict.py          instrument-agnostic inference  ← use this for benchmarking
+  api.py              FastAPI REST API (/predict, /predict_json, /healthz)
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
-tests/                16 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs)
+tests/                24 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs, API)
 demo/                 Gradio app deployed to the live HF Space (jirustaroure/desi-spectra-fm-demo)
+api/                  API app deployed to the live HF Space (jirustaroure/desi-fm-api)
+Dockerfile            CPU-only container image for the REST API
 scripts/
   make_demo_examples.py   exports the demo's real held-out example spectra
   estimate_z_histogram.py estimates the training-label histogram (v2.1 class weights)

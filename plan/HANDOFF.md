@@ -269,3 +269,40 @@ El **plan 05 se ejecutó de punta a punta** y quedó ✅ en el tracker: demo Gra
 ### Siguiente paso — Plan 06 (API FastAPI + Docker)
 
 **No iniciado.** Aviso clave: los Docker Spaces también requieren PRO (realidad nº 1) — al ejecutar el plan 06 habrá que decidir alternativa (p. ej. servir la API desde otro host gratuito, o documentar el endpoint local con Docker). `plan/06` todavía contiene `TU_USUARIO`.
+
+---
+
+## Session — 2026-08-03 (plan 06 COMPLETADO: API REST pública FastAPI)
+
+### Resumen ejecutivo
+
+El **plan 06 se ejecutó de punta a punta** y quedó ✅ en el tracker: API REST pública en <https://jirustaroure-desi-fm-api.hf.space/api/docs> (Space `jirustaroure/desi-fm-api`, `RUNNING` en `zero-a10g`), respondiendo a `curl` anónimo en ~0.6 s con la salida honesta del proyecto (`z_pred_map` + `z_confidence` primero, `z_pred` secundario). **El plan 07 NO se inició.**
+
+- **Adaptación central (autorizada por el marco de la sesión: nada pago, nada fuera de HF):** el deploy original del plan (Docker Space gratis) ya no existe — Docker Spaces requieren PRO (realidad nº 1 del plan 05). La API vive en el **segundo Space ZeroGPU Gradio** del free tier (límite: 2): gradio se lanza normal (handshake ZeroGPU) y FastAPI va injertada como sub-app en **`/api`**; las rutas REST corren en **CPU**, así que `curl` anónimo nunca toca la cuota ZeroGPU. El Dockerfile igual quedó en el repo, probado local.
+- **Código:** la API es `src/desi_fm/api.py` (módulo del paquete, no `api/main.py`): `/predict` (.npz multipart, batch hasta 32 espectros / 50 MB), `/predict_json`, `/healthz`; checkpoint lazy del Hub con overrides `DESI_FM_CKPT` / `DESI_FM_DEVICE`; validación → 422/413; CORS abierto. Extra `[api]` en pyproject; CI instala `.[api,dev]`.
+- **Tests 16→24** (8 nuevos en `tests/test_api.py`, TestClient + modelo sintético inyectado, sin red). Suite 24/24 local; CI verde en ambos commits.
+- **Verificación end-to-end** (mismos números en las 4 vías, protocolo determinista `mask_ratio=0`): uvicorn local, Docker (python:3.11-slim + torch CPU), y Space público anónimo devuelven `z_pred_map` **0.2267** para `heldout_z020` (z_true 0.204) — idéntico al valor verificado de la demo — y **2.4406** para `heldout_z287`; `/api/docs` (Swagger) HTTP 200 público. El panel Gradio del Space (ruta `@spaces.GPU(duration=8)`) responde 0.2267 en 7.9 s autenticado.
+
+### Realidades de plataforma NUEVAS (se suman a las 8 del plan 05)
+
+1. **`GRADIO_SSR_MODE=true` es el default en Spaces**: el frontend Node se bindea al 7860 — cualquier server propio (uvicorn) muere con "address already in use". Fix: `os.environ["GRADIO_SSR_MODE"] = "false"` **antes** de `import gradio`.
+2. **En ZeroGPU no se puede servir gradio vía `mount_gradio_app` + uvicorn propio**: arranca, bindea y ~segundos después recibe un SIGTERM limpio (el handshake de la lib `spaces` con el scheduler pasa por `demo.launch()`). El patrón que funciona (está en `api/app.py`): `demo.launch(prevent_thread_lock=True)` → `demo.server_app.mount("/api", fastapi_app)` → `demo.block_thread()`. Consecuencia: los endpoints públicos cuelgan de **`/api/...`**, no de la raíz.
+3. Los logs de runtime de un Space se leen por SSE autenticado: `GET https://huggingface.co/api/spaces/<id>/logs/run` con Bearer token (con `hf` CLI no hay comando).
+4. La cuota ZeroGPU anónima de esta IP ya estaba agotada hoy al probar el panel UI ("exceeded your ZeroGPU runs limit" instantáneo); autenticado funcionó a la primera. Para verificar el Space de la API alcanza el REST (CPU, sin cuota).
+
+### Qué se hizo (cronología)
+
+1. **Código + tests + Docker** (commit `5cfd178`, push, CI verde): `src/desi_fm/api.py`, `tests/test_api.py`, extras `[api]`/`[dev]`, `requirements.txt` ampliado, `ci.yml` → `.[api,dev]`, `Dockerfile` (imagen CPU, checkpoint lazy) + `.dockerignore` (whitelist: sin `runs/` ni `.git` en el build context), `api/` (fuente del Space). Smoke local uvicorn y Docker con el checkpoint v2.1 real → 0.2267 ✓.
+2. **Space:** `create_repo(..., space_sdk="gradio", space_hardware="zero-a10g")` + `upload_folder("api/")` por API Python. Dos iteraciones de arranque (SSR / SIGTERM, arriba) con `restart_space()` + logs SSE entre medio; tercera variante `RUNNING`.
+3. **Verificación pública** anónima con curl (healthz, predict × 2 ejemplos held-out, predict_json, docs, raíz) + panel GPU autenticado.
+4. **Docs:** README (línea 📡, sección "REST API (FastAPI)" con curls copy-paste, layout con `api.py`/`api/`/`Dockerfile`, "16 passed"→"24 passed"), model card con el link de la API **re-subida al Hub** (commit `455390e`, verificada anónima), `plan/06` reescrito como runbook real con DoD marcada, tracker 06 ✅.
+
+### Estado actual
+
+- Branch `main` sincronizada; CI verde; suite 24/24. Working tree limpio salvo los residuos sin trackear de siempre, **preservados**: `.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`.
+- Spaces activos: demo (`desi-spectra-fm-demo`) + API (`desi-fm-api`) — **los 2 slots ZeroGPU del free tier ocupados**; un tercer Space gratis no va a poder crearse.
+- La imagen Docker local `desi-fm-api` quedó en el daemon local (borrable con `docker rmi desi-fm-api`).
+
+### Siguiente paso — Plan 07 (spectra-copilot: repo + herramientas)
+
+**No iniciado.** `plan/07-spectra-copilot-tools.md` todavía contiene `TU_USUARIO` — corregir namespaces al ejecutarlo (GitHub `Julian0444`, HF `jirustaroure`). Con `DESI_FM_CKPT` local no depende de servicios nuevos.

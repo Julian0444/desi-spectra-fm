@@ -100,4 +100,5 @@ for the quantified analysis.
 ## Links
 
 - Live demo (HF Space): <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo>
+- REST API (FastAPI + Swagger docs): <https://jirustaroure-desi-fm-api.hf.space/api/docs>
 - Code, tests, CI and evaluation notebook: <https://github.com/Julian0444/desi-spectra-fm>

@@ -15,10 +15,13 @@ deploy path for this API is a ZeroGPU *Gradio* Space that serves FastAPI:
 import json
 import os
 
+# Con SSR (default en Spaces) el frontend Node ocupa el puerto 7860 y las
+# rutas REST inyectadas abajo no quedan expuestas; servidor python clasico.
+os.environ["GRADIO_SSR_MODE"] = "false"
+
 import spaces  # must be imported before torch on ZeroGPU
 import numpy as np
 import gradio as gr
-import uvicorn
 
 from desi_fm.api import app as fastapi_app, get_model
 from desi_fm.predict import predict_spectrum
@@ -73,14 +76,15 @@ demo = gr.Interface(
     title="desi-fm API — REST endpoint for spectrum redshifts",
     description=(
         "This Space is primarily a **REST API** (FastAPI): interactive Swagger "
-        "docs at [/docs](/docs), health check at `/healthz`. `POST /predict` "
-        "takes a `.npz` upload, `POST /predict_json` takes JSON lists — the "
-        "official prediction is `z_pred_map` (+ `z_confidence`); `z_pred` is "
-        "secondary. REST calls run on CPU and spend **no** ZeroGPU quota.\n\n"
+        "docs at [/api/docs](/api/docs), health check at `/api/healthz`. "
+        "`POST /api/predict` takes a `.npz` upload, `POST /api/predict_json` "
+        "takes JSON lists — the official prediction is `z_pred_map` "
+        "(+ `z_confidence`); `z_pred` is secondary. REST calls run on CPU and "
+        "spend **no** ZeroGPU quota.\n\n"
         "```bash\n"
-        "curl -s https://jirustaroure-desi-fm-api.hf.space/healthz\n"
+        "curl -s https://jirustaroure-desi-fm-api.hf.space/api/healthz\n"
         "curl -s -F \"file=@spectrum.npz\" "
-        "\"https://jirustaroure-desi-fm-api.hf.space/predict?mask_ratio=0.0\"\n"
+        "\"https://jirustaroure-desi-fm-api.hf.space/api/predict?mask_ratio=0.0\"\n"
         "```\n\n"
         "This panel is a small tester for the same model call "
         f"(interactive demo with plots: [desi-spectra-fm-demo]"
@@ -90,8 +94,15 @@ demo = gr.Interface(
 )
 
 demo.queue(max_size=8)
-app = gr.mount_gradio_app(fastapi_app, demo, path="/")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0",
-                port=int(os.environ.get("GRADIO_SERVER_PORT", 7860)))
+    # En ZeroGPU el handshake de la lib `spaces` con el scheduler pasa por
+    # demo.launch() (con mount_gradio_app el pod recibe SIGTERM a los pocos
+    # segundos), asi que se lanza gradio normal y se injerta la API REST como
+    # sub-app en /api del FastAPI que gradio ya sirve: /api/docs, /api/predict.
+    launched = demo.launch(prevent_thread_lock=True)
+    gradio_app = getattr(demo, "server_app", None)
+    if gradio_app is None and isinstance(launched, tuple):
+        gradio_app = launched[0]
+    gradio_app.mount("/api", fastapi_app)
+    demo.block_thread()

@@ -17,13 +17,14 @@ models:
 
 FastAPI serving the DESI foundation model v2.1 (26M-parameter transformer,
 official prediction `z_pred_map` + `z_confidence`). Swagger docs: append
-[`/docs`](https://jirustaroure-desi-fm-api.hf.space/docs) to the Space URL.
+[`/api/docs`](https://jirustaroure-desi-fm-api.hf.space/api/docs) to the
+Space URL.
 
 ```bash
-curl -s https://jirustaroure-desi-fm-api.hf.space/healthz
+curl -s https://jirustaroure-desi-fm-api.hf.space/api/healthz
 curl -s -F "file=@spectrum.npz" \
-  "https://jirustaroure-desi-fm-api.hf.space/predict?mask_ratio=0.0"
-curl -s -X POST https://jirustaroure-desi-fm-api.hf.space/predict_json \
+  "https://jirustaroure-desi-fm-api.hf.space/api/predict?mask_ratio=0.0"
+curl -s -X POST https://jirustaroure-desi-fm-api.hf.space/api/predict_json \
   -H "Content-Type: application/json" \
   -d '{"flux": [/* P floats */], "wavelength": [/* P Angstroms */]}'
 ```
