@@ -5,3 +5,4 @@ pyarrow>=14
 tqdm>=4.66
 pytest>=8
 matplotlib>=3.7
+huggingface_hub>=0.23

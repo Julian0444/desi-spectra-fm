@@ -10,6 +10,7 @@ A unimodal masked-token foundation model for astrophysical spectra, with the red
 
 > 📄 For full deliverable documentation (architecture, design decisions, metric progression), see [DELIVERABLE.md](DELIVERABLE.md).
 > 📄 For the Spanish-language development walkthrough, see [README.es.md](README.es.md).
+> 🤗 Model weights (v2.1 checkpoint) are hosted on Hugging Face Hub: [jirustaroure/desi-spectra-fm](https://huggingface.co/jirustaroure/desi-spectra-fm).
 
 ---
 
@@ -23,7 +24,8 @@ python3 -m pip install -e .
 ```
 
 Requirements: Python 3.9+, PyTorch 2.x (MPS / CUDA / CPU all supported).
-Inference uses only NumPy + PyTorch; no Hugging Face dependency.
+Inference itself uses only NumPy + PyTorch; `huggingface_hub` (in
+`requirements.txt`) is used once to download the shipped checkpoint.
 
 ### 2. Verify the build
 
@@ -37,14 +39,29 @@ For the full evaluation with plots — metrics, bias/outlier analysis, reconstru
 
 ### 3. Run inference on your benchmark spectra
 
+Model weights are not tracked in git — the shipped v2.1 checkpoint lives on Hugging Face Hub at [`jirustaroure/desi-spectra-fm`](https://huggingface.co/jirustaroure/desi-spectra-fm). Download it once (it is cached afterwards):
+
+```python
+from huggingface_hub import hf_hub_download
+
+ckpt = hf_hub_download(
+    "jirustaroure/desi-spectra-fm",
+    "checkpoint_last.pt",
+)
+```
+
+Then run the CLI on your spectra:
+
 ```bash
+CKPT=$(python3 -c "from huggingface_hub import hf_hub_download; print(hf_hub_download('jirustaroure/desi-spectra-fm', 'checkpoint_last.pt'))")
+
 python3 -m desi_fm.predict \
-    --checkpoint runs/desi_80k_classhead_v21/checkpoint_last.pt \
+    --checkpoint "$CKPT" \
     --input  YOUR_SPECTRA.npz \
     --output predictions.npz
 ```
 
-That's it. The script handles spectra from any instrument: it interpolates onto the model's internal log-λ grid, runs the forward pass, and interpolates the reconstruction back onto your input grid in your flux units.
+That's it. The script handles spectra from any instrument: it interpolates onto the model's internal log-λ grid, runs the forward pass, and interpolates the reconstruction back onto your input grid in your flux units. (If you trained the model yourself, a local `--checkpoint runs/desi_80k_classhead_v21/checkpoint_last.pt` works the same way.)
 
 ---
 
@@ -91,11 +108,13 @@ By default the model receives the full input spectrum and is asked to predict `z
 
 ```bash
 python3 -m desi_fm.predict \
-    --checkpoint runs/desi_80k_classhead_v21/checkpoint_last.pt \
+    --checkpoint "$CKPT" \
     --input  YOUR_SPECTRA.npz \
     --output predictions.npz \
     --mask-ratio 0.5
 ```
+
+(`$CKPT` is the checkpoint downloaded in the quick start above.)
 
 `spectrum_mask` in the output tells you exactly which 26-pixel patches were hidden, so you can compute reconstruction error against ground truth on those regions only.
 
@@ -105,7 +124,10 @@ python3 -m desi_fm.predict \
 
 ```python
 import numpy as np
+from huggingface_hub import hf_hub_download
 from desi_fm.predict import predict_spectrum, predict_spectra_batch
+
+ckpt = hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt")
 
 # Single spectrum
 result = predict_spectrum(
@@ -113,7 +135,7 @@ result = predict_spectrum(
     wavelength=wavelength_1d,
     ivar=optional_ivar,
     mask=optional_bad_pixel_mask,
-    checkpoint_path="runs/desi_80k_classhead_v21/checkpoint_last.pt",
+    checkpoint_path=ckpt,
 )
 z = result["z_pred_map"]                        # official prediction (v2.1)
 conf = result["z_confidence"]                   # posterior concentration [0, 1]
@@ -123,7 +145,7 @@ recon  = result["reconstruction_input_grid"]    # same shape as flux_1d
 batch = predict_spectra_batch(
     fluxes=fluxes_2d,                # (N, P)
     wavelengths=wavelengths,         # (N, P) or (P,)
-    checkpoint_path="runs/desi_80k_classhead_v21/checkpoint_last.pt",
+    checkpoint_path=ckpt,
 )
 batch["z_pred_map"]                  # (N,) official prediction
 batch["reconstruction_input_grid"]   # (N, P)
@@ -147,6 +169,7 @@ notebooks/
   evaluation_v1_baseline.ipynb  the executed v1 "before" picture (bias/outlier diagnosis)
 runs/desi_80k_classhead_v21/
   checkpoint_last.pt        the shipped model — v2.1 fine-tune of v1 (26 M parameters)
+                            (not in git — download from hf.co/jirustaroure/desi-spectra-fm)
   config.json               model configuration
   training_args.json        exact training flags of the run
   metrics.jsonl             per-step training metrics
@@ -154,7 +177,7 @@ runs/desi_80k_classhead_v21/
   reconstructions.npz       held-out reconstructions on 50 DESI spectra
   comparison.json           v1 ↔ v2.1 release gates + promote decision
 runs/desi_50k_big/
-  checkpoint_last.pt        the v1 baseline (kept for comparison)
+  checkpoint_last.pt        the v1 baseline (kept for comparison; local only, not in git)
 DELIVERABLE.md        full deliverable documentation
 README.md             this file (quick start for graders)
 README.es.md          Spanish development walkthrough
@@ -175,7 +198,7 @@ for training, never seen by either model (full table, gates and progression in
 
 | metric (2,000 held-out spectra) | v1 baseline | **v2.1 (shipped)** |
 |---|---|---|
-| catastrophic outlier fraction η₀.₁₅ | 22.6 % | **15.0 %** |
+| catastrophic outlier fraction η₀.₁₅ | 22.6 % | **14.95 %** |
 | σ_NMAD | 0.083 | **0.030** |
 | `redshift_mae_norm` = `mean(abs(z_pred - z) / (1 + z))` | 0.107 | **0.096** |
 | η₀.₁₅ in z ∈ [1.5, 2.5) | 82.7 % | **23.5 %** |

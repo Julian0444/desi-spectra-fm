@@ -37,7 +37,7 @@ following the 80,000 used for training — never seen by either model). v2.1 use
 
 | metric | v1 (50k, regression head) | **v2.1 (fine-tune, 100-bin classification)** |
 |---|---|---|
-| catastrophic outliers η₀.₁₅ | 22.6 % | **15.0 %** |
+| catastrophic outliers η₀.₁₅ | 22.6 % | **14.95 %** |
 | σ_NMAD | 0.083 | **0.030** |
 | MAE_norm ⟨\|Δz\|/(1+z)⟩ | 0.107 | **0.096** |
 | η₀.₁₅ in z ∈ [1.5, 2.5) | 82.7 % | **23.5 %** |
@@ -60,7 +60,7 @@ pip install huggingface_hub
 from huggingface_hub import hf_hub_download
 from desi_fm.predict import predict_spectrum
 
-ckpt = hf_hub_download("Julian0444/desi-spectra-fm", "checkpoint_last.pt")
+ckpt = hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt")
 result = predict_spectrum(flux=flux, wavelength=wavelength_angstrom,
                           checkpoint_path=ckpt)
 result["z_pred_map"]                   # predicted redshift (official, posterior argmax)
@@ -78,7 +78,7 @@ coverage different from DESI's is handled transparently.
 Trained on 80k spectra on a laptop (Apple MPS) — a course project, **not for
 production science** (the DESI pipeline is ~3 orders of magnitude more accurate on z).
 v2.1 removed v1's z ≈ 2 prediction ceiling and cut catastrophic outliers from 22.6 %
-to 15.0 % globally (82.7 % → 23.5 % in z ∈ [1.5, 2.5)), but 15 % of held-out spectra
+to 14.95 % globally (82.7 % → 23.5 % in z ∈ [1.5, 2.5)), but ~15 % of held-out spectra
 are still catastrophic outliers — dominated by low-S/N spectra and line-misidentification
 degeneracies — and predictions above z ≈ 3.5 remain unconstrained (few training
 examples there). Use `z_confidence` to filter unreliable predictions. See the
@@ -91,6 +91,7 @@ for the quantified analysis.
 |---|---|
 | `checkpoint_last.pt` | model weights (state_dict) + training args |
 | `config.json` | architecture configuration |
+| `training_args.json` | exact training flags of the run |
 | `metrics.jsonl` | per-step training/validation metrics |
 
 ## Links
