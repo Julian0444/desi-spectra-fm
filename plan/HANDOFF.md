@@ -194,3 +194,44 @@ El plan **02R se ejecutó de punta a punta** (Fases 4.5–8) y terminó con la d
 - Los `checkpoint_step_*.pt` intermedios de `runs/desi_80k_classhead_v21/` (6 × 99 MB) son prescindibles; solo importan `best`/`last`. No se borró nada.
 - El throughput de streaming de HF varió 550–5400 filas/min entre sesiones; cualquier ETA futura debe medirse en el momento.
 - La política de esta serie de sesiones sigue vigente: comparaciones SOLO sobre el held-out canónico; `z_pred_map` es la predicción oficial de cualquier checkpoint de clasificación.
+
+---
+
+## Session — 2026-08-02 (plan 04 COMPLETADO: checkpoint v2.1 público en HF Hub)
+
+### Resumen ejecutivo
+
+El **plan 04 se ejecutó de punta a punta** y quedó ✅ en el tracker: la v2.1 promovida por el 02R está publicada en Hugging Face Hub con model card renderizada, y la prueba de clon limpio (GitHub → venv nuevo → descarga del Hub → inferencia CPU) pasa sin depender del workspace original. **El plan 05 NO se inició.**
+
+- **Modelo público:** <https://huggingface.co/jirustaroure/desi-spectra-fm> (verificado por API anónima: `private: False`, `gated: False`, licencia MIT detectada por el Hub).
+- **Namespaces (regla permanente — no mezclar):** GitHub **`Julian0444`** para código, CI y enlaces (<https://github.com/Julian0444/desi-spectra-fm>); Hugging Face **`jirustaroure`** para modelo, uploads y `hf_hub_download`.
+- **Archivos subidos** (verificados en el tree de `main` por API anónima): `checkpoint_last.pt` (103.964.688 bytes — idéntico al local de `runs/desi_80k_classhead_v21/`), `config.json` (459 B), `training_args.json` (1.259 B), `metrics.jsonl` (161.172 B) y `README.md` (4.349 B — es `model_card.md` subido con ese nombre). **NO** se subieron `checkpoint_best.pt` (pesos idénticos a `last`), steps intermedios, logs, CSVs ni NPZs.
+- **Métricas publicadas** (held-out canónico, predicción oficial `z_pred_map`): η₀.₁₅ **14.95 %** (v1 22.6 %) · σ_NMAD **0.0303** · MAE_norm **0.0959** · η₀.₁₅ z∈[1.5,2.5) **23.47 %** · techo z_pred **3.52** · RMSE recon **0.8174**. La card describe la v2.1 como *fine-tuning de v1 con cabeza nueva de clasificación* y no afirma haber alcanzado el objetivo `<10 %`.
+
+### Qué se hizo (cronología)
+
+1. **Fase A — prepublicación** (commit `42c94e6`; push `68bdb75..42c94e6` publicó también los 6 commits locales del 02R):
+   - `LICENSE` MIT agregada (estaba sin trackear); `requirements.txt` con `huggingface_hub>=0.23` commiteado.
+   - `plan/04-checkpoint-hf-hub.md` reescrito: namespaces correctos, comandos reales de la v2.1, sin `TU_USUARIO` ni referencias operativas a v1/v2.0.
+   - `README.md`: quick start/CLI/Python API/layout descargan el checkpoint del Hub con `hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt")`; ya no se asume archivo local; η exacta 14.95 %.
+   - `model_card.md`: namespace HF corregido (`Julian0444`→`jirustaroure` solo en `hf_hub_download`; los enlaces de GitHub siguen con `Julian0444`), fila `training_args.json`, η exacta 14.95 %.
+   - Suite **16/16** antes del commit; **CI verde**: <https://github.com/Julian0444/desi-spectra-fm/actions/runs/30774254046>.
+2. **Fase B — publicación:** `hf auth whoami` → `user: jirustaroure` (token nunca impreso ni pasado por argumentos); `"$HF_CLI" repo create jirustaroure/desi-spectra-fm --repo-type model --exist-ok` + los 5 `hf upload` exactos del runbook. Verificación anónima: página HTTP 200 con la card renderizada (título y 14.95 % presentes) y checkpoint descargable (HEAD 200).
+3. **Fase C — prueba limpia:** `mktemp -d` → clon de GitHub (HEAD `42c94e6`) → venv nuevo (pip 26.0.1, torch 2.8.0, huggingface_hub 1.8.0, `pip install -r requirements.txt && pip install -e .`) → descarga del Hub con `HF_HOME` fresco dentro del tempdir → inferencia CPU sobre espectro sintético: **`CLEAN_TEST_OK z_pred_map=0.5195 z_pred=0.5461 z_confidence=0.2835`**, reconstrucción `(5000,)` toda finita, asserts de rango `[0, 4]` y de no-dependencia del workspace original pasados.
+4. **Fase D — cierre documental:** tracker 04 ✅ (con URL del Hub en el entregable), definición de hecho del plan 04 marcada con evidencia, esta sección, suite re-ejecutada, commit documental enfocado + push + CI verificada.
+
+### Estado actual
+
+- Branch `main` sincronizada con `origin/main`; CI verde. Tests **16/16**.
+- Working tree: solo residuos sin trackear **preservados a propósito** (`.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`). Nada se borró; checkpoints y runs intactos.
+- El clon de la prueba limpia quedó en un tempdir del sistema (`mktemp -d`, venv + caché HF) — borrable cuando se quiera; no pertenece al repo.
+
+### Siguiente paso — Plan 05 (Demo Gradio en HF Spaces)
+
+`plan/05-demo-gradio.md` queda desbloqueado: el Space descargará el checkpoint con `hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt")`. Ojo al ejecutarlo: ese plan todavía dice `TU_USUARIO` — usar `jirustaroure` para Space/modelo y `Julian0444` para los enlaces a GitHub (misma regla de namespaces de arriba). **No se inició en esta sesión.**
+
+### Avisos
+
+- El CLI `hf` (huggingface_hub 0.36.2) sigue fuera de PATH: `~/Library/Python/3.9/bin/hf`.
+- El Hub avisa rate limits menores para descargas anónimas (la prueba limpia funcionó sin token); para trabajo intensivo, autenticarse.
+- Los planes 05/06/07/10 y `PLAN.md` aún contienen `TU_USUARIO` — corregirlos al ejecutar cada uno (no se tocaron en esta sesión para no abrir planes ajenos al 04).

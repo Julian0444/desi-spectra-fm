@@ -93,10 +93,10 @@ PY
 
 ## Definición de hecho
 
-- [ ] <https://huggingface.co/jirustaroure/desi-spectra-fm> público con `checkpoint_last.pt` + `config.json` + `training_args.json` + `metrics.jsonl` + model card renderizada.
-- [ ] La prueba desde el clon limpio descarga y predice (`z_pred_map` finito y en rango).
-- [ ] README de GitHub actualizado (quick start ya no asume archivo local).
-- [ ] Commit + tracker actualizado.
+- [x] <https://huggingface.co/jirustaroure/desi-spectra-fm> público con `checkpoint_last.pt` + `config.json` + `training_args.json` + `metrics.jsonl` + model card renderizada. *(2026-08-02: verificado por API anónima — `private: False`, 5 archivos en `main`, card con η₀.₁₅ 14.95 %.)*
+- [x] La prueba desde el clon limpio descarga y predice (`z_pred_map` finito y en rango). *(2026-08-02: `CLEAN_TEST_OK z_pred_map=0.5195 z_confidence=0.2835`, CPU, caché HF fresca, sin dependencia del workspace original.)*
+- [x] README de GitHub actualizado (quick start ya no asume archivo local). *(Commit `42c94e6`, CI verde.)*
+- [x] Commit + tracker actualizado.
 
 ## Si algo falla
 
