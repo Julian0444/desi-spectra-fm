@@ -1,0 +1,8 @@
+# Solo entra a la imagen lo que la API necesita; sin esto el build context
+# arrastra runs/ (checkpoints de GBs), external/ y .git.
+*
+!pyproject.toml
+!README.md
+!LICENSE
+!src/
+src/desi_fm.egg-info/

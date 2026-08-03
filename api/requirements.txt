@@ -1,0 +1,8 @@
+spaces
+numpy
+huggingface_hub
+fastapi
+uvicorn[standard]
+python-multipart
+torch==2.11.0
+desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm
