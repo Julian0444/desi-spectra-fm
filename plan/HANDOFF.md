@@ -306,3 +306,40 @@ El **plan 06 se ejecutó de punta a punta** y quedó ✅ en el tracker: API REST
 ### Siguiente paso — Plan 07 (spectra-copilot: repo + herramientas)
 
 **No iniciado.** `plan/07-spectra-copilot-tools.md` todavía contiene `TU_USUARIO` — corregir namespaces al ejecutarlo (GitHub `Julian0444`, HF `jirustaroure`). Con `DESI_FM_CKPT` local no depende de servicios nuevos.
+
+---
+
+## Session — 2026-08-03 (plan 07 COMPLETADO: spectra-copilot repo + tools)
+
+### Resumen ejecutivo
+
+El **plan 07 se ejecutó de punta a punta** y quedó ✅ en el tracker: segundo repo público <https://github.com/Julian0444/spectra-copilot> con las tools determinísticas que usarán el agente (08) y el MCP server (09), **7/7 tests** locales y **CI verde propia**, y la demo CLI imprimiendo el JSON honesto sobre espectros held-out reales. **El plan 08 NO se inició.**
+
+- **Repo local:** `~/proyectos/spectra-copilot` (venv `.venv` con Python 3.12, gitignored). Estructura: `copilot/{__init__,tools,__main__}.py`, `tests/test_tools.py`, `examples/` (3 `.npz` held-out reales **commiteados**, ~103 KB c/u), `eval/cases/` y `docs/img/` (placeholder para 08/11), `.github/workflows/ci.yml`.
+- **Adaptaciones vs el plan original:** namespaces reales (pyproject instala `desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm`; `_model()` usa `DESI_FM_CKPT` o `hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt")`); `predict_redshift` devuelve la salida honesta del proyecto (`z_pred_map` oficial + `z_confidence` + `z_pred` secundario, helper `official_z()`); ejemplos reales en vez de `galaxy_z042.npz` sintético; CLI hace una sola pasada de modelo y agrega `z_true_reference` si el `.npz` lo trae.
+- **Números de control reproducidos exactos** (protocolo determinista `mask_ratio=0`, pasando `ivar`/`mask` del `.npz`): `heldout_z020` → `z_pred_map` **0.2267** / conf 0.6376 (idéntico a demo y API, z_true 0.204); `heldout_z287` → **2.4406**; `heldout_lowconf_z157` → **0.9569** / conf 0.18.
+- **Hallazgo clave para el 08:** en la galaxia real `heldout_z020`, `identify_spectral_lines` discrimina de verdad — a z_true 0.2036 matchea **8/11 (`consistent`)**, al `z_pred_map` 0.2267 solo 2/11 (Δz 0.023 ≈ 150 Å en Hα, fuera de la tolerancia de 12 Å) y a z=0.85 queda débil (0.22). El agente puede **detectar y refinar** una predicción corrida — esa es la historia del plan 08. Documentado en el README del repo nuevo.
+
+### Qué se hizo (cronología)
+
+1. **Esqueleto + código:** `~/proyectos/spectra-copilot`, `git init -b main`; `pyproject.toml` (deps del plan: numpy/scipy/torch/huggingface_hub/desi-fm\@git/anthropic/mcp[cli]; extras `ui`/`dev`); las 3 tools + `_load` robusto (2-D → primer espectro, NaN/Inf → zereados y sumados a `mask`); catálogo de 15 líneas rest-frame del plan sin cambios.
+2. **Tests (7):** los 4 del plan + `z_pred_map`/`z_confidence` en rango, `_load` 2-D+NaN, y discriminación sobre el espectro real (sin modelo). **Bug del plan original encontrado:** `_synth` inyectaba solo 4 líneas pero el catálogo espera 12 en cobertura a z=0.42 → `match_fraction` máx ~0.42 y `test_lines_match_at_true_z` fallaba tal cual estaba escrito; fix correcto = inyectar 9 líneas del catálogo en el sintético (no aflojar el umbral 0.5).
+3. **Verificación local:** venv 3.12 + `pip install -e ".[dev]"` (instala `desi-fm` desde el repo público de GitHub — de paso lo prueba); `pytest` **7/7** con `DESI_FM_CKPT` → checkpoint v2.1 local; CLI sobre los 3 ejemplos con los números de arriba.
+4. **Publicación:** commit inicial + `gh repo create spectra-copilot --public --source . --push` (cuenta `Julian0444`, autorizado explícitamente en esta sesión). CI propia (Python 3.11 + torch CPU + `actions/cache` de `~/.cache/huggingface` para el checkpoint de 104 MB) → **verde**.
+5. **Cierre documental (repo principal):** `plan/07` reescrito como runbook real con DoD marcada, tracker 07 ✅ con la URL, esta sección, commit `plan-07` + push + CI principal verde.
+
+### Estado actual
+
+- **Repo nuevo:** `Julian0444/spectra-copilot` público, `main` pusheada, Actions verde, 7/7 tests. Los `.npz` de ejemplo están commiteados ahí (en el repo principal siguen gitignored).
+- **Repo principal:** solo cambios documentales (plan/07, tracker, HANDOFF); suite sigue 24/24; residuos sin trackear de siempre **preservados** (`.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`).
+- Sin servicios nuevos: no se tocaron los Spaces ni el Hub (los 2 slots ZeroGPU siguen ocupados por demo + API).
+
+### Siguiente paso — Plan 08 (agente con la Claude API)
+
+**No iniciado.** `plan/08-agente-claude.md` construye sobre `copilot/tools.py` — las tools ya exponen todo lo que el agente necesita (`official_z()`, confidence para detectar outliers, la tool de líneas para verificar/refinar). El caso `heldout_lowconf_z157` (conf 0.18, z_pred_map 0.957 vs z_true 1.574) y el corrimiento de `heldout_z020` son el material narrativo ideal para el reporte del agente. Ojo: `anthropic` y `mcp` ya están instalados en el venv del repo nuevo.
+
+### Avisos
+
+- El venv `~/proyectos/spectra-copilot/.venv` usa el Homebrew Python 3.12; `requires-python >=3.10` (por `mcp`). El sistema tiene 3.9 como default — no usarlo para este repo.
+- La CI del repo nuevo descarga el checkpoint del Hub en el primer run y lo cachea (`actions/cache`); si el Hub rate-limitea descargas anónimas, re-lanzar el job.
+- `UserWarning: enable_nested_tensor ...` al cargar el modelo es benigno (viene de `desi_fm.model` con PyTorch ≥2.x).
