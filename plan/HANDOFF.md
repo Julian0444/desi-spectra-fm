@@ -235,3 +235,37 @@ El **plan 04 se ejecutó de punta a punta** y quedó ✅ en el tracker: la v2.1 
 - El CLI `hf` (huggingface_hub 0.36.2) sigue fuera de PATH: `~/Library/Python/3.9/bin/hf`.
 - El Hub avisa rate limits menores para descargas anónimas (la prueba limpia funcionó sin token); para trabajo intensivo, autenticarse.
 - Los planes 05/06/07/10 y `PLAN.md` aún contienen `TU_USUARIO` — corregirlos al ejecutar cada uno (no se tocaron en esta sesión para no abrir planes ajenos al 04).
+
+---
+
+## Session — 2026-08-03 (plan 05 COMPLETADO: demo Gradio en vivo en HF Spaces)
+
+### Resumen ejecutivo
+
+El **plan 05 se ejecutó de punta a punta** y quedó ✅ en el tracker: demo Gradio pública en <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo> (`RUNNING` en hardware `zero-a10g`), con **espectros DESI reales del held-out canónico** como ejemplos y salida honesta centrada en **`z_pred_map`** (+ `z_confidence`, `z_pred` secundario, `z_true` y flag de outlier catastrófico cuando el `.npz` trae ground truth). **El plan 06 NO se inició.**
+
+- **App:** fuente versionada en `demo/` (app.py + requirements.txt + README con YAML del Space); el Space es una copia publicada. Gradio **6.22.0** pineado (= el probado localmente en venv 3.12), `torch==2.11.0` (último listado como soportado por ZeroGPU), `desi-fm` instalado desde la URL git de GitHub, checkpoint bajado del Hub al arrancar. Robusta a `.npz` ajenos (2-D → primer espectro con aviso, `ivar`/`mask` opcionales, grillas de cualquier instrumento, `gr.Error` amigables) y con las regiones enmascaradas sombreadas en el plot (bug corregido: ancho de token = `config.patch_size` 26 px, no `n_pixels//n_tokens`=25).
+- **Ejemplos** (elegidos con predicciones a protocolo de demo, `mask=0` determinista, sobre los primeros 41 held-out exportados crudos; alineación 1:1 contra `predictions.csv` verificada): `heldout_z020` (0.204→0.227, conf 0.64), `heldout_z083` (0.835→0.810; preset del slider 0.35), `heldout_z287` (2.866→2.441 — arriba del techo z≈2 de v1, delta a la vista), `heldout_lowconf_z157` (**1.574→0.957, conf 0.18** — outlier catastrófico honesto de la banda débil). Los sintéticos del plan original colapsan a z≈3.4 (OOD) y quedaron solo como `--synthetic` en `scripts/make_demo_examples.py`.
+- **Verificación:** local con Playwright (`USER_TEST_OK`: 4 ejemplos, slider, upload 2-D en grilla ajena, archivo roto → toast y app viva); pública anónima por UI (valores honestos, 1.8/0.5/3.4 s) y autenticada por API en vivo (z083@0.35→0.8822 en 3.1 s, z287→2.4406 en 1.5 s, lowconf→0.9569 en 1.6 s, slider z020@0.6→0.1571 ≠ 0.2267\@0; verificación externa adicional: upload z020 0.2267 en ~4.3 s y 2-D en ~3.45 s). Todas < 5 s.
+- **Docs:** link de demo arriba del `README.md` de GitHub (+ notas + layout con `demo/` y `scripts/`), `model_card.md` con el link y **re-subida al Hub** (commit `32463db`, verificada anónima), `plan/05` reescrito como runbook real con DoD marcada, tracker 05 ✅.
+
+### Realidades de plataforma descubiertas (importan para los planes 06+)
+
+1. **HF paywalleó los Spaces Gradio/Docker en cpu-basic** (402 "requires a PRO subscription"). El camino gratis para cuentas personales en regla es **ZeroGPU** (hasta 2 Spaces Gradio): `create_repo(..., space_sdk="gradio", space_hardware="zero-a10g")` por API Python. **El plan 06 (Docker Space para la API FastAPI) va a chocar con el mismo 402** — evaluar alternativas al ejecutarlo.
+2. `hf repo create` sin hardware y `hf upload` (CLI) devuelven **402** para Spaces (el upload hace un `create_repo(exist_ok=True)` interno que 402ea aunque el repo exista) — usar `HfApi.upload_folder/upload_file`.
+3. En `zero-a10g` es **obligatorio** al menos una función `@spaces.GPU` — la variante "CPU sin decorador para esquivar la cuota" muere al arrancar (`ValueError: Invalid file descriptor: -1` tras el launch). Quedó `@spaces.GPU(duration=8)`.
+4. **Cuota anónima de ZeroGPU por visitante/IP**: pocas runs diarias — al agotarla, "You have exceeded your ZeroGPU runs limit" (el pill "Error" pelado de la UI; el mensaje real está en el SSE de `queue/data`). Mis pruebas quemaron la del equipo ese día; usuarios logueados tienen cuota mayor y se resetea a las 24 h. **Documentado en la card del Space; no es un bug.**
+5. **Un commit al Space no reinicia el contenedor** — siempre `HfApi.restart_space()` y confirmar "Application Startup" nuevo en los logs (un fix estuvo ~35 min sin aplicar por esto).
+6. `allowed_paths=[<dir>/examples]` en `launch()` para que los clicks de ejemplos no mueran con `InvalidPathError` bajo SSR (visto server-side; la UI real además re-sube el ejemplo como upload de usuario).
+7. **ZeroGPU puede caer en una GPU física rota** (`torch.AcceleratorError: uncorrectable ECC error` en el `worker_init` de la lib `spaces`, todas las llamadas fallan con "AcceleratorError") — se arregla con `restart_space()` para caer en otro host. Si todas las llamadas fallan así, es eso.
+8. El primer render de ejemplos en la UI los sirve desde la caché de gradio; **probar el Space con sesiones frescas y mirar el wire** (`queue/join`/`queue/data`) antes de culpar a la app.
+
+### Estado actual
+
+- Working tree con los cambios del plan 05 listos para commit enfocado (`.gitignore` con `examples/`, `README.md`, `model_card.md`, `demo/*`, `scripts/make_demo_examples.py`, `plan/05`, `plan/README.md`, `plan/HANDOFF.md`). `examples/*.npz` NO se commitean (gitignored; reproducibles con `scripts/make_demo_examples.py`, copias públicas en el Space).
+- Residuos sin trackear previos **preservados**: `.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`.
+- Espectros crudos exportados (41) en el scratchpad de la sesión (temporal, prescindible — el script del repo regenera los 4 elegidos).
+
+### Siguiente paso — Plan 06 (API FastAPI + Docker)
+
+**No iniciado.** Aviso clave: los Docker Spaces también requieren PRO (realidad nº 1) — al ejecutar el plan 06 habrá que decidir alternativa (p. ej. servir la API desde otro host gratuito, o documentar el endpoint local con Docker). `plan/06` todavía contiene `TU_USUARIO`.

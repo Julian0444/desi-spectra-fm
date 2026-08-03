@@ -2,6 +2,8 @@
 
 ![ci](https://github.com/Julian0444/desi-spectra-fm/actions/workflows/ci.yml/badge.svg)
 
+**[▶ Live demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** — pick a real held-out DESI spectrum (or upload your own), mask part of it, and watch the model predict the redshift and reconstruct the hidden regions in your browser.
+
 A unimodal masked-token foundation model for astrophysical spectra, with the redshift mechanism redesigned per the project specification. Given a spectrum from **any instrument** (DESI or otherwise), the model predicts the redshift `z` and reconstructs masked spectral regions.
 
 **Course:** PHYS303 / CS486 / CS686 — Final Project
@@ -11,6 +13,7 @@ A unimodal masked-token foundation model for astrophysical spectra, with the red
 > 📄 For full deliverable documentation (architecture, design decisions, metric progression), see [DELIVERABLE.md](DELIVERABLE.md).
 > 📄 For the Spanish-language development walkthrough, see [README.es.md](README.es.md).
 > 🤗 Model weights (v2.1 checkpoint) are hosted on Hugging Face Hub: [jirustaroure/desi-spectra-fm](https://huggingface.co/jirustaroure/desi-spectra-fm).
+> 🔭 Live Gradio demo (HF Space): [jirustaroure/desi-spectra-fm-demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo) — app source in [`demo/`](demo/).
 
 ---
 
@@ -164,6 +167,10 @@ src/desi_fm/
   predict.py          instrument-agnostic inference  ← use this for benchmarking
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
 tests/                16 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs)
+demo/                 Gradio app deployed to the live HF Space (jirustaroure/desi-spectra-fm-demo)
+scripts/
+  make_demo_examples.py   exports the demo's real held-out example spectra
+  estimate_z_histogram.py estimates the training-label histogram (v2.1 class weights)
 notebooks/
   evaluation.ipynb            ready-to-run evaluation notebook for v2.1 (metrics, plots, live demo)
   evaluation_v1_baseline.ipynb  the executed v1 "before" picture (bias/outlier diagnosis)

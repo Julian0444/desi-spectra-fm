@@ -1,0 +1,6 @@
+spaces
+numpy
+matplotlib
+huggingface_hub
+torch==2.11.0
+desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm

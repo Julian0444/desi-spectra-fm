@@ -12,6 +12,9 @@ tags:
 
 # DESI Spectra Foundation Model (26M)
 
+**[▶ Live demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** —
+try the model on real held-out DESI spectra (or your own) in the browser.
+
 Encoder-only transformer (8 layers, `d_model=512`, 8 heads, ~26M parameters)
 trained with masked-token prediction on DESI EDR/SV3 spectra
 ([Multimodal Universe](https://github.com/MultimodalUniverse/MultimodalUniverse)).
@@ -96,4 +99,5 @@ for the quantified analysis.
 
 ## Links
 
+- Live demo (HF Space): <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo>
 - Code, tests, CI and evaluation notebook: <https://github.com/Julian0444/desi-spectra-fm>

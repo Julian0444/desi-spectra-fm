@@ -16,7 +16,7 @@
 | 02 | [Reentrenamiento v2 + antes/después](02-reentrenamiento-v2.md) → cerrado vía [02R](02R-reentrenamiento-v2-calibrado.md) | Fase 0 | 1 h activa + 3–4 h cómputo | 01 | checkpoint v2.1 promovido (`runs/desi_80k_classhead_v21`) + notebook re-ejecutado + tabla v1→v2.1 | ✅ |
 | 03 | [Repo público en GitHub + CI](03-repo-publico-ci.md) | Nivel 1 | 1.5–2 h | — | repo público con Actions en verde — <https://github.com/Julian0444/desi-spectra-fm> | ✅ |
 | 04 | [Checkpoint en Hugging Face Hub](04-checkpoint-hf-hub.md) | Nivel 1 | 1 h | 03 (ideal: 02) | model card pública + descarga funcionando — <https://huggingface.co/jirustaroure/desi-spectra-fm> | ✅ |
-| 05 | [Demo Gradio en HF Spaces](05-demo-gradio.md) | Nivel 1 | 2–3 h | 04 | **link de demo en vivo** | ⬜ |
+| 05 | [Demo Gradio en HF Spaces](05-demo-gradio.md) | Nivel 1 | 2–3 h | 04 | **link de demo en vivo** — <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo> | ✅ |
 | 06 | [API FastAPI + Docker](06-api-fastapi-docker.md) | Nivel 1 | 2–3 h | 04 | endpoint público respondiendo a `curl` | ⬜ |
 | 07 | [spectra-copilot: repo + herramientas](07-spectra-copilot-tools.md) | Nivel 2 | 3–4 h | 04 | `tools.py` testeado + CLI de demo | ⬜ |
 | 08 | [El agente con la Claude API](08-agente-claude.md) | Nivel 2 | 2–3 h | 07 | reporte de observación generado por el agente | ⬜ |

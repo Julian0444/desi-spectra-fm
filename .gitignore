@@ -1,5 +1,8 @@
 __pycache__/
 *.egg-info/
+# espectros de ejemplo de la demo: generados por scripts/make_demo_examples.py,
+# las copias públicas viven en el Space jirustaroure/desi-spectra-fm-demo
+examples/
 .pytest_cache/
 .ipynb_checkpoints/
 .DS_Store
