@@ -38,7 +38,7 @@ ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python eval/run_evals.py -
 ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python eval/run_evals.py --resume     # 150 casos (~US$ 3–4.5 Haiku)
 ```
 
-La key SOLO al proceso, nunca exportada global. Costo total estimado: **~US$ 4 solo Haiku; +US$ 2.5–3.5 si se agrega Opus 4.8 sobre los ~25 difíciles (opcional). Recarga recomendada: ≥ US$ 10.** Después de la corrida: tabla + párrafo de metodología en el README de spectra-copilot (n=150, semilla 7, estratos, modelo LLM, costo real medido) + `results.csv` commiteado + cerrar la DoD acá y el tracker.
+La key SOLO al proceso, nunca exportada global. Costo total estimado: **~US$ 4 solo Haiku; +US$ 2.5–3.5 si se agrega Opus 4.8 sobre los ~25 difíciles (opcional). Recarga recomendada: ≥ US$ 10.** Nota (plan 12, 2026-08-17): desde `3eea698` el agente ofrece además `lookup_reference` (mini-RAG) — la corrida medirá agente **con** priors citables; documentarlo en la fila de metodología. Después de la corrida: tabla + párrafo de metodología en el README de spectra-copilot (n=150, semilla 7, estratos, modelo LLM, costo real medido) + `results.csv` commiteado + cerrar la DoD acá y el tracker.
 
 ## Definición de hecho
 

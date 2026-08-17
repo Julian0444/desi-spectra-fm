@@ -1,82 +1,41 @@
-# 12 · Mini-RAG de referencias
+# 12 · Mini-RAG de referencias — ⏳ RAG COMPLETO Y COMMITEADO; VERIFICACIÓN CON EL AGENTE BLOQUEADA POR CRÉDITO (2026-08-17)
 
-> **Bloque:** Nivel 3 · **Tiempo:** 2–3 h · **Depende de:** 08 · **Entregable:** reportes del agente con citas a fuentes
+> **Bloque:** Nivel 3 · **Tiempo real:** ~2 h · **Dependía de:** 08 · **Entregable:** reportes del agente con citas a fuentes — **pendiente solo la corrida paga** (crédito API en cero, verificado 2026-08-17 con una llamada mínima a Haiku).
 
-## Objetivo
+## Qué quedó hecho (commit `3eea698` en spectra-copilot, 35/35 tests offline)
 
-Un RAG chico y honesto: catálogo de líneas espectrales + fragmentos de documentación de DESI, detrás de una tool `lookup_reference`. El punto no es la escala — es mostrar el patrón completo (corpus → índice → retrieval → **cita en la respuesta**) sin inflarlo.
+- **Corpus commiteado en `refs/`** (30 documentos): `refs/lines.json` — el catálogo de 15 líneas extendido con contexto de retrieval (ventanas de visibilidad en la cobertura DESI 3600–9824 Å, confusiones conocidas, pares confirmatorios) — + **15 notas** `refs/*.md` redactadas desde la doc pública de DESI (overview, EDR, SV3, los 4 tipos de target con sus rangos de z, Redrock, cobertura del espectrógrafo, degeneración de línea única, doblete [OII], outliers catastróficos, espectros de absorción, serie de Balmer, residuos de cielo), cada una con `source:` (arXiv/NIST/GitHub) en la primera línea.
+- **`copilot/rag.py`**: BM25 (`rank_bm25`, agregado a `pyproject.toml`) con tokenización alfanumérica (así "[OII]" matchea "OII"), corpus lazy con `lru_cache`, clamp de `k`, filtro score > 0 (query fuera de corpus → lista vacía, no ruido) y **`valid_ids()`** — el ground truth para chequear citas alucinadas (insumo directo si el plan 11 agrega la métrica "% citas válidas").
+- **`lookup_reference` integrada en las 3 capas**: tool `@beta_tool` en el agente (ofrecida en `run()` y en `run_structured()` → la corrida pendiente del 11 medirá agente **con** RAG), tool MCP (el server pasa de 4 a 5 tools, `instructions` actualizadas) y regla nueva en el SYSTEM: paso 5 del workflow (priors de tipo de target / degeneraciones) + **contrato de citas** — citar ids entre corchetes y *solo* ids devueltos por lookup_reference en esa conversación, nunca inventar una fuente (el endurecimiento de "Si algo falla" se aplicó desde el día 1).
+- **Tests 26→35**, todos offline: corpus bien formado (≥10 notas con source https), la query de la DoD "Halpha OII confusion" → nota de degeneración + `Halpha_6563` (top-3) + `OII_3727` (top-5), priors recuperables ("ELG redshift range" → `desi-targets-elg` con "0.6" en el snippet), query fuera de corpus vacía, clamp de k, tool del agente ≡ impl, contrato de citas en el SYSTEM, capa MCP real (`call_tool`) ≡ impl, 5 tools exactas con schemas.
+- **README de spectra-copilot**: sección "Mini-RAG: cited references (BM25)" con defensa de BM25 (corpus de ~30 docs técnicos → embeddings no aportan y agregan dependencia; BM25 es determinista, offline y testeable en CI), salida real de `lookup_reference("ELG redshift range")`, y el contrato de citas. Nota visible de que el reporte del agente con cita queda pendiente de crédito.
 
-## Pasos
+## Adaptaciones vs el plan original
 
-### 1. El corpus — `data/refs/`
+1. **Corpus en `refs/`, no en `data/`**: el plan lo ponía en `data/lines.json` + `data/refs/`, pero `data/` está gitignoreado en spectra-copilot (ahí vive el índice FAISS de 30 MB). La DoD exige corpus *commiteado* → `refs/` en la raíz.
+2. **Tokenización regex en vez de `split()`**: el sketch tokenizaba con `.lower().split()`, con lo cual "[oii]" nunca matchearía una query "OII". `re.findall(r"[a-z0-9]+")` resuelve eso y de paso el truncado de puntuación.
+3. **Corpus lazy (`lru_cache`)** en vez de índice a nivel módulo: mismo patrón que `tools._model()`/`_index()`; importar `copilot.rag` no lee disco.
+4. **La regla anti-alucinación de "Si algo falla" se incorporó de entrada** al SYSTEM ("solo ids devueltos en esta conversación") en lugar de esperar a observar el fallo.
 
-- `data/lines.json`: el catálogo de líneas extendido, con contexto útil para retrieval:
+## Para cerrar cuando haya crédito (una corrida, ~US$ 0.02–0.15)
 
-```json
-[
-  {"name": "Halpha", "rest_angstrom": 6562.8,
-   "text": "Hydrogen Balmer alpha line at 6562.8 A. Strongest optical emission line in star-forming galaxies. At z>0.49 it leaves the DESI optical range (9800 A ceiling)."},
-  {"name": "OII_3727", "rest_angstrom": 3727.1,
-   "text": "[OII] doublet at 3727 A. Primary star-formation tracer for 0.6<z<1.6 in DESI when Halpha is out of range. Commonly confused with Halpha in single-line spectra."},
-  ...
-]
+```bash
+cd ~/proyectos/spectra-copilot
+ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python -m copilot.agent \
+    examples/heldout_lowconf_z157.npz --model claude-haiku-4-5   # ~$0.02
 ```
 
-- `data/refs/*.md`: 10–20 fragmentos cortos (2–5 oraciones c/u) sobre DESI EDR/SV3: qué es SV3, tipos de target (BGS/LRG/ELG/QSO) y sus rangos de z típicos, cómo mide z la pipeline (Redrock), degeneraciones clásicas de identificación de líneas. Redactalos vos a partir de la doc pública de DESI, con el link de origen en cada archivo (`source:` en la primera línea).
-
-Ese contenido no es relleno: los rangos de z por tipo de target le dan al agente **priors** ("los ELG viven en 0.6–1.6; un ELG con z_pred 3.5 es sospechoso").
-
-### 2. Retrieval — BM25 (sin infraestructura)
-
-```python
-# pip install rank_bm25
-# copilot/rag.py
-import json
-from pathlib import Path
-from rank_bm25 import BM25Okapi
-
-def _load_corpus():
-    docs = []
-    for e in json.loads(Path("data/lines.json").read_text()):
-        docs.append({"id": e["name"], "source": "line-catalog", "text": e["text"]})
-    for p in sorted(Path("data/refs").glob("*.md")):
-        text = p.read_text()
-        docs.append({"id": p.stem, "source": text.splitlines()[0].removeprefix("source:").strip(),
-                     "text": text})
-    return docs
-
-_DOCS = _load_corpus()
-_BM25 = BM25Okapi([d["text"].lower().split() for d in _DOCS])
-
-def lookup_reference_impl(query: str, k: int = 3) -> dict:
-    scores = _BM25.get_scores(query.lower().split())
-    top = sorted(range(len(scores)), key=lambda i: -scores[i])[:k]
-    return {"results": [
-        {"id": _DOCS[i]["id"], "source": _DOCS[i]["source"],
-         "snippet": _DOCS[i]["text"][:400]}
-        for i in top if scores[i] > 0
-    ]}
-```
-
-BM25 es la elección correcta acá y hay que poder defenderla: corpus de ~40 docs cortos y técnicos, queries con vocabulario controlado → embeddings no aportan y agregan una dependencia. (Si querés la versión con embeddings para comparar, `sentence-transformers` + coseno en 15 líneas — como *apéndice*, midiendo si mejora el hit rate.)
-
-### 3. Integrar al agente y al MCP server
-
-- Tool `lookup_reference(query)` con docstring que diga cuándo usarla: *"Consult the line catalog and DESI reference notes; use it to sanity-check target-type vs redshift and to explain line degeneracies."*
-- Regla nueva en el system prompt: *"Cuando uses información de lookup_reference, citá la fuente entre corchetes: [line-catalog], [desi-sv3-overview]."*
-
-### 4. Verificar con 3 análisis
-
-Correr el agente sobre 3 casos y chequear que: (a) consulta la referencia cuando el z es raro para el tipo de espectro, (b) las citas aparecen en el reporte, (c) no alucina fuentes que no existen (comparar contra los ids reales del corpus).
+(El caso lowconf es el que más invita a consultar referencias; con Opus 4.8 sin `--model` ≈ $0.10–0.15.) Verificar los 3 puntos del plan: (a) consulta la referencia cuando el z es raro para el tipo de espectro, (b) las citas `[id]` aparecen en el reporte, (c) los ids citados ∈ `rag.valid_ids()` — si alucina, correr 2 casos más y anotar el %. Pegar el reporte en la sección Mini-RAG del README (reemplaza el aviso "Pending"), commit, y marcar acá la DoD 3.
 
 ## Definición de hecho
 
-- [ ] Corpus commiteado (`lines.json` + ≥ 10 refs con fuente).
-- [ ] `lookup_reference` integrada (agente + MCP), con test unitario (query "Halpha OII confusion" → devuelve los docs correctos).
-- [ ] Un reporte real del agente con ≥ 1 cita `[fuente]` pegado en el README.
-- [ ] Commit + tracker.
+- [x] Corpus commiteado (`lines.json` + ≥ 10 refs con fuente). — 15 + 15 en `refs/`, cada nota con `source:`.
+- [x] `lookup_reference` integrada (agente + MCP), con test unitario (query "Halpha OII confusion" → devuelve los docs correctos). — 3 capas + 9 tests nuevos.
+- [ ] Un reporte real del agente con ≥ 1 cita `[fuente]` pegado en el README. — **bloqueado por crédito API**; el README ya tiene la salida real del retrieval y el aviso.
+- [x] Commit + tracker. — `3eea698` en spectra-copilot; tracker en ⏳ con nota.
 
-## Si algo falla
+## Si algo falla (actualizado)
 
-- **El agente cita fuentes inventadas:** endurecer la regla ("solo podés citar ids devueltos por lookup_reference en esta conversación") y validarlo en el eval del plan 11 (agregar métrica: % de citas válidas).
-- **BM25 devuelve basura con queries largas:** truncar la query a los términos clave en la tool (top-10 tokens) o indexar también los títulos con peso extra.
+- **El agente cita fuentes inventadas** (a verificar en la corrida): la regla dura ya está en el SYSTEM; si igual pasa, agregar al plan 11 la métrica % de citas válidas usando `rag.valid_ids()`.
+- **BM25 devuelve basura con queries largas**: mitigado por la tokenización regex y el filtro score > 0; si reaparece, truncar la query a los top-10 tokens en la tool.
+- **`rank_bm25` falta en un entorno viejo**: está en `dependencies` de `pyproject.toml`; `pip install -e .` lo trae.

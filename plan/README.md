@@ -23,7 +23,7 @@
 | 09 | [Servidor MCP](09-mcp-server.md) | Nivel 2 | 1–2 h | 07 | tus tools corriendo dentro de Claude Code — [sección MCP en el README de spectra-copilot](https://github.com/Julian0444/spectra-copilot#use-it-from-any-mcp-client) | ✅ |
 | 10 | [Embeddings + búsqueda semántica (FAISS)](10-embeddings-faiss.md) | Nivel 3 | 3–4 h | 02, 07 | búsqueda de espectros similares + UMAP coloreado por z — [sección en el README de spectra-copilot](https://github.com/Julian0444/spectra-copilot#semantic-search-embeddings--faiss) | ✅ |
 | 11 | [Evals del agente](11-evals-agente.md) | Nivel 3 | 3–4 h | 08 | tabla de métricas end-to-end sobre ≥100 casos | ⏳ arnés ✅ (`8fb4a0f`, 150 casos + baseline); corrida agente bloqueada por crédito API |
-| 12 | [Mini-RAG de referencias](12-mini-rag.md) | Nivel 3 | 2–3 h | 08 | reportes del agente con citas a fuentes | ⬜ |
+| 12 | [Mini-RAG de referencias](12-mini-rag.md) | Nivel 3 | 2–3 h | 08 | reportes del agente con citas a fuentes | ⏳ RAG ✅ (`3eea698`: corpus `refs/` + `lookup_reference` en agente/MCP + 35/35 tests); reporte con cita bloqueado por crédito API |
 | 13 | [Narrativa final del portfolio](13-narrativa-portfolio.md) | Cierre | 2 h | todo lo anterior que exista | README maestro + pitch + bullets de CV | ⬜ |
 
 ## Ruta mínima (si hay poco tiempo)

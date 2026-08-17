@@ -556,3 +556,40 @@ Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como 
 - Los 150 npz de `eval/cases/` NO están en git: si se pierden, `python eval/export_cases.py` los regenera idénticos (selección determinista, semilla 7 + aserción contra el CSV commiteado).
 - `results_baseline.csv` usa el protocolo de las tools — no mezclar con las métricas de `evaluate` (masking) en la misma tabla sin decirlo.
 - El stdout de un export redirigido a archivo se bufferea: usar `python -u` para progreso en vivo.
+
+---
+
+## Session — 2026-08-17 (plan 12 PARCIAL: mini-RAG completo y commiteado; verificación con el agente bloqueada por crédito)
+
+### Resumen ejecutivo
+
+**El crédito de la API sigue en CERO** (verificado al inicio con una llamada mínima a Haiku → "credit balance is too low"), así que ni la corrida pendiente del plan 11 ni la verificación paga del 12 se pudieron lanzar. Todo lo demás del plan 12 quedó **construido, testeado y commiteado**: spectra-copilot `main` = `3eea698` (= origin), **35/35 tests** (todos offline). Cerrar el 12 = una corrida de ~US$ 0.02 + pegar el reporte en el README.
+
+### Qué se hizo
+
+- **Corpus en `refs/` (30 docs, commiteado)**: `refs/lines.json` — catálogo de 15 líneas con contexto de retrieval (ventanas de visibilidad en 3600–9824 Å, confusiones, pares confirmatorios) — + 15 notas `refs/*.md` sobre DESI (EDR, SV3, targets BGS/LRG/ELG/QSO con rangos de z, Redrock, cobertura, degeneración de línea única, doblete [OII], outliers, absorción, Balmer, residuos de cielo), cada una con `source:` en la primera línea. **ADAPTACIÓN clave**: el plan decía `data/refs/`, pero `data/` está gitignoreado (índice FAISS) → `refs/` en la raíz para cumplir "corpus commiteado".
+- **`copilot/rag.py`**: BM25 (`rank_bm25`, ahora en `pyproject.toml`) con tokenización regex `[a-z0-9]+` (el sketch usaba `.split()` y "[oii]" jamás matchearía "OII"), corpus lazy con `lru_cache` (patrón `_model()`/`_index()`), clamp de k, score > 0 → query fuera de corpus devuelve vacío, y `valid_ids()` para chequear citas alucinadas.
+- **`lookup_reference` en las 3 capas**: agente (`run()` y `run_structured()` → **la corrida pendiente del 11 medirá agente+RAG**, anotado en su runbook y en eval/README), MCP server (4→5 tools + instructions) y SYSTEM: paso 5 nuevo (priors de target/degeneraciones) + contrato de citas — `[id]` entre corchetes, SOLO ids devueltos en esa conversación, "never invent a reference" (el endurecimiento de "Si algo falla" aplicado de entrada).
+- **Tests 26→35 offline**: corpus bien formado, query DoD "Halpha OII confusion" → nota de degeneración + Halpha_6563 (top-3) + OII_3727 (top-5), "ELG redshift range" → `desi-targets-elg` rank 1, vacío fuera de corpus, clamp, tool ≡ impl, contrato en SYSTEM, capa MCP real (`call_tool`), 5 tools con schemas, y `lookup_reference` ofrecida en el runner estructurado (test_evals).
+- **README**: sección "Mini-RAG: cited references (BM25)" con la defensa de BM25, salida real del retrieval y aviso "Pending (API credit)" para el reporte con cita; "20 passed" (desactualizado del plan 11) → "35 passed"; MCP "four tools" → "five".
+
+### Para retomar (primera acción de la próxima sesión que toque el 11 o el 12)
+
+1. Confirmar recarga: `KEY=$(tr -d '\n' < ~/.anthropic_key)` + llamada mínima (o directo el paso 2).
+2. **Cerrar 12** (~US$ 0.02): `cd ~/proyectos/spectra-copilot && ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python -m copilot.agent examples/heldout_lowconf_z157.npz --model claude-haiku-4-5` → verificar (a) consulta lookup_reference, (b) citas `[id]` en el reporte, (c) ids ∈ `rag.valid_ids()`; pegar el reporte en el README (reemplaza el aviso), commit, DoD 3 del runbook + tracker ✅.
+3. **Cerrar 11**: los 2 comandos del runbook plan/11 (validación `--limit 20` ~$0.4 + `--resume` 150 casos ~$3–4.5 Haiku). La tabla debe decir que el agente incluye la tool RAG desde `3eea698`.
+4. Costo total estimado para cerrar 11+12: **~US$ 5 solo Haiku** (+US$ 2.5–3.5 si se agrega la pasada Opus 4.8 opcional del 11; + ~$0.15 si el reporte demo del 12 se corre con Opus). **Recarga recomendada ≥ US$ 10** — sin cambios.
+
+### Estado actual
+
+- **spectra-copilot**: `main` = `3eea698` (= origin), 35/35 tests. Nuevos: `refs/` (16 archivos), `copilot/rag.py`, `tests/test_rag.py`; modificados: `agent.py`, `report.py`, `mcp_server.py`, `pyproject.toml` (+`rank_bm25`), README, eval/README, test_evals, test_mcp_server. CI: ver nota abajo.
+- **Repo principal**: cierre documental de esta sesión (runbook 12 con DoD 3/4, tracker 12 → ⏳, nota en runbook 11, esta sección) — commit `plan-12: mini-RAG cerrado offline`.
+- El server MCP registrado en Claude Code hereda `lookup_reference` al reiniciar la sesión (mismo archivo, sin re-registrar); el corpus se lee del repo, sin descargas.
+- La key sigue en `~/.anthropic_key` (chmod 600), pasada SOLO por proceso.
+
+### Avisos
+
+- **El 13 (narrativa) sigue sin necesitar API** y cierra el producto mínimo; si se hace antes que 11/12, dejar las filas pendientes como "pending" con sus costos.
+- `rank_bm25` es dependencia nueva: entornos viejos necesitan `pip install -e .` (CI lo instala solo).
+- La tokenización del RAG es alfanumérica sin stemming: al escribir queries en tools/tests usar las palabras del corpus (p.ej. "confusion" está en los textos clave; "Halpha" siempre en ASCII).
+- El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM y las descripciones MCP; el contrato nuevo de citas vive en `report.py` y está testeado en `test_rag.py`.
