@@ -1,6 +1,6 @@
-# 12 · Mini-RAG de referencias — ⏳ RAG COMPLETO Y COMMITEADO; VERIFICACIÓN CON EL AGENTE BLOQUEADA POR CRÉDITO (2026-08-17)
+# 12 · Mini-RAG de referencias — ✅ COMPLETADO (2026-08-17)
 
-> **Bloque:** Nivel 3 · **Tiempo real:** ~2 h · **Dependía de:** 08 · **Entregable:** reportes del agente con citas a fuentes — **pendiente solo la corrida paga** (crédito API en cero, verificado 2026-08-17 con una llamada mínima a Haiku).
+> **Bloque:** Nivel 3 · **Tiempo real:** ~2.5 h · **Dependía de:** 08 · **Entregable:** reportes del agente con citas a fuentes — **cumplido**: 3 corridas reales Haiku (~US$ 0.07), 6/6 citas respaldadas, reporte verbatim en el README de spectra-copilot. La parte offline se construyó con el crédito en cero; la verificación paga se corrió el mismo día tras la recarga de Julián.
 
 ## Qué quedó hecho (commit `3eea698` en spectra-copilot, 35/35 tests offline)
 
@@ -17,25 +17,29 @@
 3. **Corpus lazy (`lru_cache`)** en vez de índice a nivel módulo: mismo patrón que `tools._model()`/`_index()`; importar `copilot.rag` no lee disco.
 4. **La regla anti-alucinación de "Si algo falla" se incorporó de entrada** al SYSTEM ("solo ids devueltos en esta conversación") en lugar de esperar a observar el fallo.
 
-## Para cerrar cuando haya crédito (una corrida, ~US$ 0.02–0.15)
+## Verificación con el agente (3 corridas Haiku, 2026-08-17, ~US$ 0.07 — commit `ac04121`)
 
-```bash
-cd ~/proyectos/spectra-copilot
-ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python -m copilot.agent \
-    examples/heldout_lowconf_z157.npz --model claude-haiku-4-5   # ~$0.02
-```
+Tras la recarga de crédito (key `sk-ant-api03-mr...DgAA` confirmada con llamada mínima), se corrieron los 3 análisis del plan con `claude-haiku-4-5` y transcript commiteado (`eval/transcripts/{lowconf,trap,z287}_rag.json`):
 
-(El caso lowconf es el que más invita a consultar referencias; con Opus 4.8 sin `--model` ≈ $0.10–0.15.) Verificar los 3 puntos del plan: (a) consulta la referencia cuando el z es raro para el tipo de espectro, (b) las citas `[id]` aparecen en el reporte, (c) los ids citados ∈ `rag.valid_ids()` — si alucina, correr 2 casos más y anotar el %. Pegar el reporte en la sección Mini-RAG del README (reemplaza el aviso "Pending"), commit, y marcar acá la DoD 3.
+| caso | consultó lookup_reference | citas en el reporte | ¿respaldadas? |
+|---|---|---|---|
+| `heldout_lowconf_z157` ($0.023) | ✓ (2 queries: rangos BGS/LRG, diagnóstico) | `[desi-targets-lrg]` `[absorption-dominated-spectra]` | 2/2 ✓ |
+| `trap_single_line` ($0.024) | ✓ ("BGS redshift range Halpha") | `[desi-targets-bgs]` | 1/1 ✓ |
+| `heldout_z287` ($0.023) | ✓ ("QSO redshift range … MgII") | `[MgII_2799]` `[Lya_1216]` `[desi-targets-qso]` | 3/3 ✓ |
+
+- (a) el agente consultó la referencia **sin que se lo pidieran** en los 3 casos ✓; (b) citas presentes en los 3 reportes ✓; (c) **6/6 citas corresponden a ids devueltos por lookup_reference en esa misma conversación** (verificado programáticamente contra `rag.valid_ids()` + los transcripts) — 0 fuentes inventadas ✓.
+- El reporte del caso lowconf (indeterminado honesto, ambas citas trabajando como priors: ventana LRG 0.4–1.1 + caveat de absorción) quedó **verbatim en el README** reemplazando el aviso "Pending".
+- **Hallazgo honesto (Haiku vs Opus, no es fallo del RAG):** en el trap sintético Haiku concluyó z=0.219 con confianza "High" apoyándose en vecinos sin sentido (el trap está fuera del manifold), donde la corrida de referencia con Opus (plan 08) decía "Indeterminate". La mecánica de citas funcionó igual; para reportes de calidad usar Opus, para evals masivas Haiku.
 
 ## Definición de hecho
 
 - [x] Corpus commiteado (`lines.json` + ≥ 10 refs con fuente). — 15 + 15 en `refs/`, cada nota con `source:`.
 - [x] `lookup_reference` integrada (agente + MCP), con test unitario (query "Halpha OII confusion" → devuelve los docs correctos). — 3 capas + 9 tests nuevos.
-- [ ] Un reporte real del agente con ≥ 1 cita `[fuente]` pegado en el README. — **bloqueado por crédito API**; el README ya tiene la salida real del retrieval y el aviso.
-- [x] Commit + tracker. — `3eea698` en spectra-copilot; tracker en ⏳ con nota.
+- [x] Un reporte real del agente con ≥ 1 cita `[fuente]` pegado en el README. — reporte lowconf con 2 citas, verbatim (`ac04121`).
+- [x] Commit + tracker. — `3eea698` + `ac04121` en spectra-copilot; tracker ✅.
 
 ## Si algo falla (actualizado)
 
-- **El agente cita fuentes inventadas** (a verificar en la corrida): la regla dura ya está en el SYSTEM; si igual pasa, agregar al plan 11 la métrica % de citas válidas usando `rag.valid_ids()`.
+- **El agente cita fuentes inventadas**: NO pasó en las 3 corridas (6/6 respaldadas) — la regla dura del SYSTEM alcanzó. Si reaparece en corridas futuras, agregar al plan 11 la métrica % de citas válidas usando `rag.valid_ids()`.
 - **BM25 devuelve basura con queries largas**: mitigado por la tokenización regex y el filtro score > 0; si reaparece, truncar la query a los top-10 tokens en la tool.
 - **`rank_bm25` falta en un entorno viejo**: está en `dependencies` de `pyproject.toml`; `pip install -e .` lo trae.

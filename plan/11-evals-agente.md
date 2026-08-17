@@ -1,55 +1,50 @@
-# 11 · Evals del agente — ⏳ ARNÉS COMPLETO; CORRIDA API BLOQUEADA POR CRÉDITO (2026-08-17)
+# 11 · Evals del agente — ✅ COMPLETADO (2026-08-17)
 
-> **Bloque:** Nivel 3 · **Tiempo real (arnés):** ~2 h activas + 20 min de export desatendido · **Dependía de:** 08 · **Entregable:** tabla de métricas end-to-end sobre ≥ 100 casos etiquetados — **pendiente solo de la corrida paga** (crédito API en cero, verificado 2026-08-17).
+> **Bloque:** Nivel 3 · **Tiempo real:** ~2 h de arnés + 20 min de export + ~2.5 h de corrida desatendida · **Dependía de:** 08 · **Entregable:** tabla de métricas end-to-end sobre 150 casos etiquetados — **cumplido** (commits `8fb4a0f` arnés + `6efbdfd` resultados en spectra-copilot, CI verde, 35/35 tests). El arnés se construyó con el crédito en cero; la corrida paga se hizo el mismo día tras la recarga, con go-ahead explícito de Julián por lote.
 
-## Qué quedó hecho (commit `8fb4a0f` en spectra-copilot, CI verde, 26/26 tests)
+## El resultado (corrida 2026-08-17, `eval/results.csv` commiteado)
 
-- **`eval/export_cases.py`** — 150 espectros DESI reales del **lado held-out** del split (stream canónico `filter(valid z) → skip(80000)`, el mismo de `desi_fm.evaluate` y `make_demo_examples.py`), estratificados sobre la distribución de z_true conocida del CSV de predicciones v2.1: **45 casos con z > 1.5** (la banda donde v2.1 todavía falla; el plan pedía ≥ 20). Cada z_true exportado se **asserta contra la fila del CSV** — si MultimodalUniverse reordena el dataset, el export aborta en vez de etiquetar mal. Corrió en ~20 min (150/150, 15 MB en `eval/cases/`, npz gitignoreados, `labels.csv` commiteado con `case,heldout_index,z_true`).
-- **`submit_report` + `run_structured()`** en `copilot/agent.py` — salida estructurada vía tool (la eval lee campos tipados del dict `SUBMITTED`, cero parsing de prosa), con `tokens_in/tokens_out` + dict `usage` completo para estimar costo. El system suma `STRUCTURED_RULE` (submit_report exactamente una vez, ≤ 6 tool calls).
-- **`eval/run_evals.py`** — por caso: baseline modelo-solo (`tools.official_z(predict_redshift_impl(...))`, la misma llamada que hace la primera tool del agente) + loop completo del agente. El CSV de resultados se **reescribe tras cada caso** y `--resume` retoma una corrida muerta (crédito, red) sin perder nada; cada caso fallido se reintenta 1 vez antes de marcarse `error`. El summary incluye ambos sistemas, el **desglose confianza↔acierto** (`by_confidence`, lo pide la DoD) y el costo estimado de la corrida.
-- **`eval/heldout_predictions_v21.csv`** commiteado (copia de `runs/desi_80k_classhead_v21/predictions.csv`): fuente de la selección y del η = 14.95 % oficial.
-- **`eval/README.md`** — metodología + comandos de reproducción.
-- **Tests 20→26**, todos offline: contrato de `submit_report` (tipado, "recorded"), `run_structured` contra un tool runner falso monkeypatcheado (payload + contabilidad de tokens + submit_report ofrecida + regla en el system + sin `thinking` en Haiku), estado stale no se filtra, estratificación determinista del export sobre el CSV commiteado, métricas de `summarize` (ambos sistemas + by_confidence), convención de dz_norm.
+**150/150 casos con `submit_report` estructurado, 0 errores, costo medido US$ 4.06** (`claude-haiku-4-5`, 3.27 M tokens ≈ $0.027/caso; validación de 20 casos $0.57 + corrida `--resume` de 130 $3.49 — dentro del estimado de $3–4.5).
 
-## Baseline modelo-solo ya corrido (sin API) — `eval/results_baseline.csv`
+| sistema (protocolo de las tools) | tasa < 0.15 | tasa < 0.05 | MAE_norm |
+|---|---|---|---|
+| modelo v2.1 solo | **92.7 %** | **77.3 %** | **0.061** |
+| agente (Haiku + 5 tools incl. RAG del plan 12) | 79.3 % | 72.0 % | 0.104 |
+| híbrido (agente solo si reporta confianza `high`) | 90.0 % | — | — |
 
-| sistema | tasa < 0.15 | tasa < 0.05 | MAE_norm | n |
-|---|---|---|---|---|
-| modelo v2.1 solo (protocolo de las tools) | **92.7 %** | **77.3 %** | **0.061** | 150 |
-| **agente (v2.1 + verificación)** | pendiente de crédito | — | — | — |
+**El titular honesto: con un LLM barato, el loop de verificación empeora al modelo.** Transiciones: 118 ambos-bien · **21 modelo-bien/agente-mal** · **1 outlier recuperado** (de 11) · 10 ambos-mal. El daño se concentra en la banda estratificada z > 1.5 (agente 68.9 % vs modelo 91.1 %): con tan pocas líneas del catálogo en cobertura DESI, el z *verdadero* también "se ve débil" al matching de emisión, y Haiku pisa una predicción correcta con una hipótesis de línea única a z bajo — exactamente la degeneración sobre la que el SYSTEM advierte. Los éxitos demo del plan 08 (Opus recuperando outliers elegidos a mano) **no generalizan hacia abajo** a Haiku a 1/25 del precio.
 
-Son **11 outliers catastróficos** (7.3 %) para que el agente intente recuperar — en ambas direcciones y por todo el rango (z_true 0.22→z_model 1.29, z_true 2.35→1.08, z_true 3.14→2.44, ...). La lista exacta sale de `results_baseline.csv`.
+**Lo que sí funciona: la correlación confianza↔acierto** (la métrica que pedía la DoD) es monótona y accionable — high 88.9 % (n=63) / medium 77.1 % (n=70) / low 52.9 % (n=17); 17 de los 21 casos rotos venían auto-marcados medium/low, por eso el híbrido recupera a 90.0 %. **La eval hizo su trabajo: cazó un fallo relevante para deployment (no dejar que un LLM barato pise a un modelo bien calibrado) que 4 demos elegidas a mano escondían.** Tablas y discusión completa en el README de spectra-copilot (sección "End-to-end evals") y en `eval/README.md`.
 
-**Hallazgo de protocolo:** sobre los mismos 150 índices, el CSV de `evaluate` da 84 % / 68 % / 0.090 — el protocolo de evaluate mide con masking, el de las tools usa contexto completo determinista. La fila "modelo solo" de la tabla final **debe** usar el protocolo de las tools (es literalmente lo que ve el agente); el 14.95 % de η oficial es del otro protocolo y no es comparable directo.
+## Qué quedó hecho (arnés: `8fb4a0f` · resultados: `6efbdfd`)
+
+- **`eval/export_cases.py`** — 150 espectros del lado held-out (stream canónico `filter(valid z) → skip(80000)`), estratificados con 45 en z > 1.5, cada z_true asserted contra `eval/heldout_predictions_v21.csv`; npz gitignoreados (regenerables deterministas, semilla 7), `labels.csv` commiteado.
+- **`submit_report` + `run_structured()`** en `copilot/agent.py` — salida estructurada tipada vía tool, tokens + usage para costo; incluye `find_similar_spectra` y (desde el plan 12) `lookup_reference`.
+- **`eval/run_evals.py`** — baseline modelo-solo + agente por caso; CSV reescrito tras cada caso + `--resume` (la corrida real usó exactamente ese camino: 20 validados primero, 130 después) + retry×2 + summary con `by_confidence` y costo. `--baseline-only` sin API.
+- **Tests 20→26** (después 35 con el plan 12), todos offline.
 
 ## Adaptaciones vs el plan original
 
-1. **Casos del lado held-out, no del stream shuffleado**: el sketch (`shuffle(buffer_size=4096)` desde el inicio) muestreaba casi todo del lado de ENTRENAMIENTO — el modelo y el índice FAISS ya vieron esos espectros; las métricas saldrían infladas. Se reemplazó por selección estratificada de índices contra el CSV held-out + aserción de alineación.
-2. **`official_z` en vez de `["z_pred"]`**: el sketch leía la cabeza de regresión secundaria; la predicción oficial de v2.1 es `z_pred_map`.
-3. **`run_structured` incluye `find_similar_spectra`** (el sketch era anterior al plan 10 y el SYSTEM la exige) y usa `request_kwargs()` — Haiku 4.5 rechaza `thinking: adaptive` con 400.
-4. **Robustez de corrida**: CSV reescrito por caso + `--resume` + retry×2 (el sketch escribía el CSV recién al final — una corrida muerta a mitad perdía todo, letal con el crédito justo).
-5. **`--baseline-only`**: la fila modelo-solo no necesita API — ya está corrida y commiteada.
+1. **Casos del lado held-out, no del stream shuffleado** (el sketch muestreaba del lado de entrenamiento → métricas infladas).
+2. **`official_z` en vez de `["z_pred"]`** (la predicción oficial de v2.1 es `z_pred_map`).
+3. **`run_structured` con toolset completo** y `request_kwargs()` (Haiku 4.5 rechaza `thinking: adaptive`).
+4. **Robustez de corrida**: CSV por caso + `--resume` + retry — clave con presupuesto justo.
+5. **Corrida en dos lotes con go-ahead por lote** (validación n=20 → OK de Julián → 130 restantes), tras el susto de contabilidad del panel (ver HANDOFF: los $22.71 previos eran del 16-ago, no de la sesión).
 
-## Para retomar cuando haya crédito (los dos comandos)
+## Hallazgo de protocolo (mantener en toda tabla futura)
 
-```bash
-cd ~/proyectos/spectra-copilot
-ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python eval/run_evals.py --limit 20   # validación (~US$ 0.4)
-ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python eval/run_evals.py --resume     # 150 casos (~US$ 3–4.5 Haiku)
-```
-
-La key SOLO al proceso, nunca exportada global. Costo total estimado: **~US$ 4 solo Haiku; +US$ 2.5–3.5 si se agrega Opus 4.8 sobre los ~25 difíciles (opcional). Recarga recomendada: ≥ US$ 10.** Nota (plan 12, 2026-08-17): desde `3eea698` el agente ofrece además `lookup_reference` (mini-RAG) — la corrida medirá agente **con** priors citables; documentarlo en la fila de metodología. Después de la corrida: tabla + párrafo de metodología en el README de spectra-copilot (n=150, semilla 7, estratos, modelo LLM, costo real medido) + `results.csv` commiteado + cerrar la DoD acá y el tracker.
+La fila "modelo solo" usa el protocolo de las tools (contexto completo determinista — lo que el agente ve): 92.7 % sobre estos 150. El CSV de `evaluate` (masking) da 84 % sobre los mismos índices y el η oficial 14.95 % es de ese otro protocolo — **no mezclar** sin decirlo.
 
 ## Definición de hecho
 
-- [ ] ≥ 100 casos corridos end-to-end con salida estructurada (0 reportes sin `submit_report`). — **bloqueado por crédito**; arnés validado offline con runner falso + baseline real de 150 casos.
-- [ ] Tabla modelo-solo vs agente en el README, con metodología y costo. — fila modelo-solo lista (92.7 % / 77.3 % / 0.061); fila agente pendiente.
-- [ ] La correlación confianza↔acierto reportada. — implementada y testeada (`by_confidence` en el summary); números pendientes de la corrida.
-- [x] Commit + tracker. — arnés en `8fb4a0f` (CI verde); tracker en ⏳ con nota.
+- [x] ≥ 100 casos corridos end-to-end con salida estructurada (0 reportes sin `submit_report`). — 150/150, 0 errores.
+- [x] Tabla modelo-solo vs agente en el README, con metodología y costo. — README de spectra-copilot + `eval/README.md` (`6efbdfd`), costo medido US$ 4.06.
+- [x] La correlación confianza↔acierto reportada. — monótona: 88.9/77.1/52.9 %; base de la política híbrida (90.0 %).
+- [x] Commit + tracker. — `8fb4a0f` + `6efbdfd`, CI verde; tracker ✅.
 
 ## Si algo falla (aprendido)
 
-- **El export aborta con "stream z != csv z"**: el dataset upstream cambió de orden — NO usar esas etiquetas; regenerar la selección contra un CSV nuevo de predicciones.
-- **Corrida muerta a mitad (crédito/red)**: `--resume` retoma; los casos `error` se reintentan, los `ok` se conservan.
-- **El agente no llama `submit_report`**: `run_structured` devuelve `None` → run_evals reintenta 1 vez y después marca `error` (se reporta el % en `n_error`).
-- **Los stdout del export no aparecen en el log**: Python bufferea al redirigir a archivo — correr con `python -u` si se quiere progreso en vivo (los npz aparecen en disco igual).
+- **El export aborta con "stream z != csv z"**: el dataset upstream cambió de orden — regenerar la selección contra un CSV nuevo.
+- **Corrida muerta a mitad**: `--resume` retoma; los `ok` se conservan (probado en la corrida real).
+- **El agente no llama `submit_report`**: `run_structured` → `None` → retry → `error` (esta corrida: 0 casos).
+- **Números del agente peores que el modelo**: no es bug — es el resultado (ver arriba). Antes de "arreglarlo", recordar que la corrida de referencia con Opus (plan 08) sí recuperaba outliers: el siguiente experimento natural es Opus sobre los 21+10 casos que Haiku falló (~US$ 3), no tocar el arnés.

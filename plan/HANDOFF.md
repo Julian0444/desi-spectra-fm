@@ -593,3 +593,45 @@ Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como 
 - `rank_bm25` es dependencia nueva: entornos viejos necesitan `pip install -e .` (CI lo instala solo).
 - La tokenización del RAG es alfanumérica sin stemming: al escribir queries en tools/tests usar las palabras del corpus (p.ej. "confusion" está en los textos clave; "Halpha" siempre en ASCII).
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM y las descripciones MCP; el contrato nuevo de citas vive en `report.py` y está testeado en `test_rag.py`.
+
+---
+
+## Session — 2026-08-17 (planes 11 y 12 COMPLETADOS: recarga confirmada, corridas pagas hechas, tablas commiteadas)
+
+### Resumen ejecutivo
+
+Julián recargó crédito y conectó la key (`sk-ant-api03-mr...DgAA`, verificada contra `~/.anthropic_key` + llamada mínima). Con eso se cerraron **los dos planes que estaban solo-por-crédito**: el **12** (mini-RAG — 3 corridas de verificación, 6/6 citas respaldadas, reporte en el README) y el **11** (evals — 150/150 casos, tabla honesta commiteada). spectra-copilot `main` = `6efbdfd` (= origin), CI verde, 35/35 tests. **Costo API total de la sesión: ~US$ 4.20 medidos** (probes <$0.01 + plan 12 $0.07 + validación n=20 $0.57 + corrida 130 casos $3.49); saldo restante ≈ US$ 1.7.
+
+### Incidente de contabilidad (importante para el trato futuro)
+
+A mitad de sesión Julián frenó el lanzamiento de los 130 casos al ver "Gasto este mes USD 23.31" en la consola, creyendo que la sesión lo había gastado. Aclaración que lo destrabó: **$22.71 ya estaban gastados ANTES de esta sesión** (visible en su propio screenshot matinal de la key; es el incidente del 16-ago de la key exportada global + plan 08) y el delta de la sesión cuadraba ($0.60 en ese momento). Regla nueva (en memoria persistente `feedback-corridas-pagas`): **go-ahead explícito por cada lote pago >$1 + reportar siempre sesión vs acumulado del panel**. La corrida de 130 se lanzó recién con su OK explícito ("Haz la corrida de los 130").
+
+### Plan 12 — verificación con el agente (commit `ac04121`)
+
+- 3 corridas Haiku (~$0.07, transcripts commiteados `eval/transcripts/{lowconf,trap,z287}_rag.json`): el agente consultó `lookup_reference` **sin pedírselo** en los 3 casos; **6/6 citas corresponden a ids devueltos en esa conversación** (verificado programáticamente contra `rag.valid_ids()`) — 0 fuentes inventadas. Reporte lowconf verbatim en el README (2 citas trabajando como priors: ventana LRG + caveat de absorción).
+- Hallazgo Haiku-vs-Opus: en el trap sintético Haiku dio z=0.219 "High" apoyado en vecinos sin sentido (el trap está fuera del manifold) donde Opus decía "Indeterminate" — la mecánica de citas funcionó igual; para reportes de calidad usar Opus.
+- Runbook plan/12 con DoD 4/4, tracker ✅.
+
+### Plan 11 — corrida completa (commit `6efbdfd`, `eval/results.csv` commiteado)
+
+- **150/150 submit_report, 0 errores, US$ 4.06 medido** (~21.8k tokens/caso). Camino real: validación `--limit 20` → freno de Julián → OK → `--resume` 130 (~2 h desatendida, CSV por caso).
+- **Titular honesto: modelo solo 92.7 % vs agente Haiku 79.3 % (<0.15)** — el agente recuperó 1/11 outliers y rompió 21 predicciones buenas, concentrado en z>1.5 (68.9 % vs 91.1 %): con pocas líneas en cobertura el z verdadero también "se ve débil" y Haiku pisa al modelo con hipótesis de línea única a z bajo. Los éxitos demo del plan 08 (Opus, casos elegidos) no generalizan a Haiku.
+- **Lo que redime el loop:** confianza↔acierto monótona (high 88.9 % n=63 / medium 77.1 % n=70 / low 52.9 % n=17; 17 de los 21 rotos auto-marcados medium/low) → política híbrida "agente solo si high" = 90.0 %. **La eval cazó un fallo relevante para deployment que las demos escondían — ese es el valor de portfolio.**
+- Tablas + discusión en README de spectra-copilot (sección "End-to-end evals") y `eval/README.md`; runbook plan/11 con DoD 4/4, tracker ✅.
+
+### Estado actual
+
+- **spectra-copilot**: `main` = `6efbdfd` (= origin) — hoy: `3eea698` (RAG offline) → `ac04121` (citas verificadas) → `6efbdfd` (resultados evals); CI verde en los tres; 35/35 tests.
+- **Repo principal**: `7f77c50` (cierre offline del 12) + el commit de cierre de esta sesión (runbooks 11 y 12 ✅, tracker, esta sección). Residuos sin trackear de siempre preservados.
+- Saldo API ≈ **US$ 1.7**. La key sigue en `~/.anthropic_key` (chmod 600), solo por proceso.
+
+### Siguiente paso — Plan 13 (narrativa, SIN API): el único que falta
+
+**Todo 01–12 está ✅.** El 13 cierra el portfolio: README maestro + pitch + bullets de CV. Materia prima nueva de hoy para la narrativa: (1) "construí evals que demostraron que mi agente barato empeoraba a mi modelo — y la señal de confianza para arreglarlo con una política híbrida"; (2) "RAG con citas verificadas programáticamente contra el corpus: 0 alucinadas en todas las corridas". Experimento opcional si se recarga (~US$ 3): Opus sobre los 31 casos que Haiku falló (comando en el runbook 11, sección "Si algo falla").
+
+### Avisos
+
+- **Go-ahead por lote pago** (regla nueva, ver incidente arriba).
+- El protocolo de la tabla (tools, contexto completo) NO es comparable con el η 14.95 % de evaluate (masking) — está anotado en ambos READMEs y en el runbook.
+- `eval/results.csv` está commiteado; los 150 npz siguen fuera de git (regenerables, semilla 7).
+- El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, SYSTEM y descripciones MCP; el contrato de citas vive en `report.py` (testeado).
