@@ -517,3 +517,42 @@ Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como 
 - La key sigue en `~/.anthropic_key` (chmod 600); NUNCA exportarla global.
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM y las descripciones MCP; el SYSTEM ahora tiene además la regla 4 (vecinos complementan, no reemplazan) testeada por contrato en `test_agent.py` y `test_mcp_server.py`.
 - Los 2 slots ZeroGPU gratis siguen ocupados (demo + API); el índice FAISS corre local/CI, no necesita hosting.
+
+---
+
+## Session — 2026-08-17 (plan 11 PARCIAL: arnés de evals completo y commiteado; corrida del agente bloqueada por crédito)
+
+### Resumen ejecutivo
+
+**El crédito de la API sigue en CERO** (verificado al inicio con una llamada mínima a Haiku → "credit balance is too low"), así que la corrida paga del plan 11 no se pudo lanzar. Todo lo demás del plan quedó **construido, testeado y commiteado**: cuando haya crédito, cerrar el plan es correr dos comandos y pegar la tabla. spectra-copilot `main` = `8fb4a0f` (= origin), CI verde, **26/26 tests** (todos offline).
+
+### Qué se hizo
+
+- **`eval/export_cases.py` + 150 casos exportados** (~20 min desatendido): lado **held-out** del split (stream canónico `filter(valid z) → skip(80000)`), selección **estratificada** sobre el CSV de predicciones v2.1 con 45 casos en z > 1.5. Cada z_true asserted contra el CSV (reordenamiento upstream → abort, nunca etiquetas malas). `eval/cases/labels.csv` commiteado (`case,heldout_index,z_true`); los 150 npz (15 MB) gitignoreados — se regeneran determinísticamente.
+- **CORRECCIÓN al sketch del plan**: muestreaba con `shuffle(buffer_size=4096)` desde el inicio del stream = casi todo del lado de ENTRENAMIENTO (visto por el modelo Y por el índice FAISS) → métricas infladas. También leía `z_pred` (cabeza secundaria) como baseline; lo correcto es `tools.official_z` (z_pred_map).
+- **`submit_report` + `run_structured()`** en `copilot/agent.py`: salida estructurada vía tool (dict `SUBMITTED`, cero parsing de prosa), tokens + usage completo para costo. Incluye `find_similar_spectra` (el sketch era pre-plan-10) y `request_kwargs()` (Haiku 4.5 rechaza thinking adaptive con 400).
+- **`eval/run_evals.py`**: baseline modelo-solo + agente por caso; el CSV se **reescribe tras cada caso** y `--resume` retoma una corrida muerta sin perder nada (clave con crédito justo); retry×2 por caso; summary con ambos sistemas, **`by_confidence`** (la correlación confianza↔acierto que pide la DoD) y costo estimado. `--baseline-only` corre sin API.
+- **Baseline modelo-solo YA CORRIDO** sobre los 150 casos → `eval/results_baseline.csv` commiteado: **rate<0.15 = 92.7 %, rate<0.05 = 77.3 %, MAE_norm = 0.061; 11 outliers catastróficos** para que el agente recupere.
+- **Hallazgo de protocolo**: sobre los mismos 150 índices, el CSV de `evaluate` da 84 %/68 %/0.090 — evaluate mide con masking; las tools usan contexto completo determinista. La fila "modelo solo" de la tabla final debe usar el protocolo de las tools (lo que el agente ve); el η = 14.95 % oficial es del otro protocolo, no comparable directo.
+- **Tests 20→26** offline: `run_structured` contra un tool runner falso (payload, tokens, submit_report ofrecida, regla en el system, sin thinking en Haiku, estado stale no se filtra), estratificación determinista del export, métricas de `summarize`, convención dz_norm.
+- **Cierre documental**: `eval/README.md` en spectra-copilot; en el repo principal plan/11 reescrito como runbook (estado honesto: DoD abierta), tracker 11 → ⏳ con nota, esta sección.
+
+### Para retomar (primera acción de la próxima sesión que toque el 11)
+
+1. Confirmar recarga: `ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)"` + llamada mínima (o directamente el paso 2 con `--limit 20`).
+2. `cd ~/proyectos/spectra-copilot && ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python eval/run_evals.py --limit 20` (validación, ~US$ 0.4).
+3. `... eval/run_evals.py --resume` (150 casos, ~US$ 3–4.5 Haiku). Opcional: Opus 4.8 sobre los difíciles (`--model claude-opus-4-8 --out eval/results_opus.csv --limit 25`, +US$ 2.5–3.5). **Recarga recomendada ≥ US$ 10.**
+4. Tabla + metodología (n=150, semilla 7, estratos, LLM, costo real) en el README de spectra-copilot, commitear `results.csv`, cerrar DoD del runbook + tracker ✅.
+
+### Estado actual
+
+- **spectra-copilot**: `main` = `8fb4a0f` (= origin), CI verde, 26/26 tests. Nuevos: `eval/{export_cases,run_evals}.py`, `eval/README.md`, `eval/heldout_predictions_v21.csv`, `eval/cases/labels.csv`, `eval/results_baseline.csv`, `tests/test_evals.py`; `.gitignore` + `eval/cases/*.npz`. Local: 150 npz en `eval/cases/`.
+- **Repo principal**: cierre documental de esta sesión (runbook 11, tracker ⏳, esta sección) — commit `plan-11: arnés cerrado`. Residuos sin trackear de siempre preservados.
+- La key sigue en `~/.anthropic_key` (chmod 600), solo pasada por proceso.
+
+### Avisos
+
+- **El plan 12 (mini-RAG) sigue bloqueado por el mismo crédito.** El 13 (narrativa) no necesita API y puede cerrar el producto mínimo; si se hace antes que el 11, dejar la tabla del README con la fila del agente como "pending".
+- Los 150 npz de `eval/cases/` NO están en git: si se pierden, `python eval/export_cases.py` los regenera idénticos (selección determinista, semilla 7 + aserción contra el CSV commiteado).
+- `results_baseline.csv` usa el protocolo de las tools — no mezclar con las métricas de `evaluate` (masking) en la misma tabla sin decirlo.
+- El stdout de un export redirigido a archivo se bufferea: usar `python -u` para progreso en vivo.
