@@ -1,120 +1,45 @@
-# 10 · Embeddings + búsqueda semántica (FAISS)
+# 10 · Embeddings + búsqueda semántica (FAISS) — ✅ COMPLETADO (2026-08-16/17)
 
-> **Bloque:** Nivel 3 · **Tiempo:** 3–4 h (+ ~40 min de indexado desatendido) · **Depende de:** 02 (checkpoint bueno), 07 · **Entregable:** "espectros similares a este" funcionando + UMAP coloreado por z
+> **Bloque:** Nivel 3 · **Tiempo real:** ~2.5 h (el indexado tomó 5.1 min, no los 30–60 estimados) · **Dependía de:** 02 (checkpoint v2.1), 07 · **Entregable:** `find_similar_spectra` funcionando sobre un índice FAISS de 15k espectros + UMAP con gradiente de z visible a simple vista en los README de ambos repos.
 
-## Objetivo
+## Qué quedó hecho
 
-Usar el encoder como **modelo de embeddings** — la demostración conceptual de que entendés para qué sirve un foundation model: representaciones reutilizables downstream. Además le da al agente la tool `find_similar_spectra` y produce la imagen más linda del portfolio (UMAP con gradiente de z).
+- **`DESIFoundationModel.encode()`** (`src/desi_fm/model.py`) + **`embed_spectrum()`** (`src/desi_fm/predict.py`) en [`Julian0444/desi-spectra-fm`](https://github.com/Julian0444/desi-spectra-fm) (commit `7a2f8ab`, CI verde, tests 24→26): mean-pooling de los tokens espectrales válidos, contexto completo (sin masking), determinista, 512-d. El preprocesado se factorizó en `_prepare_inputs()` compartido con `predict_spectrum` — cero duplicación.
+- **`scripts/build_index.py`** en [`Julian0444/spectra-copilot`](https://github.com/Julian0444/spectra-copilot) (commit `75997c5`, CI verde): 15.000 espectros streaming → embeddings L2-normalizados → `faiss.IndexFlatIP` (coseno). Corrió en **5.1 min** en MPS (48 espectros/s). El índice cubre los **primeros 15k del lado de entrenamiento** del split (held-out = skip 80k) → las consultas con `examples/heldout_*.npz` son out-of-index por construcción.
+- **Índice publicado en el Hub**: `faiss/spectra.faiss` (30 MB) + `faiss/spectra_meta.npz` en [jirustaroure/desi-spectra-fm](https://huggingface.co/jirustaroure/desi-spectra-fm/tree/main/faiss); la model card lo documenta. Resolución en `tools.py`: `DESI_FM_INDEX_DIR` → `data/` del repo → descarga del Hub (mismo patrón que el checkpoint). `data/` quedó gitignoreado.
+- **`find_similar_spectra`** integrada en las 3 capas: `tools.py` (impl con `k` clampeado, `neighbor_z_range`/`neighbor_z_median` para que el agente cite rangos), `agent.py` (`@beta_tool` + regla 4 del SYSTEM: los vecinos complementan la verificación por líneas, **nunca la reemplazan**) y `mcp_server.py` (tool + `instructions` actualizadas). Suite **17→20 tests** offline (fixture `tiny_index` en `conftest.py`: el embedding real del held-out entre 32 vectores random → rank 1 = él mismo con sim ≈ 1.0).
+- **`scripts/plot_umap.py`** → **`docs/img/umap_z.png`** (UMAP coseno, n_neighbors=30, viridis sobre log(1+z) con ticks legibles en z): gradiente de z **visible a simple vista** — violeta (z≈0) → azul (z≈0.5–1) → verde (z≈2–3) — más una isla separada de z bajo. Linkeada en el README de **ambos** repos con la frase clave: nadie le enseñó al modelo a ordenarse por redshift.
 
-## Pasos
+## Verificación (consultas reales sobre el índice de 15k)
 
-### 1. `encode()` en `desi-spectra-fm`
+| query (held-out) | z_true | vecinos (k=5) | lectura |
+|---|---|---|---|
+| `heldout_z020` | 0.2036 | z ∈ [0.187, 0.202], sims 0.989–0.992 | cluster apretado alrededor del z verdadero — apoya el 0.204 verificado por líneas **contra** el z_pred_map 0.2267 del propio modelo |
+| `heldout_z287` | 2.866 | mediana 2.898, sims 0.971–0.987 | coherente también a z alto |
+| `heldout_lowconf_z157` | 1.574 | z dispersos [0.13, 1.39] con sims ~0.997 | embedding no distintivo → duda, consistente con conf 0.18 — el fallo se señala honesto |
+| `trap_single_line` | — | sims máx 0.898 (vs ~0.99 de espectros reales) | lejos del manifold: similitud baja = "no confíes en estos vecinos" |
 
-En `model.py` (método nuevo de `DESIFoundationModel`):
+La consulta de la DoD se ejecutó además **por la capa MCP real** (`mcp.call_tool("find_similar_spectra", ...)` sobre `heldout_z020`) con idéntico resultado — el server registrado en Claude Code hereda la tool sin tocar el registro (mismo archivo).
 
-```python
-@torch.no_grad()
-def encode(self, flux: torch.Tensor, valid: torch.Tensor) -> torch.Tensor:
-    """Embedding por espectro: mean-pooling de los tokens espectrales válidos."""
-    tokens, _, valid_patches = self.tokenizer(flux, valid)
-    z_token = self.z_mask_token.expand(flux.shape[0], 1, -1)
-    seq = torch.cat([tokens, z_token], dim=1)          # sin masking: contexto completo
-    seq = seq + self.wavelength_pos_embed.to(seq.dtype)
-    if self.learned_pos_embed is not None:
-        seq = seq + self.learned_pos_embed
-    hidden = self.norm(self.encoder(seq))
-    spec_hidden = hidden[:, : self.config.n_tokens]     # (B, 273, d)
-    w = (valid_patches.mean(-1) > 0.0).float()          # token válido si tiene píxeles válidos
-    pooled = (spec_hidden * w.unsqueeze(-1)).sum(1) / w.sum(1, keepdim=True).clamp_min(1.0)
-    return pooled                                       # (B, d_model)
-```
+## Adaptaciones vs el plan original
 
-En `predict.py`, wrapper público `embed_spectrum(flux, wavelength, ..., model=...) -> np.ndarray` que reusa el mismo preprocesado de `predict_spectrum`. Test: dos espectros sintéticos con el mismo z tienen mayor similitud coseno entre sí que contra uno de z muy distinto.
-
-### 2. `scripts/build_index.py` (en spectra-copilot)
-
-```python
-"""Indexa N espectros DESI: embeddings L2-normalizados → FAISS IndexFlatIP."""
-# pip install faiss-cpu
-import faiss, numpy as np, torch
-from desi_fm.data import HFDESISpectra, SpectrumPreprocessConfig, collate_spectra
-from torch.utils.data import DataLoader
-
-import os
-from huggingface_hub import hf_hub_download
-from desi_fm.predict import load_model_from_checkpoint
-
-N = 15_000
-ds = HFDESISpectra(max_examples=N, shuffle_buffer=4096)
-loader = DataLoader(ds, batch_size=32, collate_fn=collate_spectra)
-
-ckpt = os.environ.get("DESI_FM_CKPT") or hf_hub_download(
-    "TU_USUARIO/desi-spectra-fm", "checkpoint_last.pt")
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-model = load_model_from_checkpoint(ckpt, device)
-
-embs, zs, done = [], [], 0
-for batch in loader:
-    e = model.encode(batch["flux"].to(device), batch["valid"].to(device))
-    embs.append(e.cpu().numpy()); zs.append(batch["z"].numpy())
-    done += len(batch["z"])
-    if done % 1600 == 0:
-        print(f"{done}/{N}")
-X = np.concatenate(embs).astype(np.float32)
-X /= np.linalg.norm(X, axis=1, keepdims=True)
-index = faiss.IndexFlatIP(X.shape[1])
-index.add(X)
-faiss.write_index(index, "data/spectra.faiss")
-np.savez("data/spectra_meta.npz", z=np.concatenate(zs))
-```
-
-~15k espectros en streaming ≈ 30–60 min (una sola vez). Guardar también los `flux/valid` de un subset chico si querés mostrar los vecinos gráficamente.
-
-### 3. Tool `find_similar_spectra` (agregar a `tools.py` + al agente + al MCP server)
-
-```python
-def find_similar_spectra_impl(npz_path: str, k: int = 5) -> dict:
-    flux, wave = _load(npz_path)
-    e = embed_spectrum(flux=flux, wavelength=wave, model=_model())
-    e = (e / np.linalg.norm(e)).astype(np.float32)[None, :]
-    index = faiss.read_index("data/spectra.faiss")
-    meta = np.load("data/spectra_meta.npz")
-    sims, ids = index.search(e, k)
-    return {"neighbors": [
-        {"rank": i + 1, "similarity": round(float(s), 3), "z": round(float(meta["z"][j]), 3)}
-        for i, (s, j) in enumerate(zip(sims[0], ids[0]))
-    ]}
-```
-
-Uso por el agente: "los 5 vecinos más cercanos tienen z entre 0.40 y 0.45 (find_similar_spectra) — consistente con z_pred = 0.42". **Otra vía de validación independiente.**
-
-### 4. El visual: UMAP coloreado por z
-
-```python
-# pip install umap-learn
-import umap, numpy as np, matplotlib.pyplot as plt
-X = ...  # embeddings ya normalizados
-z = np.load("data/spectra_meta.npz")["z"]
-xy = umap.UMAP(n_neighbors=30, min_dist=0.1, metric="cosine").fit_transform(X)
-plt.figure(figsize=(7, 6))
-sc = plt.scatter(xy[:, 0], xy[:, 1], c=np.log1p(z), s=2, cmap="viridis", alpha=0.6)
-plt.colorbar(sc, label="log(1+z)"); plt.axis("off")
-plt.title("Espacio de embeddings del foundation model, coloreado por redshift")
-plt.savefig("docs/img/umap_z.png", dpi=180, bbox_inches="tight")
-```
-
-Si el modelo aprendió física, el gradiente de z se ve **a simple vista** sin que nadie le haya enseñado a ordenarse así. Esa imagen + una frase van al README de ambos repos.
+1. **faiss + torch se matan entre sí en macOS** (dos `libomp.dylib`, OMP Error #15: el proceso aborta en la primera región paralela de faiss — así aparecieron los diálogos "Python se cerró inesperadamente"). Fix centralizado en `tools._faiss()`: `KMP_DUPLICATE_LIB_OK=TRUE` (workaround documentado por Intel/LLVM) + `faiss.omp_set_num_threads(1)` (search sobre 15k flat es microsegundos igual). `build_index.py` además guarda embeddings/meta **antes** de tocar faiss, para que un abort no pierda la pasada de streaming.
+2. **El índice vive en el Hub, no en git**: 30 MB binarios no van a un repo de código; `_index_paths()` los baja y cachea igual que el checkpoint. Bonus: los embeddings crudos quedan en `data/spectra_embeddings.npy` para reuso (UMAP, análisis).
+3. **Sin `shuffle_buffer`** en el indexado: la membresía del índice es idéntica (`take` corre antes de `shuffle` en `HFDESISpectra`) y el orden determinista hace el rebuild reproducible.
+4. **Corrida demo del agente con la tool nueva NO se hizo**: el crédito de la API está agotado ("credit balance is too low", medido 2026-08-17 ~06:40 UTC — la memoria decía ~US$ 4.50 restantes; el saldo real era cero). La integración quedó igualmente verificada offline: test `agent.find_similar_spectra.call(...) ≡ impl`, SYSTEM testeado por contrato, y la consulta real por la capa MCP. Cuando haya crédito: una corrida haiku (~$0.013) sobre `heldout_z020` debería citar "the 5 nearest neighbors have z between 0.19 and 0.20".
+5. **UMAP con `random_state=42`** (reproducible) y colorbar que codifica log(1+z) pero se lee en z plano — más honesto que el label "log(1+z)" del plan.
 
 ## Definición de hecho
 
-- [ ] `embed_spectrum` con test de sanidad (mismo z → más similar).
-- [ ] Índice de ≥ 10k espectros construido y guardado.
-- [ ] `find_similar_spectra` integrada al agente y al MCP server; una consulta devuelve vecinos con z coherentes.
-- [ ] `docs/img/umap_z.png` con gradiente de z visible, linkeado en el README.
-- [ ] Commit + tracker.
+- [x] `embed_spectrum` con test de sanidad (mismo z → más similar) — + determinismo y shape; 26/26 en el repo principal, CI verde.
+- [x] Índice de ≥ 10k espectros construido y guardado — 15.000 × 512-d, local en `data/` y publicado en el Hub.
+- [x] `find_similar_spectra` integrada al agente y al MCP server; una consulta devuelve vecinos con z coherentes — tabla de arriba; consulta MCP real con z ∈ [0.187, 0.202] para z_true 0.204. (Corrida API del agente pendiente de crédito — adaptación nº 4.)
+- [x] `docs/img/umap_z.png` con gradiente de z visible, linkeado en el README — en ambos repos.
+- [x] Commit + tracker — `7a2f8ab` (código desi-fm) + `75997c5` (spectra-copilot) + cierre documental; CI verde en ambos.
 
-## Si algo falla
+## Si algo falla (aprendido)
 
-- **faiss-cpu no instala en Python 3.9:** usar el venv 3.10+ de spectra-copilot (el índice vive ahí).
-- **El UMAP sale sin estructura:** verificar que los embeddings vienen del checkpoint v2 entrenado (no de pesos random), y probar `n_neighbors=50`; también puede ayudar poolear solo tokens con `w>0`.
-- **Streaming lento:** bajar a N=8k; el punto se demuestra igual.
+- **"Python se cerró inesperadamente" / exit 139 / OMP Error #15:** es el doble libomp de torch+faiss. Importar faiss **siempre** vía `tools._faiss()`; nunca `import faiss` directo en código que también toca torch.
+- **faiss-cpu no instala en Python 3.9:** confirmado el consejo del plan — todo corre en el venv 3.12 de spectra-copilot.
+- **El streaming no fue el cuello de botella** (5 min, no 30–60): los shards estaban calientes en el CDN/cache; si un rebuild diera lento, `--n 8000` demuestra lo mismo.
+- **El UMAP salió con estructura al primer intento** con el checkpoint v2.1; si saliera sin estructura, revisar que no se estén usando pesos random (el fallback del Hub descarga el checkpoint correcto).

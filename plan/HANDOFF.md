@@ -476,3 +476,44 @@ El **plan 09 quedó ✅ de punta a punta**, repartido en dos sesiones: una sesi�
 - El server MCP registrado a scope usuario apunta al checkpoint **local** vía `DESI_FM_CKPT`; si ese path se mueve, borrar el env o actualizarlo (sin él, descarga del Hub en la primera llamada, ~104 MB).
 - La key sigue en `~/.anthropic_key` (chmod 600); el plan 09 no la tocó. Crédito API intacto: ~US$ 4.50.
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM del agente y las descripciones MCP; si se toca uno, tocar los tres.
+
+---
+
+## Session — 2026-08-16/17 (plan 10 COMPLETADO: embeddings + búsqueda semántica FAISS)
+
+### Resumen ejecutivo
+
+El **plan 10 quedó ✅ de punta a punta** en una sesión: el encoder ahora es un modelo de embeddings (`encode()`/`embed_spectrum()` en desi-spectra-fm, commit `7a2f8ab`, 26/26 tests, CI verde), un índice FAISS de **15.000 espectros de entrenamiento** construido en 5.1 min y **publicado en el Hub** (`faiss/` en jirustaroure/desi-spectra-fm), la tool **`find_similar_spectra`** integrada en tools + agente + MCP server (spectra-copilot commit `75997c5`, 20/20 tests, CI verde) y el **UMAP coloreado por z** (`docs/img/umap_z.png`) con gradiente visible a simple vista, linkeado en el README de ambos repos. Sin costo de API (ver bloqueo de crédito abajo).
+
+### Qué se hizo (cronología)
+
+1. **`DESIFoundationModel.encode()`** (mean-pooling de tokens válidos, sin masking, determinista, 512-d) + **`embed_spectrum()`** con el preprocesado factorizado en `_prepare_inputs()` compartido con `predict_spectrum`. Tests de sanidad: mismo z → más similar que z distinto (modelo random chico), determinismo, shape. Push primero al repo principal porque el CI de spectra-copilot instala `desi-fm` desde git.
+2. **Hallazgo duro — faiss-cpu y torch se segfaultean entre sí en macOS** (cada uno bundlea su `libomp.dylib`; OMP Error #15 aborta el proceso en la primera región paralela de faiss — de ahí los diálogos "Python se cerró inesperadamente" que vio Julián). Fix centralizado en **`tools._faiss()`**: `KMP_DUPLICATE_LIB_OK=TRUE` + `faiss.omp_set_num_threads(1)`; `build_index.py` guarda embeddings/meta ANTES de tocar faiss para no perder la pasada si aborta. Regla: nunca `import faiss` directo en código que toque torch.
+3. **`scripts/build_index.py`**: 15k espectros streaming (los primeros 15k válidos = lado de ENTRENAMIENTO del split; held-out = skip 80k → las queries de `examples/` son out-of-index por construcción) → `IndexFlatIP` coseno. 5.1 min en MPS (48/s — la estimación de 30–60 min del plan era muy conservadora). Salidas: `data/spectra.faiss` (30 MB), `data/spectra_meta.npz` (z), `data/spectra_embeddings.npy` (para el UMAP); `data/` gitignoreado, índice subido al Hub y model card actualizada (`faiss/` documentado).
+4. **`find_similar_spectra`** en las 3 capas + resolución del índice `DESI_FM_INDEX_DIR` → `data/` → Hub (mismo patrón que el checkpoint). SYSTEM regla 4 nueva: los vecinos son señal del espacio de embeddings (no de la cabeza de clasificación) y **complementan la verificación por líneas, nunca la reemplazan** — testeado por contrato. Suite 17→20 (fixture `tiny_index` en `tests/conftest.py`: embedding real del held-out entre 32 vectores random → rank 1 = sí mismo, sim ≈ 1.0; CI no necesita bajar el índice de 15k).
+5. **Consultas reales** (las 4 de `examples/`): z020 → vecinos z ∈ [0.187, 0.202] (¡apoya el z_true 0.204 contra el z_pred_map 0.2267 del propio modelo!); z287 → mediana 2.898 ✓; lowconf_z157 → vecinos dispersos [0.13, 1.39] = duda honesta; trap → sim máx 0.898 vs ~0.99 de espectros reales = fuera del manifold. La consulta DoD también se corrió **por la capa MCP real** (`mcp.call_tool`) con idéntico resultado.
+6. **UMAP** (`scripts/plot_umap.py`, `random_state=42`, viridis sobre log(1+z) con ticks en z plano): gradiente violeta→verde nítido + isla de z bajo separada. En los README de ambos repos con la frase "nadie le enseñó a ordenarse por redshift".
+7. **Cierre**: spectra-copilot `75997c5` push + CI verde; repo principal: README (sección embeddings + snippet API + 26 tests), model card re-subida al Hub, plan/10 runbook con DoD marcada, tracker ✅, esta sección.
+
+### BLOQUEO — crédito API agotado (afecta plan 11 y 12)
+
+`python -m copilot.agent` falló con **"Your credit balance is too low"** (2026-08-17 ~06:40 UTC). La memoria decía "~US$ 4.50 restantes" — el saldo real es CERO (algo lo drenó o el dato estaba viejo; la memoria ya se corrigió). Impacto: la corrida demo del agente con la tool nueva quedó pendiente (integración verificada offline igual — DoD cumplida con esa adaptación anotada en el runbook). **El plan 11 (evals, necesita ~100 corridas) y el 12 (mini-RAG) NO pueden correr sin recarga.** Primera acción de la próxima sesión que los toque: confirmar recarga con Julián. Cuando haya crédito: una corrida haiku (~$0.013) sobre `heldout_z020` debería citar el rango de vecinos.
+
+### Estado actual
+
+- **desi-spectra-fm**: `main` = `7a2f8ab` (código) + el commit de cierre documental de esta sesión; CI verde; 26/26 tests. Hub: `faiss/spectra.faiss` + `faiss/spectra_meta.npz` + model card actualizada.
+- **spectra-copilot**: `main` = `75997c5` (= origin), CI verde, 20/20 tests. Nuevos: `scripts/build_index.py`, `scripts/plot_umap.py`, `tests/conftest.py`, `docs/img/umap_z.png` (excepción en .gitignore); `data/` local con índice + embeddings (30 MB c/u, NO en git). Venv: + `faiss-cpu` (dependencia), `umap-learn`/`matplotlib` (solo local, para el plot).
+- El server MCP registrado en Claude Code hereda `find_similar_spectra` sin re-registrar (mismo archivo); primera llamada puede bajar el índice del Hub si no encuentra `data/` (30 MB).
+- Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+
+### Siguiente paso — Planes 11–12 (Nivel 3, requieren crédito API) o 13 (cierre)
+
+Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como insumo, pero **bloqueado por crédito**), 12 (mini-RAG, también usa API), 13 (narrativa — **nunca se recorta**, no necesita API). Si el crédito no se recarga, el 13 es el único ejecutable y cierra el producto mínimo del sprint.
+
+### Avisos
+
+- **Regla faiss/torch en macOS**: importar faiss SOLO vía `tools._faiss()` (OMP Error #15 → abort). Los diálogos de crash de macOS que vio Julián durante esta sesión fueron eso — inofensivos, se cierran con OK.
+- El índice indexa SOLO lado de entrenamiento; si se reconstruye, mantener esa propiedad (las queries held-out deben seguir out-of-index) — está en el docstring de `build_index.py`.
+- La key sigue en `~/.anthropic_key` (chmod 600); NUNCA exportarla global.
+- El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM y las descripciones MCP; el SYSTEM ahora tiene además la regla 4 (vecinos complementan, no reemplazan) testeada por contrato en `test_agent.py` y `test_mcp_server.py`.
+- Los 2 slots ZeroGPU gratis siguen ocupados (demo + API); el índice FAISS corre local/CI, no necesita hosting.

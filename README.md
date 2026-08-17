@@ -153,6 +153,11 @@ batch = predict_spectra_batch(
 )
 batch["z_pred_map"]                  # (N,) official prediction
 batch["reconstruction_input_grid"]   # (N, P)
+
+# Embedding (the encoder as a representation model)
+from desi_fm.predict import embed_spectrum
+emb = embed_spectrum(flux=flux_1d, wavelength=wavelength_1d, checkpoint_path=ckpt)
+emb.shape                            # (512,) — mean-pooled valid spectral tokens
 ```
 
 ---
@@ -210,7 +215,7 @@ src/desi_fm/
   predict.py          instrument-agnostic inference  ← use this for benchmarking
   api.py              FastAPI REST API (/predict, /predict_json, /healthz)
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
-tests/                24 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs, API)
+tests/                26 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs, embeddings, API)
 demo/                 Gradio app deployed to the live HF Space (jirustaroure/desi-spectra-fm-demo)
 api/                  API app deployed to the live HF Space (jirustaroure/desi-fm-api)
 Dockerfile            CPU-only container image for the REST API
@@ -258,6 +263,25 @@ for training, never seen by either model (full table, gates and progression in
 | prediction ceiling (max z_pred) | 2.00 | **3.52** |
 | `reconstruction_rmse_masked` (pixel-weighted, arcsinh space) | 0.819 | **0.817** |
 | trainable parameters | 25,929,859 | 25,980,646 |
+
+---
+
+## The encoder as an embedding model
+
+`embed_spectrum()` turns the pretrained encoder into a general-purpose
+embedding model (mean-pooled valid spectral tokens, 512-d, deterministic).
+15k training spectra embedded and projected with UMAP, colored by their
+catalog redshift:
+
+![UMAP of the embedding space, colored by redshift](docs/img/umap_z.png)
+
+The model was never told to order spectra by redshift — the smooth z gradient
+emerges from masked-spectrum pretraining alone, which is the foundation-model
+claim in one picture: representations reusable downstream, not just a z head.
+These embeddings power the `find_similar_spectra` semantic-search tool in
+[spectra-copilot](https://github.com/Julian0444/spectra-copilot#semantic-search-embeddings--faiss)
+(FAISS index of the 15k spectra, published under
+[`faiss/` on the Hub](https://huggingface.co/jirustaroure/desi-spectra-fm/tree/main/faiss)).
 
 ---
 

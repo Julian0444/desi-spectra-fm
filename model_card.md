@@ -96,6 +96,11 @@ for the quantified analysis.
 | `config.json` | architecture configuration |
 | `training_args.json` | exact training flags of the run |
 | `metrics.jsonl` | per-step training/validation metrics |
+| `faiss/spectra.faiss` | FAISS index (cosine) of 15k training-spectra embeddings from `embed_spectrum()` |
+| `faiss/spectra_meta.npz` | catalog redshift per indexed row |
+
+The `faiss/` pair powers the `find_similar_spectra` semantic-search tool in
+[spectra-copilot](https://github.com/Julian0444/spectra-copilot#semantic-search-embeddings--faiss).
 
 ## Links
 
