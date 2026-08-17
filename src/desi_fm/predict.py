@@ -110,6 +110,48 @@ def _device_of(model: DESIFoundationModel) -> torch.device:
     return next(model.parameters()).device
 
 
+def _prepare_inputs(
+    model: DESIFoundationModel,
+    flux: np.ndarray,
+    wavelength: np.ndarray,
+    ivar: np.ndarray | None,
+    mask: np.ndarray | None,
+) -> tuple[torch.Tensor, torch.Tensor, dict[str, Any], SpectrumPreprocessConfig]:
+    """Validate raw arrays and preprocess them onto the model's grid.
+
+    Returns the (1, n_pixels) flux/valid tensors on the model's device plus
+    the raw `preprocess_spectrum` output and the preprocess config used.
+    """
+    device_t = _device_of(model)
+    config = model.config
+    preprocess = SpectrumPreprocessConfig(
+        n_pixels=config.n_pixels,
+        lambda_min=config.lambda_min,
+        lambda_max=config.lambda_max,
+        wavelength_grid=config.wavelength_grid,
+    )
+
+    flux = np.asarray(flux, dtype=np.float32).reshape(-1)
+    wavelength = np.asarray(wavelength, dtype=np.float32).reshape(-1)
+    if flux.shape != wavelength.shape:
+        raise ValueError(
+            f"flux ({flux.shape}) and wavelength ({wavelength.shape}) must have the same shape."
+        )
+    if ivar is None:
+        ivar_arr = np.ones_like(flux)
+    else:
+        ivar_arr = np.asarray(ivar, dtype=np.float32).reshape(-1)
+    if mask is None:
+        mask_arr = np.zeros_like(flux, dtype=bool)
+    else:
+        mask_arr = np.asarray(mask, dtype=bool).reshape(-1)
+
+    processed = preprocess_spectrum(flux, ivar_arr, wavelength, mask_arr, preprocess)
+    flux_t = torch.from_numpy(processed["flux"]).to(device_t).unsqueeze(0)
+    valid_t = torch.from_numpy(processed["valid"]).to(device_t).unsqueeze(0)
+    return flux_t, valid_t, processed, preprocess
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -164,37 +206,14 @@ def predict_spectrum(
     if model is None:
         if checkpoint_path is None:
             raise ValueError("Either `model` or `checkpoint_path` must be provided.")
-        device_t = pick_device(device)
-        model = load_model_from_checkpoint(checkpoint_path, device_t)
-    else:
-        device_t = _device_of(model)
+        model = load_model_from_checkpoint(checkpoint_path, pick_device(device))
+    device_t = _device_of(model)
 
     config = model.config
-    preprocess = SpectrumPreprocessConfig(
-        n_pixels=config.n_pixels,
-        lambda_min=config.lambda_min,
-        lambda_max=config.lambda_max,
-        wavelength_grid=config.wavelength_grid,
-    )
-
-    flux = np.asarray(flux, dtype=np.float32).reshape(-1)
     wavelength = np.asarray(wavelength, dtype=np.float32).reshape(-1)
-    if flux.shape != wavelength.shape:
-        raise ValueError(
-            f"flux ({flux.shape}) and wavelength ({wavelength.shape}) must have the same shape."
-        )
-    if ivar is None:
-        ivar_arr = np.ones_like(flux)
-    else:
-        ivar_arr = np.asarray(ivar, dtype=np.float32).reshape(-1)
-    if mask is None:
-        mask_arr = np.zeros_like(flux, dtype=bool)
-    else:
-        mask_arr = np.asarray(mask, dtype=bool).reshape(-1)
-
-    processed = preprocess_spectrum(flux, ivar_arr, wavelength, mask_arr, preprocess)
-    flux_t = torch.from_numpy(processed["flux"]).to(device_t).unsqueeze(0)
-    valid_t = torch.from_numpy(processed["valid"]).to(device_t).unsqueeze(0)
+    flux_t, valid_t, processed, preprocess = _prepare_inputs(
+        model, flux, wavelength, ivar, mask
+    )
 
     if mask_ratio <= 0.0:
         spectrum_mask = torch.zeros(
@@ -236,6 +255,36 @@ def predict_spectrum(
         result["z_pred_map"] = float(out["z_pred_map"].item())
         result["z_confidence"] = float(out["z_confidence"].item())
     return result
+
+
+@torch.no_grad()
+def embed_spectrum(
+    flux: np.ndarray,
+    wavelength: np.ndarray,
+    *,
+    checkpoint_path: Path | str | None = None,
+    ivar: np.ndarray | None = None,
+    mask: np.ndarray | None = None,
+    device: str = "auto",
+    model: DESIFoundationModel | None = None,
+) -> np.ndarray:
+    """Embed a single spectrum with the encoder (no masking, deterministic).
+
+    Same preprocessing and argument semantics as `predict_spectrum`, but the
+    output is the mean-pooled representation of the valid spectral tokens — a
+    reusable embedding for similarity search, clustering or any downstream
+    task, independent of the redshift heads.
+
+    Returns:
+        1D float32 array of length `config.d_model`.
+    """
+    if model is None:
+        if checkpoint_path is None:
+            raise ValueError("Either `model` or `checkpoint_path` must be provided.")
+        model = load_model_from_checkpoint(checkpoint_path, pick_device(device))
+
+    flux_t, valid_t, _, _ = _prepare_inputs(model, flux, wavelength, ivar, mask)
+    return model.encode(flux_t, valid_t).squeeze(0).cpu().numpy().astype(np.float32)
 
 
 def predict_spectra_batch(

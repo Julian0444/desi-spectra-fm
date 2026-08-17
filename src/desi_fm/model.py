@@ -315,3 +315,27 @@ class DESIFoundationModel(nn.Module):
         mask = self.random_spectrum_mask(flux.shape[0], flux.device, mask_ratio)
         out = self.forward(flux, valid, spectrum_mask=mask)
         return self.unpatchify(out["patch_pred"])
+
+    @torch.no_grad()
+    def encode(self, flux: torch.Tensor, valid: torch.Tensor) -> torch.Tensor:
+        """Per-spectrum embedding: mean-pooling of the valid spectral tokens.
+
+        No spectral masking is applied — the encoder sees the full spectrum —
+        so the embedding is deterministic. The z token still participates in
+        attention but is excluded from the pooling: the goal is a reusable
+        representation of the spectrum, not the redshift readout.
+        """
+        bsz = flux.shape[0]
+        tokens, _, valid_patches = self.tokenizer(flux, valid)
+        z_token = self.z_mask_token.expand(bsz, 1, -1)
+        sequence = torch.cat([tokens, z_token], dim=1)
+        sequence = sequence + self.wavelength_pos_embed.to(dtype=sequence.dtype)
+        if self.learned_pos_embed is not None:
+            sequence = sequence + self.learned_pos_embed
+        hidden = self.norm(self.encoder(sequence))
+        spectrum_hidden = hidden[:, : self.config.n_tokens]
+        # A token counts if it has at least one valid pixel; fully-invalid
+        # tokens (padding, masked regions) are excluded from the mean.
+        weight = (valid_patches.mean(-1) > 0.0).float()
+        pooled = (spectrum_hidden * weight.unsqueeze(-1)).sum(1)
+        return pooled / weight.sum(1, keepdim=True).clamp_min(1.0)
