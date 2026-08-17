@@ -19,7 +19,7 @@
 | 05 | [Demo Gradio en HF Spaces](05-demo-gradio.md) | Nivel 1 | 2–3 h | 04 | **link de demo en vivo** — <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo> | ✅ |
 | 06 | [API FastAPI + Docker](06-api-fastapi-docker.md) | Nivel 1 | 2–3 h | 04 | endpoint público respondiendo a `curl` — <https://jirustaroure-desi-fm-api.hf.space/api/docs> | ✅ |
 | 07 | [spectra-copilot: repo + herramientas](07-spectra-copilot-tools.md) | Nivel 2 | 3–4 h | 04 | `tools.py` testeado + CLI de demo — <https://github.com/Julian0444/spectra-copilot> | ✅ |
-| 08 | [El agente con la Claude API](08-agente-claude.md) | Nivel 2 | 2–3 h | 07 | reporte de observación generado por el agente | ⬜ |
+| 08 | [El agente con la Claude API](08-agente-claude.md) | Nivel 2 | 2–3 h | 07 | reporte de observación generado por el agente — [reportes en el README de spectra-copilot](https://github.com/Julian0444/spectra-copilot#the-agent-claude-api) | ✅ |
 | 09 | [Servidor MCP](09-mcp-server.md) | Nivel 2 | 1–2 h | 07 | tus tools corriendo dentro de Claude Code/Desktop | ⬜ |
 | 10 | [Embeddings + búsqueda semántica (FAISS)](10-embeddings-faiss.md) | Nivel 3 | 3–4 h | 02, 07 | búsqueda de espectros similares + UMAP coloreado por z | ⬜ |
 | 11 | [Evals del agente](11-evals-agente.md) | Nivel 3 | 3–4 h | 08 | tabla de métricas end-to-end sobre ≥100 casos | ⬜ |

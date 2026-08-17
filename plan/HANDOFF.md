@@ -343,3 +343,100 @@ El **plan 07 se ejecutó de punta a punta** y quedó ✅ en el tracker: segundo 
 - El venv `~/proyectos/spectra-copilot/.venv` usa el Homebrew Python 3.12; `requires-python >=3.10` (por `mcp`). El sistema tiene 3.9 como default — no usarlo para este repo.
 - La CI del repo nuevo descarga el checkpoint del Hub en el primer run y lo cachea (`actions/cache`); si el Hub rate-limitea descargas anónimas, re-lanzar el job.
 - `UserWarning: enable_nested_tensor ...` al cargar el modelo es benigno (viene de `desi_fm.model` con PyTorch ≥2.x).
+
+---
+
+## Session — 2026-08-16 (plan 08 EN CURSO: agente Claude API — interrumpido a mitad)
+
+### Resumen de la sesión
+
+Se empezó a ejecutar el **plan 08 (agente con la Claude API)** en `~/proyectos/spectra-copilot`. El código central del agente **ya está escrito pero sin commitear y sin probar contra la API** — la sesión se cortó justo al corregir el generador del caso trampa. **Esta sesión no hizo ninguna llamada a la Claude API (US$ 0.00)**, pero ⚠️ según la memoria del proyecto (actualizada por otra sesión el 2026-08-16), una sesión de Claude Code capturó la `ANTHROPIC_API_KEY` que estaba exportada en `~/.zshrc` y **quemó el crédito de ~US$ 5.60** (351k tokens, murió con "Credit balance too low") → **recargar crédito en platform.claude.com/settings/billing ANTES de correr el agente**; el presupuesto del plan sigue siendo < US$ 1 de corridas.
+
+**Verificado del entorno:**
+
+- `spectra-copilot` partía limpio en `8ba6a4c` (= `origin/main`), 7/7 tests, CI verde.
+- `anthropic` **0.120.2** en el venv: `client.beta.messages.tool_runner` y `@beta_tool` disponibles. `BetaFunctionTool` expone **`.call(dict)`** → las tools envueltas se pueden testear **sin API** (verificado con un tool de juguete).
+- **Key — estado FINAL verificado en disco al escribir este handoff** (cambió respecto del brief original de la sesión): la key ya **NO** está en `~/.zshrc` (0 exports) sino en **`~/.anthropic_key`** (chmod 600, 109 bytes, creada 2026-08-16 19:55). Leerla con `KEY=$(tr -d '\n' < ~/.anthropic_key)` y pasarla SOLO al proceso del agente (`ANTHROPIC_API_KEY="$KEY" .venv/bin/python -m copilot.agent ...`); **no imprimirla nunca y NUNCA re-exportarla globalmente** — Claude Code la captura al arrancar y factura la sesión entera al crédito de la API (así se quemó el crédito hoy).
+
+**Hallazgos de la referencia oficial de la API que condicionan el código:**
+
+1. **`claude-haiku-4-5` NO soporta `thinking: {"type": "adaptive"}`** (400; esa sintaxis es de Opus/Sonnet 4.6+). El código del plan original lo pasaba incondicionalmente → se implementó `request_kwargs(model)`: adaptive para todos salvo `claude-haiku*` (sin thinking).
+2. Precios por MTok: haiku-4-5 **$1/$5**, opus-4-8 **$5/$25**; cache write 1.25× y cache read 0.1× del precio de input → `estimate_cost_usd()` lo contempla.
+3. Patrón de transcript con tool_runner: iterar el runner (cada mensaje = 1 turno API; acumular `message.usage`) y capturar los tool_results con `runner.generate_tool_call_response()` (**cacheado — no re-ejecuta las tools**) → el transcript queda como historia completa de mensajes, insumo directo del plan 11.
+
+**Archivos NUEVOS en `~/proyectos/spectra-copilot` (sin trackear, nada commiteado):**
+
+- `copilot/report.py` — `SYSTEM` adaptado a la **v2.1** (no al sesgo v1 que menciona el plan original): salida oficial `z_pred_map` + `z_confidence`; conf < 0.3 = sospechoso → derivar hipótesis alternativas (Hα 6563 / [OIII] 5007 / [OII] 3727) y compararlas con `identify_spectral_lines`; **techo del grid z≈3.5** (predicción clavada cerca del techo = probable OOD); "weak_or_inconsistent" = falta de confirmación, NO refutación (espectros de absorción); formato `## Observation report` (Object/Redshift/Evidence/Confidence/Notes), cada afirmación cita su tool, ~300 palabras. En inglés, consistente con el repo público (mismo criterio que el plan 07: planes en español, repos públicos en inglés).
+- `copilot/agent.py` — agente completo: 3 `@beta_tool` que envuelven `tools.*_impl` devolviendo `json.dumps(...)`; `run()` con `tool_runner` (max_tokens 16000, `system=SYSTEM`, `**request_kwargs(model)`), acumulación de usage por turno, `--save-transcript` (guarda assistant + tool_results), línea `[usage] model=... turns=... in=... out=... ~= $...` a stderr; CLI con `--model` default **`claude-opus-4-8`** (default del plan; haiku solo para iterar barato).
+- `scripts/make_trap_example.py` — genera `examples/trap_single_line.npz`: **una sola línea de emisión en 8000 Å** → ambigüedad genuina Hα (z=0.219) / [OIII] 5007 (z=0.598) / [OII] 3727 (z=1.146); sin `z_true` a propósito.
+- `examples/trap_single_line.npz` — **generado con la versión DEFECTUOSA del script** (ver bloqueo abajo); regenerarlo tras el fix.
+
+### Bloqueo exacto donde se cortó: fix del caso trampa (pendiente de aplicar)
+
+El trap v1 llevaba ruido blanco (σ=0.03) y `identify_spectral_lines_impl` **detectó 81 picos**: su umbral de prominencia es `0.8·std(flux−smooth)`, que escala con el propio ruido → los picos espurios pasan SIEMPRE (invariante de escala: bajar σ no ayuda) y matchean líneas por accidente. Resultado medido: Hα 3/11 débil, pero **[OIII] 5/9 "consistent" y [OII] 4/7 "consistent"** → trampa rota. **Fix diseñado: continuo SIN ruido** — con una sola gaussiana sobre un continuo suave y creciente, el suavizado deja exactamente 1 máximo local. El `Edit` que lo aplicaba falló por un error transitorio del clasificador de permisos ("claude-sonnet-5[1m] is temporarily unavailable... try again") y ahí terminó la sesión — **reintentar el mismo edit sin más**. Cambio pendiente en `scripts/make_trap_example.py`:
+
+1. Borrar `rng = np.random.default_rng(42)` y quitar `+ rng.normal(0, 0.03, wave.size)` del continuo (queda `flux = 0.6 + 0.05 * (wave / 9800.0)` + la gaussiana).
+2. Nota en el docstring: el continuo va sin ruido porque el umbral de picos escala con el ruido y planta picos espurios que rompen la ambigüedad de una sola línea.
+3. Regenerar el `.npz` y verificar: `n_peaks == 1` y las 3 hipótesis con `n_matched == 1`, todas `weak_or_inconsistent`.
+
+### Estado actual
+
+- **spectra-copilot**: `main` = `origin/main` = `8ba6a4c`; sin trackear: `copilot/agent.py`, `copilot/report.py`, `scripts/`, `examples/trap_single_line.npz`. Tests siguen 7/7 (los nuevos no existen todavía).
+- **Repo principal**: `main` = `origin/main` = `3e6fbbb`; único cambio de esta sesión: esta sección del HANDOFF (sin commitear). Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+
+### Tareas pendientes (en orden)
+
+1. **Aplicar el fix del trap** + regenerar + verificar (sección de arriba).
+2. **`tests/test_agent.py` offline** (sin API key; CI no la necesita): `SYSTEM` contiene los hechos v2.1 (`z_pred_map`, `0.3`, `3.5`); `agent.identify_spectral_lines.call({"npz_path": ..., "z": 0.2036})` devuelve JSON con verdict `consistent` sobre `heldout_z020.npz`; `estimate_cost_usd` reproduce tarifas (1M in + 1M out → haiku $6, opus-4-8 $30, modelo desconocido → None); `request_kwargs` (haiku → `{}`, opus → adaptive); ambigüedad del trap (solo la tool de líneas, sin modelo). Correr la suite con `DESI_FM_CKPT="/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/runs/desi_80k_classhead_v21/checkpoint_last.pt"` (comillas: la ruta tiene espacios) y `.venv/bin/python -m pytest`.
+3. **Corridas del agente** (anotar el `[usage]` de cada una — es el número de la DoD): iterar con `--model claude-haiku-4-5` (~US$ 0.02/análisis) sobre `heldout_z020` y el trap hasta que el reporte cumpla formato + citas + ambigüedad reconocida; después las finales con el default `claude-opus-4-8` (~US$ 0.10/análisis) sobre los 4 casos (`heldout_z020`, `heldout_lowconf_z157`, `heldout_z287`, `trap_single_line`) con `--save-transcript eval/transcripts/<caso>.json`. Total estimado ~US$ 0.5–0.6 < US$ 1.
+4. **README de spectra-copilot**: sección del agente (uso, modelos y costo medido por análisis, reporte de ejemplo pegado — DoD — y el reporte del caso trampa), actualizar el conteo de tests, y quitar la línea final "The agent (Claude API) and the MCP server land next" (queda solo el MCP → plan 09).
+5. **Commit + push** en `Julian0444/spectra-copilot` y **CI verde** (los transcripts en `eval/transcripts/` se commitean: insumo del plan 11).
+6. **Repo principal (solo docs)**: reescribir `plan/08-agente-claude.md` como runbook real con la DoD marcada (incluye costo por análisis y el caso trampa), tracker 08 ✅, commitear también esta sección del HANDOFF, push, CI verde.
+7. **Memoria persistente**: plan 08 ✅ con lo aprendido; siguiente = plan 09 (MCP). **No empezar el plan 09.**
+
+### Avisos
+
+- **Discrepancia corregida en la memoria persistente**: la memoria del proyecto (editada por otra sesión) describía el trap como "validado, ambigüedad genuina" citando justamente los números que prueban que está ROTO (Hα 0.27 débil vs [OIII] 0.56 y [OII] 0.57 "consistent" — con umbral 0.4 no hay empate: gana la hipótesis espuria). La versión que vale es la de esta sección: trap pendiente del fix noiseless. La memoria ya quedó corregida.
+- **Material narrativo confirmado para los reportes**: `heldout_z020` (8/11 líneas a z_true 0.2036 vs 2/11 al z_pred_map 0.2267 → el agente puede detectar y refinar), `heldout_lowconf_z157` (conf 0.18, z_pred_map 0.957 vs z_true 1.574 → outlier cazado por confianza), `heldout_z287` (2.44 vs z_true 2.87 — funciona a z alto), trap (debe reconocer la ambigüedad, no inventar certeza).
+- Umbral del verdict en `identify_spectral_lines_impl`: `match_fraction ≥ 0.4` → "consistent"; el `SYSTEM` usa el mismo 0.4 — mantenerlos sincronizados si se toca alguno.
+- Usar siempre `~/proyectos/spectra-copilot/.venv/bin/python` (3.12); el Python 3.9 del sistema no sirve para este repo.
+- Los 2 slots ZeroGPU gratis siguen ocupados (demo + API); el plan 08 no necesita servicios nuevos.
+
+### Primera acción sugerida para la próxima sesión
+
+1. Confirmar con Julián que el crédito de la API fue recargado (sin eso, el punto 3 de las tareas no puede correr; los puntos 1–2 no necesitan API).
+2. Reintentar el edit noiseless en `scripts/make_trap_example.py` (el fallo fue transitorio), regenerar `examples/trap_single_line.npz` y verificar `n_peaks == 1` con las 3 hipótesis empatadas en 1 matched / weak; seguir con los tests offline.
+
+---
+
+## Session — 2026-08-16 (noche) (plan 08 COMPLETADO: agente Claude API con reportes citados)
+
+### Resumen ejecutivo
+
+Se retomó exactamente desde el punto de corte del runbook anterior y el **plan 08 quedó ✅ de punta a punta**: agente Claude API en `Julian0444/spectra-copilot` (commit `c9de49d`, CI verde, suite 7→13), 4 corridas de referencia con `claude-opus-4-8` (transcripts commiteados en `eval/transcripts/` — insumo del plan 11), 2 reportes verbatim en el README del repo, **gasto total ≈ US$ 0.49 < US$ 1**. El trabajo previo sin commitear (`report.py`, `agent.py`, script del trap) se preservó y se continuó — no se rehizo nada. **El plan 09 NO se inició.**
+
+### Qué se hizo (cronología)
+
+1. **Fix del trap aplicado tal como estaba diseñado** (continuo sin ruido): regenerado y verificado — 1 pico exacto en 7999.6 Å, Hα/[OIII]/[OII] empatadas en 1 matched, todas `weak_or_inconsistent`.
+2. **Hallazgo nuevo — las tools tuvieron que cambiar**: el SYSTEM (regla 3) pide derivar hipótesis desde "el pico más fuerte", pero `identify_spectral_lines` no devolvía picos → en el trap el agente quedaba **ciego** (z_pred_map 2.79 conf 0.19, 0 matches, ninguna λ en el JSON). Fix aditivo: la tool ahora reporta `n_peaks_detected` + `strongest_peaks_angstrom` (top 5 por prominencia). Efecto doble: en el trap ancla las 3 hipótesis; en `heldout_z020` el pico 7900.8 Å como Hα da z=0.2039 ≈ z_true — el loop detect→refine se volvió alcanzable (hasta haiku lo completa).
+3. **`tests/test_agent.py`** (6 tests offline, sin API key; suite **13/13** local): hechos v2.1 en el SYSTEM, `.call(dict)` del `@beta_tool` ≡ impl, tarifas + cache tokens, `request_kwargs`, ambigüedad del trap por contrato.
+4. **Corridas** (key leída de `~/.anthropic_key` solo al proceso del agente, jamás exportada; crédito estaba recargado): 3 iteraciones haiku (~$0.013 c/u) + 4 finales opus con transcript. Resultados: z020 → agente rechaza el z del modelo (2/11) y recupera **z=0.204** = z_true (8/11), $0.094; z287 → reancla Lyα → **z=2.874** (z_true 2.866; el modelo decía 2.441), $0.131; lowconf_z157 → descarta el outlier por conf 0.18 ✓ pero su recuperación da z≈1.98 vs 1.574 (las líneas UV a z_true caen fuera de cobertura — limitación del verificador de picos, documentada honesta en el README), $0.125; trap → "**Indeterminate** — single-line trap", 3 hipótesis comparadas, "no redshift is defensible", $0.100.
+5. **README de spectra-copilot**: sección "The agent (Claude API)" (uso, costos medidos, transcripts) + reportes verbatim de z020 y trap + resumen honesto de z287/z157; salida del CLI actualizada (nuevos campos de picos); "13 passed"; la línea final quedó "The MCP server lands next."
+6. **Publicación**: commit `c9de49d` + push en spectra-copilot → **CI verde**. Repo principal: plan/08 reescrito como runbook real con DoD marcada, tracker 08 ✅, esta sección, commit + push + CI.
+
+### Estado actual
+
+- **spectra-copilot**: `main` = `c9de49d`, CI verde, 13/13 tests. Nuevos: `copilot/agent.py`, `copilot/report.py`, `scripts/make_trap_example.py`, `examples/trap_single_line.npz` (noiseless), `tests/test_agent.py`, `eval/transcripts/*.json` (4); modificados: `copilot/tools.py` (picos expuestos), `README.md`.
+- **Repo principal**: solo docs (plan/08, tracker, HANDOFF). Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+- **Crédito API**: quedaban ~US$ 4.99 recargados; esta sesión gastó ≈ US$ 0.49 → restan ~US$ 4.50.
+
+### Siguiente paso — Plan 09 (servidor MCP)
+
+**No iniciado.** `plan/09-mcp-server.md` construye sobre las mismas tools (`mcp[cli]` ya está en el venv). Ojo: `identify_spectral_lines` ahora devuelve también los picos — el server MCP los hereda gratis. `plan/09` puede contener `TU_USUARIO` — corregir namespaces al ejecutarlo.
+
+### Avisos
+
+- **La key sigue en `~/.anthropic_key`** (chmod 600): leerla con `KEY=$(tr -d '\n' < ~/.anthropic_key)` y pasarla SOLO al proceso que la necesita. NUNCA exportarla global/`~/.zshrc` (Claude Code la captura y factura la sesión al crédito API — ya pasó una vez).
+- El umbral 0.4 del verdict sigue sincronizado entre `tools.py` y el SYSTEM; si se toca uno, tocar el otro.
+- En `heldout_lowconf_z157` la conclusión del agente (z≈1.98) difiere del catálogo (1.574): no es bug — a z_true solo 1/4 líneas del catálogo caen en cobertura con picos débiles. Si el plan 11 lo evalúa, contar "outlier detectado" como éxito y "z recuperado" como fallo honesto.
+- Los transcripts de `eval/transcripts/` son el insumo directo del plan 11 (assistant turns + tool_results completos).
