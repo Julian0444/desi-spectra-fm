@@ -440,3 +440,39 @@ Se retomó exactamente desde el punto de corte del runbook anterior y el **plan 
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py` y el SYSTEM; si se toca uno, tocar el otro.
 - En `heldout_lowconf_z157` la conclusión del agente (z≈1.98) difiere del catálogo (1.574): no es bug — a z_true solo 1/4 líneas del catálogo caen en cobertura con picos débiles. Si el plan 11 lo evalúa, contar "outlier detectado" como éxito y "z recuperado" como fallo honesto.
 - Los transcripts de `eval/transcripts/` son el insumo directo del plan 11 (assistant turns + tool_results completos).
+
+---
+
+## Session — 2026-08-16 (plan 09 COMPLETADO: servidor MCP verificado dentro de Claude Code)
+
+### Resumen ejecutivo
+
+El **plan 09 quedó ✅ de punta a punta**, repartido en dos sesiones: una sesión previa escribió y commiteó el servidor (`5340bae` en spectra-copilot, CI verde) y esta sesión hizo la **verificación en cliente real** (las 3 tools MCP corriendo dentro de Claude Code, loop completo detect→refine) más el cierre documental en ambos repos. Sin costos: el plan 09 no usa la Claude API ni servicios nuevos.
+
+- **Servidor:** `copilot/mcp_server.py` (stdio) expone `predict_redshift` / `identify_spectral_lines` / `reconstruct_spectrum` delegando en `tools.py`. **Adaptación clave: `mcp` 2.x renombró la API** — `mcp.server.fastmcp.FastMCP` ya no existe, ahora es `from mcp.server.mcpserver import MCPServer`. El server declara `instructions` con el loop típico (predict → si conf < 0.3 o se pide verificación → lines + hipótesis desde `strongest_peaks_angstrom`) y las descripciones por tool dicen *cuándo* usarlas (heredan los picos del plan 08).
+- **Tests 13→17** (4 nuevos en `tests/test_mcp_server.py`, offline, sobre la capa MCP real `list_tools`/`call_tool`): 3 tools exactas; descripciones + schemas (`required`, default de `mask_ratio` aplicado por el server); `call_tool` ≡ impl sobre `heldout_z020` real (`consistent` a z_true); delegación monkeypatcheada. Suite 17/17 local; CI verde.
+- **Registro en Claude Code** (scope usuario, `~/.claude-personal/.claude.json`): stdio con el python del venv 3.12 y `env.DESI_FM_CKPT` → checkpoint v2.1 local. `claude mcp list` → `desi-fm: ... - ✔ Connected`.
+- **Verificación en cliente real (esta sesión):** sobre `examples/heldout_z020.npz` (z_true 0.204), 5 tool calls / las 3 tools, sin código del agente: predict → 0.2267 conf 0.64; lines\@0.2267 → **débil** 2/11 (0.18); reconstruct\@0.5 → z 0.2031 (swing = evidencia frágil); pico 7900.8 Å leído como Hα → lines\@0.204 → **`consistent`** 8/11 (0.73, deltas < 2 Å). La misma historia del agente del plan 08, reproducida por un cliente MCP genérico guiado solo por las descripciones.
+- **README de spectra-copilot** (commit `843ac92`, CI verde): sección "Use it from any MCP client" (snippets Claude Code + Claude Desktop, sesión verificada transcripta), "17 passed", y se quitó "The MCP server lands next.".
+
+### Adaptaciones honestas vs la DoD original
+
+- **`mcp dev` (inspector) no se corrió**: superado por los 4 tests offline sobre la capa MCP real + la conversación real en Claude Code (evidencia más fuerte que el inspector).
+- **Screenshot `docs/img/mcp-session.png` NO capturado**: la evidencia quedó como transcript verbatim en el README (verificable). El screenshot es mejora opcional que solo Julián puede capturar desde la UI de Claude Code.
+
+### Estado actual
+
+- **spectra-copilot**: `main` = `843ac92` (= origin), CI verde, 17/17 tests. Servidor + tests en `5340bae`; docs en `843ac92`.
+- **Repo principal**: cierre documental de esta sesión (plan/09 reescrito como runbook con DoD marcada, tracker 09 ✅, esta sección) — commit `plan-09: cerrado`. Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+- Los 2 slots ZeroGPU gratis siguen ocupados (demo + API); el MCP server corre local por stdio, no necesita hosting.
+
+### Siguiente paso — Planes 10–12 (Nivel 3) o 13 (cierre)
+
+**El producto mínimo del sprint (01–09 + 13) está a un plan de distancia: solo falta el 13 (narrativa).** Según el tracker, lo próximo en orden es el 10 (FAISS, depende de 02+07), después 11 (evals — los transcripts de `eval/transcripts/` ya están commiteados como insumo) y 12 (mini-RAG); orden de recorte si falta tiempo: 12 → 10 → 11. El 13 nunca se recorta. Ninguno se inició.
+
+### Avisos
+
+- **Permisos de Claude Code con tools MCP**: la primera llamada a cada tool pide permiso; un fallo transitorio del clasificador de permisos se resuelve reintentando la misma llamada (pasó en esta sesión con `predict_redshift`).
+- El server MCP registrado a scope usuario apunta al checkpoint **local** vía `DESI_FM_CKPT`; si ese path se mueve, borrar el env o actualizarlo (sin él, descarga del Hub en la primera llamada, ~104 MB).
+- La key sigue en `~/.anthropic_key` (chmod 600); el plan 09 no la tocó. Crédito API intacto: ~US$ 4.50.
+- El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM del agente y las descripciones MCP; si se toca uno, tocar los tres.
