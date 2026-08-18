@@ -24,7 +24,7 @@
 | 10 | [Embeddings + búsqueda semántica (FAISS)](10-embeddings-faiss.md) | Nivel 3 | 3–4 h | 02, 07 | búsqueda de espectros similares + UMAP coloreado por z — [sección en el README de spectra-copilot](https://github.com/Julian0444/spectra-copilot#semantic-search-embeddings--faiss) | ✅ |
 | 11 | [Evals del agente](11-evals-agente.md) | Nivel 3 | 3–4 h | 08 | tabla de métricas end-to-end sobre ≥100 casos | ✅ (`8fb4a0f` + `6efbdfd`: 150/150 casos, US$4.06 medido; modelo 92.7% vs agente Haiku 79.3%, confianza↔acierto monótona, híbrido 90.0% — la eval cazó lo que las demos escondían) |
 | 12 | [Mini-RAG de referencias](12-mini-rag.md) | Nivel 3 | 2–3 h | 08 | reportes del agente con citas a fuentes | ✅ (`3eea698` + `ac04121`: corpus `refs/` + `lookup_reference` en agente/MCP + 35/35 tests + 3 corridas Haiku con 6/6 citas respaldadas; reporte en el README) |
-| 13 | [Narrativa final del portfolio](13-narrativa-portfolio.md) | Cierre | 2 h | todo lo anterior que exista | README maestro + pitch + bullets de CV | ⬜ |
+| 13 | [Narrativa final del portfolio](13-narrativa-portfolio.md) | Cierre | 2 h | todo lo anterior que exista | README maestro + pitch + bullets de CV | ✅ (2026-08-18: ambos READMEs reescritos recruiter-first + `demo.png`/`scatter_v1_v2.png` + pitch EN/ES + bullets + post LinkedIn + metadata GitHub; **pendiente humano**: pinear repos, GIFs, post, test 60 s — checklist al pie del [plan](13-narrativa-portfolio.md)) |
 
 ## Ruta mínima (si hay poco tiempo)
 

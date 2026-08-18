@@ -635,3 +635,30 @@ A mitad de sesión Julián frenó el lanzamiento de los 130 casos al ver "Gasto 
 - El protocolo de la tabla (tools, contexto completo) NO es comparable con el η 14.95 % de evaluate (masking) — está anotado en ambos READMEs y en el runbook.
 - `eval/results.csv` está commiteado; los 150 npz siguen fuera de git (regenerables, semilla 7).
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, SYSTEM y descripciones MCP; el contrato de citas vive en `report.py` (testeado).
+
+---
+
+## Session — 2026-08-18 (plan 13 EJECUTADO: narrativa de portfolio, sin API — quedan solo pasos humanos)
+
+### Resumen ejecutivo
+
+Se ejecutó **el plan 13** (el único pendiente), todo offline y US$ 0.00 de API. Los dos READMEs quedaron recruiter-first con los números reales, se generaron 2 assets nuevos (screenshot real de la demo viva + scatter v1↔v2.1), pitch EN/ES + 4 bullets de CV + post de LinkedIn listos en el runbook del 13, y la metadata de GitHub (descripción/homepage/topics) actualizada vía `gh repo edit`. **Los 13 planes están ✅** con una cola corta de pasos que solo Julián puede hacer (checklist al pie de `plan/13-narrativa-portfolio.md`): pinear los 2 repos (hoy los 6 pins son repos viejos), GIFs, perfil HF, post de LinkedIn y el test de 60 segundos.
+
+### Qué se hizo
+
+- **README maestro (`desi-spectra-fm`)**: reescrito con la estructura del plan — badges (CI/HF/Space/API), párrafo sin jerga, 5 links arriba del fold, `docs/img/demo.png` como hero, sección Results (historia TA→diagnóstico→rediseño + tabla v1→v2.1 + scatter), UMAP como foundation-model claim, "From model to product" con el titular honesto de las evals, arquitectura en 6 líneas, quick start de 3 comandos (pytest dice **26 passed** — el "24" viejo era stale, verificado corriendo la suite), "How it was trained", y TODO el contenido grader-facing conservado bajo "Reference" + "Academic context" (nada se borró).
+- **README `spectra-copilot`**: badge CI + links al ecosistema + bloque "The 60-second version" (evals honestas → híbrido 90.0 %, RAG 6/6, 35 tests). El cuerpo ya cumplía el plan.
+- **Assets**: `demo.png` capturado con Playwright contra el Space vivo (wake-up + click ejemplo + Submit + predicción renderizada); `scatter_v1_v2.png` con script nuevo commiteado `scripts/plot_scatter_v1_v2.py` (offline, CSVs canónicos; η verificada al regenerar: 22.6 % / 14.95 %).
+- **GitHub metadata**: `desi-spectra-fm` → homepage = demo + topics `huggingface astrophysics fastapi redshift spectroscopy` + descripción con números; `spectra-copilot` → homepage = repo del modelo + primera tanda de topics (`llm-agents claude mcp model-context-protocol rag faiss evals astronomy anthropic`) + descripción nueva.
+- **Runbook 13**: pitch EN/ES finales, bullets con números reales (22.6→14.95 %, 92.7 vs 79.3 → 90.0 %, 6/6 citas, US$ 4.06), post de LinkedIn, checklist manual. Tracker fila 13 → ✅ con pendientes humanos anotados.
+
+### Estado actual
+
+- Repo principal: commit de esta sesión con README + assets + script + runbooks. spectra-copilot: commit con su README. CI a verificar en ambos tras el push.
+- Sin gasto de API (plan 13 no la usa); saldo sigue ≈ US$ 1.7.
+- Protocolos separados y anotados: η 14.95 % (evaluate, masking) vs 92.7 % (eval de tools) — los READMEs nuevos mantienen la distinción.
+
+### Para retomar
+
+1. Checklist manual del runbook 13 (pins ↔ prioridad 1 — es lo primero que ve un reclutador).
+2. Opcional si se recarga: Opus sobre los 31 casos fallados (~US$ 3, comando en runbook 11).
