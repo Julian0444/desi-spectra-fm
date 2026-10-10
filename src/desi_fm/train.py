@@ -105,14 +105,21 @@ def evaluate(model: DESIFoundationModel, loader: DataLoader, device: torch.devic
         total_abs_z_norm += float((dz / (1.0 + z)).sum().detach().cpu())
         batches += 1
         examples += bsz
-    denom = max(batches, 1)
-    ex_denom = max(examples, 1)
+    if not examples:
+        raise ValueError("Evaluation contains no examples")
+    denom = batches
+    ex_denom = examples
     return {
+        "n_examples": examples,
+        "n_batches": batches,
+        "loss_denominator": batches,
+        "redshift_denominator": examples,
+        "reconstruction_denominator": int(total_recon_pixels),
         "loss": total_loss / denom,
         "reconstruction_loss": total_recon / denom,
         "reconstruction_rmse_masked": math.sqrt(
-            total_recon_sse / max(total_recon_pixels, 1.0)
-        ),
+            total_recon_sse / total_recon_pixels
+        ) if total_recon_pixels else None,
         "masked_valid_pixels": total_recon_pixels,
         "redshift_loss": total_z / denom,
         "redshift_mae": total_abs_z / ex_denom,

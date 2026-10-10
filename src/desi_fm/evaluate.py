@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from itertools import chain
 import csv
 import json
 import os
@@ -30,15 +31,8 @@ def write_metrics_json(metrics: dict[str, float], output: Path) -> None:
 
 
 def load_model(checkpoint_path: Path, device: torch.device) -> DESIFoundationModel:
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    config = DESIFoundationModelConfig(**checkpoint["config"])
-    model = DESIFoundationModel(config).to(device)
-    state_dict = checkpoint["model"]
-    if "pos_embed" in state_dict and "learned_pos_embed" not in state_dict:
-        state_dict["learned_pos_embed"] = state_dict.pop("pos_embed")
-    model.load_state_dict(state_dict, strict=False)
-    model.eval()
-    return model
+    from .predict import load_model_from_checkpoint
+    return load_model_from_checkpoint(checkpoint_path, device)
 
 
 def build_eval_loader(args: argparse.Namespace, config: DESIFoundationModelConfig) -> DataLoader:
@@ -82,6 +76,13 @@ def evaluate_and_write_outputs(
     reconstructions_npz: Path | None = None,
     num_reconstructions: int = 8,
 ) -> dict[str, float]:
+    iterator = iter(loader)
+    try:
+        first_batch = next(iterator)
+    except StopIteration:
+        raise ValueError("Evaluation contains no examples") from None
+    if first_batch["flux"].shape[0] == 0:
+        raise ValueError("Evaluation contains an empty batch")
     model.eval()
     total_loss = 0.0
     total_recon = 0.0
@@ -117,12 +118,14 @@ def evaluate_and_write_outputs(
         )
         writer.writeheader()
 
-    for batch in loader:
+    for batch in chain([first_batch], iterator):
         flux = batch["flux"].to(device)
         valid = batch["valid"].to(device)
         z = batch["z"].to(device)
         out = model(flux, valid, z=z)
         bsz = flux.shape[0]
+        if bsz == 0:
+            raise ValueError("Evaluation contains an empty batch")
         total_loss += float(out["loss"].detach().cpu())
         total_recon += float(out["reconstruction_loss"].detach().cpu())
         total_z += float(out["redshift_loss"].detach().cpu())
@@ -188,14 +191,19 @@ def evaluate_and_write_outputs(
             z_pred=np.asarray(z_pred_rows, dtype=np.float32),
         )
 
-    denom = max(batches, 1)
-    ex_denom = max(examples, 1)
+    denom = batches
+    ex_denom = examples
     return {
+        "n_examples": examples,
+        "n_batches": batches,
+        "loss_denominator": batches,
+        "redshift_denominator": examples,
+        "reconstruction_denominator": int(total_recon_pixels),
         "loss": total_loss / denom,
         "reconstruction_loss": total_recon / denom,
         "reconstruction_rmse_masked": float(
-            np.sqrt(total_recon_sse / max(total_recon_pixels, 1.0))
-        ),
+            np.sqrt(total_recon_sse / total_recon_pixels)
+        ) if total_recon_pixels else None,
         "masked_valid_pixels": total_recon_pixels,
         "redshift_loss": total_z / denom,
         "redshift_mae": total_abs_z / ex_denom,

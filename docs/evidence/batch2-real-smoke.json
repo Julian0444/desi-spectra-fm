@@ -1,0 +1,71 @@
+{
+  "protocol": "cpu/eval/mask_ratio=0; bounded contract smoke, no accuracy estimate",
+  "fixture_sha256": "7352af31e622c4b2761a1bc00a70f2fe3d848a2f88f7b3a1a61fd09e9fb7589b",
+  "loaded": {
+    "runs/desi_50k_big/checkpoint_last.pt": {
+      "sha256": "515b9a50d2e4ed6387acb06dff57595e881351bb7ebb34cdeeae9e9ce69f39b6",
+      "step": 12500,
+      "migration": null
+    },
+    "runs/desi_80k_classhead_v21/checkpoint_best.pt": {
+      "sha256": "a924c0dfa6f10b5f90079567e5c3620dcc04ac24b872794f655f33f2e34ea835",
+      "step": 30000,
+      "migration": null
+    },
+    "runs/desi_80k_classhead_v21/checkpoint_last.pt": {
+      "sha256": "40247cbe0e706a66084d001b36424081554c26d3eb75c1f8b0ebec89cf5afe5a",
+      "step": 30000,
+      "migration": null
+    }
+  },
+  "inference": {
+    "desi_50k_big": {
+      "fully_usable_derived": {
+        "z_pred": 0.14748689532279968
+      },
+      "historical_raw": {
+        "z_pred": 0.14731229841709137
+      },
+      "raw_delta_from_contract_v1": {
+        "z_pred": -8.299946784973145e-05
+      },
+      "coverage": {
+        "contract": "spectra-input-v2",
+        "n_input_pixels": 7781,
+        "n_valid_input_pixels": 7762,
+        "n_model_pixels": 7081,
+        "n_valid_model_pixels": 7061,
+        "model_valid_fraction": 0.997175540177941,
+        "valid_wavelength_min_angstrom": 3600.0,
+        "valid_wavelength_max_angstrom": 9800.0
+      }
+    },
+    "desi_80k_classhead_v21": {
+      "fully_usable_derived": {
+        "z_pred": 0.23093274235725403,
+        "z_pred_map": 0.22669130563735962,
+        "z_confidence": 0.638111412525177
+      },
+      "historical_raw": {
+        "z_pred": 0.23162490129470825,
+        "z_pred_map": 0.22669130563735962,
+        "z_confidence": 0.6373987197875977
+      },
+      "raw_delta_from_contract_v1": {
+        "z_pred": 0.00017577409744262695,
+        "z_pred_map": 0.0,
+        "z_confidence": -0.00018644332885742188
+      },
+      "coverage": {
+        "contract": "spectra-input-v2",
+        "n_input_pixels": 7781,
+        "n_valid_input_pixels": 7762,
+        "n_model_pixels": 7081,
+        "n_valid_model_pixels": 7061,
+        "model_valid_fraction": 0.997175540177941,
+        "valid_wavelength_min_angstrom": 3600.0,
+        "valid_wavelength_max_angstrom": 9800.0
+      }
+    }
+  }
+}

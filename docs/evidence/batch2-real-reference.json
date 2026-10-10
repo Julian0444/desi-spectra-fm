@@ -1,0 +1,31 @@
+{
+  "baseline_commit": "a8f4560506dbd22eebacf9a5269df45e4a0f7172",
+  "fixture": "Copilot eval/cases/case_000.npz",
+  "fixture_sha256": "7352af31e622c4b2761a1bc00a70f2fe3d848a2f88f7b3a1a61fd09e9fb7589b",
+  "protocol": "mask_ratio=0, eval, cpu, torch2.13",
+  "historical_raw_expected": {
+    "desi_50k_big": {
+      "z_pred": 0.1473952978849411
+    },
+    "desi_80k_classhead_v21": {
+      "z_pred": 0.23144912719726562,
+      "z_pred_map": 0.22669130563735962,
+      "z_confidence": 0.6375851631164551
+    }
+  },
+  "fully_usable_derived_expected": {
+    "desi_50k_big": {
+      "z_pred": 0.14748689532279968
+    },
+    "desi_80k_classhead_v21": {
+      "z_pred": 0.23093274235725403,
+      "z_pred_map": 0.22669130563735962,
+      "z_confidence": 0.638111412525177
+    }
+  },
+  "tolerance": {
+    "fully_usable_derived": 1e-06,
+    "raw_classifier_MAP": 0
+  },
+  "note": "Derived control forces all input quality flags valid to verify unchanged interpolation; no accuracy conclusion. Raw input has 19 invalid pixels and may change under contract v2."
+}
