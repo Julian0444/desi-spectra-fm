@@ -1,0 +1,49 @@
+{
+  "status": "complete",
+  "snapshot_sha256": "933b7959138ea1ed3a45496dd679c52ce0d8dd8e522628da7ff99252fb68f7ee",
+  "index_sha256": "36d1433bbf2457b1eeab8b1a27cb4c37228800b79a48403e247980c29eed57b0",
+  "counts": {
+    "rows": 100000,
+    "label_eligible": 84759,
+    "input_eligible": 99996,
+    "label_and_input_eligible": 84759
+  },
+  "input_rejection_causes": {
+    "Spectrum 0: fewer than 8 usable input pixels": 4
+  },
+  "preprocess": {
+    "n_pixels": 7081,
+    "lambda_min": 3600.0,
+    "lambda_max": 9800.0,
+    "wavelength_grid": "log",
+    "clip_value": 8.0,
+    "eps": 1e-06
+  },
+  "contract": "spectra-input-v2",
+  "id_storage": "TEXT; integer/string conversion without floating point",
+  "duplicate_ids": 0,
+  "relationship_fields": [],
+  "relationships": "No explicit relationship identifier available",
+  "label_rejections": {
+    "nonfinite": 0,
+    "negative": 15241
+  },
+  "input_exclusions": [
+    {
+      "object_id": "39633453863403755",
+      "cause": "Spectrum 0: fewer than 8 usable input pixels"
+    },
+    {
+      "object_id": "2305843026032874369",
+      "cause": "Spectrum 0: fewer than 8 usable input pixels"
+    },
+    {
+      "object_id": "39627752101380567",
+      "cause": "Spectrum 0: fewer than 8 usable input pixels"
+    },
+    {
+      "object_id": "39627752160101637",
+      "cause": "Spectrum 0: fewer than 8 usable input pixels"
+    }
+  ]
+}

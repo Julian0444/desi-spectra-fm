@@ -1,0 +1,42 @@
+{
+  "repository": "MultimodalUniverse/desi",
+  "revision": "933b9056b93b0f3e7790ee28c43412b49c39e232",
+  "data_dir": "edr_sv3",
+  "files": [
+    {
+      "path": "edr_sv3/train-00000-of-00007.parquet",
+      "bytes": 1091305162,
+      "sha256": "54e9f5f81e6e64ec977fb587c6a7dbc78e4b6008f2402a5d03b062e860ca196d"
+    },
+    {
+      "path": "edr_sv3/train-00001-of-00007.parquet",
+      "bytes": 1091346562,
+      "sha256": "3bbef94ff024ffc82ce3ab8bc1ab9750745a32a8c38d258c05139a1341dbaa19"
+    },
+    {
+      "path": "edr_sv3/train-00002-of-00007.parquet",
+      "bytes": 1091421086,
+      "sha256": "91694cd3cfe6cb71317b6654437cf63633d993774918181e545a66f30f77ed43"
+    },
+    {
+      "path": "edr_sv3/train-00003-of-00007.parquet",
+      "bytes": 1091540828,
+      "sha256": "097ec2b852a3e15fd4e7be0fe3715e510a1352fff5a825cd4f18e7bdfe365978"
+    },
+    {
+      "path": "edr_sv3/train-00004-of-00007.parquet",
+      "bytes": 1091477862,
+      "sha256": "5f1362bcd009399879af63bc05cbb87e9f12bb24ed59dfdb3354d0d211e1df02"
+    },
+    {
+      "path": "edr_sv3/train-00005-of-00007.parquet",
+      "bytes": 1091425674,
+      "sha256": "04771b61bf1991a4c75975bccb7cccff199b2d9d9dacb4c2a8bec85c6f909663"
+    },
+    {
+      "path": "edr_sv3/train-00006-of-00007.parquet",
+      "bytes": 1091381842,
+      "sha256": "1f6c12d5b326c9b7ef5c4f78db68d4daa2a887a2635eb84a3b2b3bed175e0b77"
+    }
+  ]
+}

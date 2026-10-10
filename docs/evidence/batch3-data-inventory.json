@@ -1,0 +1,17 @@
+{
+  "cache_roots_checked": [
+    "~/.cache/huggingface",
+    "FM/data",
+    "Copilot/data"
+  ],
+  "existing_complete_DESI_parquet": 0,
+  "existing_audit_metadata": {
+    "bytes": 8928630,
+    "sha256": "57dae78385c163c4e84444d6110bad2f839b56a960cbee2c1a0e63a306f22151"
+  },
+  "free_before_bytes": 82047184896,
+  "raw_expected_bytes": 7639899016,
+  "additional_reserved_bytes": 4000000000,
+  "destination": "/Users/jirustaroure/.local/share/spectra-data/933b9056b93b0f3e7790ee28c43412b49c39e232",
+  "download_scope": "exactly seven locked parquet; no full repository download"
+}
