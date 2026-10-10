@@ -1,0 +1,94 @@
+{
+  "actual": {
+    "test": 10000,
+    "train": 64759,
+    "validation": 10000
+  },
+  "allocation_quotas": {
+    "test": {
+      "z0:zwarn0": 269,
+      "z0:zwarn1": 4363,
+      "z1:zwarn0": 294,
+      "z1:zwarn1": 2465,
+      "z2:zwarn0": 234,
+      "z2:zwarn1": 1749,
+      "z3:zwarn0": 143,
+      "z3:zwarn1": 340,
+      "z4:zwarn0": 2,
+      "z4:zwarn1": 82,
+      "z5:zwarn0": 4,
+      "z5:zwarn1": 55
+    },
+    "validation": {
+      "z0:zwarn0": 269,
+      "z0:zwarn1": 4363,
+      "z1:zwarn0": 294,
+      "z1:zwarn1": 2465,
+      "z2:zwarn0": 234,
+      "z2:zwarn1": 1749,
+      "z3:zwarn0": 143,
+      "z3:zwarn1": 340,
+      "z4:zwarn0": 2,
+      "z4:zwarn1": 82,
+      "z5:zwarn0": 4,
+      "z5:zwarn1": 55
+    }
+  },
+  "mixed_stratum_groups": [],
+  "observed_groups": 84759,
+  "physical_independence": "not established by these metadata",
+  "protected_groups": 2000,
+  "protected_ids": 2000,
+  "rare_definition": "fewer than 3 observed groups or zero validation/test quota; retained in all accounting",
+  "rare_strata": [],
+  "requested": {
+    "test": 10000,
+    "train": 64759,
+    "validation": 10000
+  },
+  "seed": 20261009,
+  "strata": {
+    "test": {
+      "z0:zwarn0": 269,
+      "z0:zwarn1": 4363,
+      "z1:zwarn0": 294,
+      "z1:zwarn1": 2465,
+      "z2:zwarn0": 234,
+      "z2:zwarn1": 1749,
+      "z3:zwarn0": 143,
+      "z3:zwarn1": 340,
+      "z4:zwarn0": 2,
+      "z4:zwarn1": 82,
+      "z5:zwarn0": 4,
+      "z5:zwarn1": 55
+    },
+    "train": {
+      "z0:zwarn0": 1740,
+      "z0:zwarn1": 28256,
+      "z1:zwarn0": 1904,
+      "z1:zwarn1": 15967,
+      "z2:zwarn0": 1511,
+      "z2:zwarn1": 11324,
+      "z3:zwarn0": 930,
+      "z3:zwarn1": 2203,
+      "z4:zwarn0": 12,
+      "z4:zwarn1": 535,
+      "z5:zwarn0": 23,
+      "z5:zwarn1": 354
+    },
+    "validation": {
+      "z0:zwarn0": 269,
+      "z0:zwarn1": 4363,
+      "z1:zwarn0": 294,
+      "z1:zwarn1": 2465,
+      "z2:zwarn0": 234,
+      "z2:zwarn1": 1749,
+      "z3:zwarn0": 143,
+      "z3:zwarn1": 340,
+      "z4:zwarn0": 2,
+      "z4:zwarn1": 82,
+      "z5:zwarn0": 4,
+      "z5:zwarn1": 55
+    }
+  }
+}

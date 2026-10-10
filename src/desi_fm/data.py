@@ -97,22 +97,8 @@ def summarize_mmu_schema(example: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def preprocess_spectrum(
-    flux: np.ndarray,
-    ivar: np.ndarray,
-    wavelength: np.ndarray,
-    mask: np.ndarray,
-    config: SpectrumPreprocessConfig,
-    normalization_mask: np.ndarray | None = None,
-) -> dict[str, np.ndarray | float]:
-    """Interpolate and robustly normalize one observed spectrum.
-
-    AION projects spectra onto a latent wavelength grid before tokenization. This
-    implementation uses the same idea in simpler form: every input spectrum is
-    interpolated onto one fixed wavelength grid so the transformer sees aligned
-    patches. Bad pixels are excluded from the robust normalization and from the
-    reconstruction loss.
-    """
+def resample_spectrum(flux, ivar, wavelength, mask, config):
+    """Input-contract grid before normalization; safe to cache for masked training."""
     flux, wavelength, ivar, mask = parse_arrays(flux, wavelength, ivar, mask).single()
     # Construct validity before replacing nonfinite values. Keep invalid samples
     # in the sorted grid so interpolation cannot bridge a masked region.
@@ -142,6 +128,21 @@ def preprocess_spectrum(
     if support.sum() < MIN_VALID_PIXELS:
         raise SpectrumInputError(f"Fewer than {MIN_VALID_PIXELS} usable model-grid pixels; no usable coverage")
 
+    return {"flux": flux_i, "valid": valid_i,
+        "coverage": {"contract": CONTRACT_VERSION, "n_input_pixels": int(flux.size),
+                     "n_valid_input_pixels": int(good.sum()),
+                     "n_model_pixels": int(target.size), "n_valid_model_pixels": int(support.sum()),
+                     "model_valid_fraction": float(support.mean()),
+                     "valid_wavelength_min_angstrom": float(target[support].min()),
+                     "valid_wavelength_max_angstrom": float(target[support].max())},
+    }
+
+
+def normalize_grid(flux, valid, config, normalization_mask=None, *, insufficient="raise"):
+    """Normalize using visible valid values only. Identity fallback is explicit."""
+    flux_i = np.asarray(flux, dtype=np.float32)
+    valid_i = np.asarray(valid, dtype=np.float32)
+    support = valid_i.astype(bool)
     normalization_support = support.copy()
     if normalization_mask is not None:
         normalization_mask = mask_array(normalization_mask)
@@ -149,7 +150,10 @@ def preprocess_spectrum(
             raise SpectrumInputError("Normalization mask must match the model grid")
         normalization_support &= ~normalization_mask
         if normalization_support.sum() < MIN_VALID_PIXELS:
-            raise SpectrumInputError("Fewer than 8 visible pixels for reconstruction normalization")
+            if insufficient == "raise":
+                raise SpectrumInputError("Fewer than 8 visible pixels for reconstruction normalization")
+            if insufficient != "identity":
+                raise ValueError("Unknown insufficient support policy")
     valid_values = flux_i[normalization_support]
     if valid_values.size < 8:
         center = 0.0
@@ -166,18 +170,17 @@ def preprocess_spectrum(
     norm_flux = np.clip(norm_flux, -config.clip_value, config.clip_value)
     norm_flux = norm_flux * valid_i
 
-    return {
-        "flux": norm_flux.astype(np.float32),
-        "valid": valid_i.astype(np.float32),
-        "center": np.float32(center),
-        "scale": np.float32(scale),
-        "coverage": {"contract": CONTRACT_VERSION, "n_input_pixels": int(flux.size),
-                     "n_valid_input_pixels": int(good.sum()),
-                     "n_model_pixels": int(target.size), "n_valid_model_pixels": int(support.sum()),
-                     "model_valid_fraction": float(support.mean()),
-                     "valid_wavelength_min_angstrom": float(target[support].min()),
-                     "valid_wavelength_max_angstrom": float(target[support].max())},
-    }
+    return {"flux": norm_flux.astype(np.float32), "valid": valid_i,
+            "center": np.float32(center), "scale": np.float32(scale),
+            "normalization_fallback": bool(valid_values.size < MIN_VALID_PIXELS)}
+
+
+def preprocess_spectrum(flux, ivar, wavelength, mask, config, normalization_mask=None):
+    """Batch-3 contract: resample, then robust visible-support normalization."""
+    grid = resample_spectrum(flux, ivar, wavelength, mask, config)
+    normalized = normalize_grid(grid["flux"], grid["valid"], config, normalization_mask)
+    normalized.pop("normalization_fallback")
+    return {**normalized, "coverage": grid["coverage"]}
 
 
 class HFDESISpectra(IterableDataset):

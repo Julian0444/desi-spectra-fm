@@ -1,0 +1,227 @@
+{
+  "contract": "batch4-grid-v1:unnormalized-spectra-input-v2",
+  "environment": {
+    "packages": {
+      "numpy": "2.5.1",
+      "pyarrow": "25.0.0",
+      "scipy": "1.18.0",
+      "torch": "2.13.0"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "files": {
+    "decision-before-split.json": {
+      "bytes": 65984,
+      "sha256": "782f7dd184ccea3ed40ea260622d2cfd40fc9dbb098d6c03c11227917d7bd6bb"
+    },
+    "exclusions.json": {
+      "bytes": 2427627,
+      "sha256": "6c191e4d35db4a304df0b9b8c8b0fa4f7dc38f1123a2fef359273d482b36a091"
+    },
+    "splits.json": {
+      "bytes": 2093,
+      "sha256": "fdb186153393cb6e2ad1d98b1bb83bec19b50f1413b174185d7131dbf50dd5da"
+    }
+  },
+  "index": {
+    "bytes": 13443072,
+    "sha256": "36d1433bbf2457b1eeab8b1a27cb4c37228800b79a48403e247980c29eed57b0"
+  },
+  "materialization_seconds": 47.32028645800892,
+  "preprocess": {
+    "clip_value": 8.0,
+    "eps": 1e-06,
+    "lambda_max": 9800.0,
+    "lambda_min": 3600.0,
+    "n_pixels": 7081,
+    "wavelength_grid": "log"
+  },
+  "snapshot": {
+    "bytes": 9038,
+    "sha256": "933b7959138ea1ed3a45496dd679c52ce0d8dd8e522628da7ff99252fb68f7ee"
+  },
+  "source": {
+    "files": {
+      "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+      "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+      "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+      "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+      "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+      "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+      "src/desi_fm/experiment/artifacts.py": "96f74d15fbafe0f4bb04a6c76ee2697664964c6c7be10b4adfb3f68d50dfed95",
+      "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+      "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+      "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+      "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+      "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+      "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+      "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+      "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+      "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+    },
+    "head": "008ce03da7d8c3d74d522b03eedbf3d61b7e861a",
+    "sha256": "986209997187d5b256e930b8951439c6cd83689e0e0207b6e42e427d5fcccab9"
+  },
+  "split_report": {
+    "actual": {
+      "test": 10000,
+      "train": 64759,
+      "validation": 10000
+    },
+    "allocation_quotas": {
+      "test": {
+        "z0:zwarn0": 269,
+        "z0:zwarn1": 4363,
+        "z1:zwarn0": 294,
+        "z1:zwarn1": 2465,
+        "z2:zwarn0": 234,
+        "z2:zwarn1": 1749,
+        "z3:zwarn0": 143,
+        "z3:zwarn1": 340,
+        "z4:zwarn0": 2,
+        "z4:zwarn1": 82,
+        "z5:zwarn0": 4,
+        "z5:zwarn1": 55
+      },
+      "validation": {
+        "z0:zwarn0": 269,
+        "z0:zwarn1": 4363,
+        "z1:zwarn0": 294,
+        "z1:zwarn1": 2465,
+        "z2:zwarn0": 234,
+        "z2:zwarn1": 1749,
+        "z3:zwarn0": 143,
+        "z3:zwarn1": 340,
+        "z4:zwarn0": 2,
+        "z4:zwarn1": 82,
+        "z5:zwarn0": 4,
+        "z5:zwarn1": 55
+      }
+    },
+    "mixed_stratum_groups": [],
+    "observed_groups": 84759,
+    "physical_independence": "not established by these metadata",
+    "protected_groups": 2000,
+    "protected_ids": 2000,
+    "rare_definition": "fewer than 3 observed groups or zero validation/test quota; retained in all accounting",
+    "rare_strata": [],
+    "requested": {
+      "test": 10000,
+      "train": 64759,
+      "validation": 10000
+    },
+    "seed": 20261009,
+    "strata": {
+      "test": {
+        "z0:zwarn0": 269,
+        "z0:zwarn1": 4363,
+        "z1:zwarn0": 294,
+        "z1:zwarn1": 2465,
+        "z2:zwarn0": 234,
+        "z2:zwarn1": 1749,
+        "z3:zwarn0": 143,
+        "z3:zwarn1": 340,
+        "z4:zwarn0": 2,
+        "z4:zwarn1": 82,
+        "z5:zwarn0": 4,
+        "z5:zwarn1": 55
+      },
+      "train": {
+        "z0:zwarn0": 1740,
+        "z0:zwarn1": 28256,
+        "z1:zwarn0": 1904,
+        "z1:zwarn1": 15967,
+        "z2:zwarn0": 1511,
+        "z2:zwarn1": 11324,
+        "z3:zwarn0": 930,
+        "z3:zwarn1": 2203,
+        "z4:zwarn0": 12,
+        "z4:zwarn1": 535,
+        "z5:zwarn0": 23,
+        "z5:zwarn1": 354
+      },
+      "validation": {
+        "z0:zwarn0": 269,
+        "z0:zwarn1": 4363,
+        "z1:zwarn0": 294,
+        "z1:zwarn1": 2465,
+        "z2:zwarn0": 234,
+        "z2:zwarn1": 1749,
+        "z3:zwarn0": 143,
+        "z3:zwarn1": 340,
+        "z4:zwarn0": 2,
+        "z4:zwarn1": 82,
+        "z5:zwarn0": 4,
+        "z5:zwarn1": 55
+      }
+    }
+  },
+  "splits": {
+    "test": {
+      "files": {
+        "flux.npy": {
+          "bytes": 283240128,
+          "sha256": "f6d6a1ee4eaae5583367a071579d0f692ca515e765997650bf8e59d9933a2533"
+        },
+        "ids.json": {
+          "bytes": 230384,
+          "sha256": "e2fb00c6dd98cbe61e7198f15eb381dece77dbffacc98417c2530d0f7ce03002"
+        },
+        "metadata.npz": {
+          "bytes": 1130742,
+          "sha256": "fd4567a0c1b2e2e0881f63a51d2a5869a3d2050398ec09d85c1d2a0103515872"
+        },
+        "valid.npy": {
+          "bytes": 70810128,
+          "sha256": "0f2d996c1542936e7b9b17a78ef7f2544d1a18f32d767377c493acf019881616"
+        }
+      },
+      "n": 10000
+    },
+    "train": {
+      "files": {
+        "flux.npy": {
+          "bytes": 1834234044,
+          "sha256": "1eec4dfeff6c5d76598384ae5932c707c8b20c9e03e1f855162398e957473722"
+        },
+        "ids.json": {
+          "bytes": 1491503,
+          "sha256": "83a6ce1711a4a46e1ebfe6c6225bf7a163448f87b2081afaeb2122642953b5b3"
+        },
+        "metadata.npz": {
+          "bytes": 7318509,
+          "sha256": "9b6e2725fd945c9e483c9cd367d693668052bc5ac4af308bdaeec5fdeb7282c3"
+        },
+        "valid.npy": {
+          "bytes": 458558607,
+          "sha256": "4961585a235bf51a38be81f4a70621bfdd5103674f5c93eec46dbd7931cd5740"
+        }
+      },
+      "n": 64759
+    },
+    "validation": {
+      "files": {
+        "flux.npy": {
+          "bytes": 283240128,
+          "sha256": "efa8bc479184b09133227383280bbc1707d56f35c6e283f6f70dcb89f6931605"
+        },
+        "ids.json": {
+          "bytes": 230367,
+          "sha256": "46eb29c58e8f8ae7645cac155295602a7d9743c4760c449798df22b4eb022bf5"
+        },
+        "metadata.npz": {
+          "bytes": 1130742,
+          "sha256": "4e0d2501db9d4dee9c0599b531ab95fe7e29240fa1ca5930f5688736f455d5c2"
+        },
+        "valid.npy": {
+          "bytes": 70810128,
+          "sha256": "87aff01aa60b4eb723d8eb6aebf83c5de45e5744f8741bed4ab865791fc8a8a9"
+        }
+      },
+      "n": 10000
+    }
+  },
+  "status": "complete",
+  "total_seconds": 52.62297824991401
+}
