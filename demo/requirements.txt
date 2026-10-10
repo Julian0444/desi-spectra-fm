@@ -3,4 +3,5 @@ numpy
 matplotlib
 huggingface_hub
 torch==2.11.0
-desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm
+# Until publication, provide the local batch-2 desi_fm wheel when installing.
+desi-fm>=0.2.0,<0.3
