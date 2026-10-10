@@ -1,5 +1,11 @@
 # 10 · Embeddings + búsqueda semántica (FAISS) — ✅ COMPLETADO (2026-08-16/17)
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 3 · **Tiempo real:** ~2.5 h (el indexado tomó 5.1 min, no los 30–60 estimados) · **Dependía de:** 02 (checkpoint v2.1), 07 · **Entregable:** `find_similar_spectra` funcionando sobre un índice FAISS de 15k espectros + UMAP con gradiente de z visible a simple vista en los README de ambos repos.
 
 ## Qué quedó hecho
@@ -26,14 +32,14 @@ La consulta de la DoD se ejecutó además **por la capa MCP real** (`mcp.call_to
 1. **faiss + torch se matan entre sí en macOS** (dos `libomp.dylib`, OMP Error #15: el proceso aborta en la primera región paralela de faiss — así aparecieron los diálogos "Python se cerró inesperadamente"). Fix centralizado en `tools._faiss()`: `KMP_DUPLICATE_LIB_OK=TRUE` (workaround documentado por Intel/LLVM) + `faiss.omp_set_num_threads(1)` (search sobre 15k flat es microsegundos igual). `build_index.py` además guarda embeddings/meta **antes** de tocar faiss, para que un abort no pierda la pasada de streaming.
 2. **El índice vive en el Hub, no en git**: 30 MB binarios no van a un repo de código; `_index_paths()` los baja y cachea igual que el checkpoint. Bonus: los embeddings crudos quedan en `data/spectra_embeddings.npy` para reuso (UMAP, análisis).
 3. **Sin `shuffle_buffer`** en el indexado: la membresía del índice es idéntica (`take` corre antes de `shuffle` en `HFDESISpectra`) y el orden determinista hace el rebuild reproducible.
-4. **Corrida demo del agente con la tool nueva NO se hizo**: el crédito de la API está agotado ("credit balance is too low", medido 2026-08-17 ~06:40 UTC — la memoria decía ~US$ 4.50 restantes; el saldo real era cero). La integración quedó igualmente verificada offline: test `agent.find_similar_spectra.call(...) ≡ impl`, SYSTEM testeado por contrato, y la consulta real por la capa MCP. Cuando haya crédito: una corrida haiku (~$0.013) sobre `heldout_z020` debería citar "the 5 nearest neighbors have z between 0.19 and 0.20".
+> [Account-specific operational detail removed during consolidation.]
 5. **UMAP con `random_state=42`** (reproducible) y colorbar que codifica log(1+z) pero se lee en z plano — más honesto que el label "log(1+z)" del plan.
 
 ## Definición de hecho
 
 - [x] `embed_spectrum` con test de sanidad (mismo z → más similar) — + determinismo y shape; 26/26 en el repo principal, CI verde.
 - [x] Índice de ≥ 10k espectros construido y guardado — 15.000 × 512-d, local en `data/` y publicado en el Hub.
-- [x] `find_similar_spectra` integrada al agente y al MCP server; una consulta devuelve vecinos con z coherentes — tabla de arriba; consulta MCP real con z ∈ [0.187, 0.202] para z_true 0.204. (Corrida API del agente pendiente de crédito — adaptación nº 4.)
+> [Account-specific operational detail removed during consolidation.]
 - [x] `docs/img/umap_z.png` con gradiente de z visible, linkeado en el README — en ambos repos.
 - [x] Commit + tracker — `7a2f8ab` (código desi-fm) + `75997c5` (spectra-copilot) + cierre documental; CI verde en ambos.
 

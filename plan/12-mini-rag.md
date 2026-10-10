@@ -1,6 +1,12 @@
 # 12 · Mini-RAG de referencias — ✅ COMPLETADO (2026-08-17)
 
-> **Bloque:** Nivel 3 · **Tiempo real:** ~2.5 h · **Dependía de:** 08 · **Entregable:** reportes del agente con citas a fuentes — **cumplido**: 3 corridas reales Haiku (~US$ 0.07), 6/6 citas respaldadas, reporte verbatim en el README de spectra-copilot. La parte offline se construyó con el crédito en cero; la verificación paga se corrió el mismo día tras la recarga de Julián.
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
+> [Account-specific operational detail removed during consolidation.]
 
 ## Qué quedó hecho (commit `3eea698` en spectra-copilot, 35/35 tests offline)
 
@@ -8,7 +14,7 @@
 - **`copilot/rag.py`**: BM25 (`rank_bm25`, agregado a `pyproject.toml`) con tokenización alfanumérica (así "[OII]" matchea "OII"), corpus lazy con `lru_cache`, clamp de `k`, filtro score > 0 (query fuera de corpus → lista vacía, no ruido) y **`valid_ids()`** — el ground truth para chequear citas alucinadas (insumo directo si el plan 11 agrega la métrica "% citas válidas").
 - **`lookup_reference` integrada en las 3 capas**: tool `@beta_tool` en el agente (ofrecida en `run()` y en `run_structured()` → la corrida pendiente del 11 medirá agente **con** RAG), tool MCP (el server pasa de 4 a 5 tools, `instructions` actualizadas) y regla nueva en el SYSTEM: paso 5 del workflow (priors de tipo de target / degeneraciones) + **contrato de citas** — citar ids entre corchetes y *solo* ids devueltos por lookup_reference en esa conversación, nunca inventar una fuente (el endurecimiento de "Si algo falla" se aplicó desde el día 1).
 - **Tests 26→35**, todos offline: corpus bien formado (≥10 notas con source https), la query de la DoD "Halpha OII confusion" → nota de degeneración + `Halpha_6563` (top-3) + `OII_3727` (top-5), priors recuperables ("ELG redshift range" → `desi-targets-elg` con "0.6" en el snippet), query fuera de corpus vacía, clamp de k, tool del agente ≡ impl, contrato de citas en el SYSTEM, capa MCP real (`call_tool`) ≡ impl, 5 tools exactas con schemas.
-- **README de spectra-copilot**: sección "Mini-RAG: cited references (BM25)" con defensa de BM25 (corpus de ~30 docs técnicos → embeddings no aportan y agregan dependencia; BM25 es determinista, offline y testeable en CI), salida real de `lookup_reference("ELG redshift range")`, y el contrato de citas. Nota visible de que el reporte del agente con cita queda pendiente de crédito.
+> [Account-specific operational detail removed during consolidation.]
 
 ## Adaptaciones vs el plan original
 
@@ -19,7 +25,7 @@
 
 ## Verificación con el agente (3 corridas Haiku, 2026-08-17, ~US$ 0.07 — commit `ac04121`)
 
-Tras la recarga de crédito (key `sk-ant-api03-mr...DgAA` confirmada con llamada mínima), se corrieron los 3 análisis del plan con `claude-haiku-4-5` y transcript commiteado (`eval/transcripts/{lowconf,trap,z287}_rag.json`):
+> [Account-specific operational detail removed during consolidation.]
 
 | caso | consultó lookup_reference | citas en el reporte | ¿respaldadas? |
 |---|---|---|---|

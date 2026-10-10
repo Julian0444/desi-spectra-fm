@@ -1,6 +1,12 @@
 # 11 · Evals del agente — ✅ COMPLETADO (2026-08-17)
 
-> **Bloque:** Nivel 3 · **Tiempo real:** ~2 h de arnés + 20 min de export + ~2.5 h de corrida desatendida · **Dependía de:** 08 · **Entregable:** tabla de métricas end-to-end sobre 150 casos etiquetados — **cumplido** (commits `8fb4a0f` arnés + `6efbdfd` resultados en spectra-copilot, CI verde, 35/35 tests). El arnés se construyó con el crédito en cero; la corrida paga se hizo el mismo día tras la recarga, con go-ahead explícito de Julián por lote.
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
+> [Account-specific operational detail removed during consolidation.]
 
 ## El resultado (corrida 2026-08-17, `eval/results.csv` commiteado)
 
@@ -29,7 +35,7 @@
 2. **`official_z` en vez de `["z_pred"]`** (la predicción oficial de v2.1 es `z_pred_map`).
 3. **`run_structured` con toolset completo** y `request_kwargs()` (Haiku 4.5 rechaza `thinking: adaptive`).
 4. **Robustez de corrida**: CSV por caso + `--resume` + retry — clave con presupuesto justo.
-5. **Corrida en dos lotes con go-ahead por lote** (validación n=20 → OK de Julián → 130 restantes), tras el susto de contabilidad del panel (ver HANDOFF: los $22.71 previos eran del 16-ago, no de la sesión).
+> [Account-specific operational detail removed during consolidation.]
 
 ## Hallazgo de protocolo (mantener en toda tabla futura)
 

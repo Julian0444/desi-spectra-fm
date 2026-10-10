@@ -1,5 +1,11 @@
 # HANDOFF — registro de continuidad entre sesiones
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > Log acumulativo (skill `/handoff`): cada sesión agrega una sección datada abajo, sin borrar las anteriores. Un lector sin contexto previo debería poder retomar el trabajo leyendo la última sección + el tracker [`plan/README.md`](README.md).
 
 ---
@@ -20,7 +26,7 @@ Se ejecutó completo el **plan 03 — Repo público en GitHub + CI**. El proyect
 
 ### Estado actual
 
-- **Branch**: `main`, sincronizada con `origin/main`, working tree limpio (solo `.claude/` sin trackear — ver Avisos).
+> [Private local configuration omitted.]
 - **Commits recientes**:
   - `68bdb75` (2026-07-11) docs: CI badge + mark plan 03 done in tracker
   - `96826fd` (2026-07-11) ci: run unit tests on push
@@ -42,7 +48,7 @@ Se ejecutó completo el **plan 03 — Repo público en GitHub + CI**. El proyect
 - **Ningún bloqueo duro.** Cosas a saber:
 - **pip viejo con Python 3.9 de sistema**: `pip install -e .` falla con pip 21 (no soporta editable desde `pyproject.toml`). En venvs nuevos: `pip install --upgrade pip` primero. CI usa Python 3.11 y no lo sufre.
 - **`plan/` es público**: todo lo que se commitee ahí (incluido este archivo) se publica en GitHub al pushear. Este HANDOFF quedó **sin commitear** a propósito — decidir si commitearlo o agregarlo al `.gitignore`.
-- **`.claude/` está sin trackear** (contiene el skill `handoff` creado el 2026-07-12): decidir si commitearlo (útil si se clona en otra máquina) o ignorarlo.
+> [Private local configuration omitted.]
 - **Material privado**: todo en `~/Documents/PHYS303-privado/` (consigna del profesor + runs viejos). No re-agregarlo al repo.
 - **Permisos**: el clasificador de auto-mode deniega `rm -rf` de directorios no nombrados por el usuario y la creación de superficies públicas sin autorización explícita — pedir confirmación explícita a Julián antes de crear repos/Spaces públicos (para el 04/05 va a volver a pasar con HF Hub).
 - Anotación cosmética en Actions: deprecación de Node 20 en `actions/checkout@v4`/`setup-python@v5` (corren forzadas en Node 24; no afecta, se puede ignorar o subir versiones de actions más adelante).
@@ -223,7 +229,7 @@ El **plan 04 se ejecutó de punta a punta** y quedó ✅ en el tracker: la v2.1 
 ### Estado actual
 
 - Branch `main` sincronizada con `origin/main`; CI verde. Tests **16/16**.
-- Working tree: solo residuos sin trackear **preservados a propósito** (`.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`). Nada se borró; checkpoints y runs intactos.
+> [Private local configuration omitted.]
 - El clon de la prueba limpia quedó en un tempdir del sistema (`mktemp -d`, venv + caché HF) — borrable cuando se quiera; no pertenece al repo.
 
 ### Siguiente paso — Plan 05 (Demo Gradio en HF Spaces)
@@ -263,7 +269,7 @@ El **plan 05 se ejecutó de punta a punta** y quedó ✅ en el tracker: demo Gra
 ### Estado actual
 
 - Working tree con los cambios del plan 05 listos para commit enfocado (`.gitignore` con `examples/`, `README.md`, `model_card.md`, `demo/*`, `scripts/make_demo_examples.py`, `plan/05`, `plan/README.md`, `plan/HANDOFF.md`). `examples/*.npz` NO se commitean (gitignored; reproducibles con `scripts/make_demo_examples.py`, copias públicas en el Space).
-- Residuos sin trackear previos **preservados**: `.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`.
+> [Private local configuration omitted.]
 - Espectros crudos exportados (41) en el scratchpad de la sesión (temporal, prescindible — el script del repo regenera los 4 elegidos).
 
 ### Siguiente paso — Plan 06 (API FastAPI + Docker)
@@ -299,7 +305,7 @@ El **plan 06 se ejecutó de punta a punta** y quedó ✅ en el tracker: API REST
 
 ### Estado actual
 
-- Branch `main` sincronizada; CI verde; suite 24/24. Working tree limpio salvo los residuos sin trackear de siempre, **preservados**: `.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`.
+> [Private local configuration omitted.]
 - Spaces activos: demo (`desi-spectra-fm-demo`) + API (`desi-fm-api`) — **los 2 slots ZeroGPU del free tier ocupados**; un tercer Space gratis no va a poder crearse.
 - La imagen Docker local `desi-fm-api` quedó en el daemon local (borrable con `docker rmi desi-fm-api`).
 
@@ -331,7 +337,7 @@ El **plan 07 se ejecutó de punta a punta** y quedó ✅ en el tracker: segundo 
 ### Estado actual
 
 - **Repo nuevo:** `Julian0444/spectra-copilot` público, `main` pusheada, Actions verde, 7/7 tests. Los `.npz` de ejemplo están commiteados ahí (en el repo principal siguen gitignored).
-- **Repo principal:** solo cambios documentales (plan/07, tracker, HANDOFF); suite sigue 24/24; residuos sin trackear de siempre **preservados** (`.agents/`, `.claude/`, `runs/desi_150k_classhead/`, `runs/desi_50k_big/predictions_heldout.csv`, `runs/desi_80k_classhead_v21/reconstructions_best.npz`).
+> [Private local configuration omitted.]
 - Sin servicios nuevos: no se tocaron los Spaces ni el Hub (los 2 slots ZeroGPU siguen ocupados por demo + API).
 
 ### Siguiente paso — Plan 08 (agente con la Claude API)
@@ -350,13 +356,13 @@ El **plan 07 se ejecutó de punta a punta** y quedó ✅ en el tracker: segundo 
 
 ### Resumen de la sesión
 
-Se empezó a ejecutar el **plan 08 (agente con la Claude API)** en `~/proyectos/spectra-copilot`. El código central del agente **ya está escrito pero sin commitear y sin probar contra la API** — la sesión se cortó justo al corregir el generador del caso trampa. **Esta sesión no hizo ninguna llamada a la Claude API (US$ 0.00)**, pero ⚠️ según la memoria del proyecto (actualizada por otra sesión el 2026-08-16), una sesión de Claude Code capturó la `ANTHROPIC_API_KEY` que estaba exportada en `~/.zshrc` y **quemó el crédito de ~US$ 5.60** (351k tokens, murió con "Credit balance too low") → **recargar crédito en platform.claude.com/settings/billing ANTES de correr el agente**; el presupuesto del plan sigue siendo < US$ 1 de corridas.
+> [Account-specific operational detail removed during consolidation.]
 
 **Verificado del entorno:**
 
 - `spectra-copilot` partía limpio en `8ba6a4c` (= `origin/main`), 7/7 tests, CI verde.
 - `anthropic` **0.120.2** en el venv: `client.beta.messages.tool_runner` y `@beta_tool` disponibles. `BetaFunctionTool` expone **`.call(dict)`** → las tools envueltas se pueden testear **sin API** (verificado con un tool de juguete).
-- **Key — estado FINAL verificado en disco al escribir este handoff** (cambió respecto del brief original de la sesión): la key ya **NO** está en `~/.zshrc` (0 exports) sino en **`~/.anthropic_key`** (chmod 600, 109 bytes, creada 2026-08-16 19:55). Leerla con `KEY=$(tr -d '\n' < ~/.anthropic_key)` y pasarla SOLO al proceso del agente (`ANTHROPIC_API_KEY="$KEY" .venv/bin/python -m copilot.agent ...`); **no imprimirla nunca y NUNCA re-exportarla globalmente** — Claude Code la captura al arrancar y factura la sesión entera al crédito de la API (así se quemó el crédito hoy).
+> [Account-specific operational detail removed during consolidation.]
 
 **Hallazgos de la referencia oficial de la API que condicionan el código:**
 
@@ -382,7 +388,7 @@ El trap v1 llevaba ruido blanco (σ=0.03) y `identify_spectral_lines_impl` **det
 ### Estado actual
 
 - **spectra-copilot**: `main` = `origin/main` = `8ba6a4c`; sin trackear: `copilot/agent.py`, `copilot/report.py`, `scripts/`, `examples/trap_single_line.npz`. Tests siguen 7/7 (los nuevos no existen todavía).
-- **Repo principal**: `main` = `origin/main` = `3e6fbbb`; único cambio de esta sesión: esta sección del HANDOFF (sin commitear). Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+> [Private local configuration omitted.]
 
 ### Tareas pendientes (en orden)
 
@@ -404,7 +410,7 @@ El trap v1 llevaba ruido blanco (σ=0.03) y `identify_spectral_lines_impl` **det
 
 ### Primera acción sugerida para la próxima sesión
 
-1. Confirmar con Julián que el crédito de la API fue recargado (sin eso, el punto 3 de las tareas no puede correr; los puntos 1–2 no necesitan API).
+> [Account-specific operational detail removed during consolidation.]
 2. Reintentar el edit noiseless en `scripts/make_trap_example.py` (el fallo fue transitorio), regenerar `examples/trap_single_line.npz` y verificar `n_peaks == 1` con las 3 hipótesis empatadas en 1 matched / weak; seguir con los tests offline.
 
 ---
@@ -420,15 +426,15 @@ Se retomó exactamente desde el punto de corte del runbook anterior y el **plan 
 1. **Fix del trap aplicado tal como estaba diseñado** (continuo sin ruido): regenerado y verificado — 1 pico exacto en 7999.6 Å, Hα/[OIII]/[OII] empatadas en 1 matched, todas `weak_or_inconsistent`.
 2. **Hallazgo nuevo — las tools tuvieron que cambiar**: el SYSTEM (regla 3) pide derivar hipótesis desde "el pico más fuerte", pero `identify_spectral_lines` no devolvía picos → en el trap el agente quedaba **ciego** (z_pred_map 2.79 conf 0.19, 0 matches, ninguna λ en el JSON). Fix aditivo: la tool ahora reporta `n_peaks_detected` + `strongest_peaks_angstrom` (top 5 por prominencia). Efecto doble: en el trap ancla las 3 hipótesis; en `heldout_z020` el pico 7900.8 Å como Hα da z=0.2039 ≈ z_true — el loop detect→refine se volvió alcanzable (hasta haiku lo completa).
 3. **`tests/test_agent.py`** (6 tests offline, sin API key; suite **13/13** local): hechos v2.1 en el SYSTEM, `.call(dict)` del `@beta_tool` ≡ impl, tarifas + cache tokens, `request_kwargs`, ambigüedad del trap por contrato.
-4. **Corridas** (key leída de `~/.anthropic_key` solo al proceso del agente, jamás exportada; crédito estaba recargado): 3 iteraciones haiku (~$0.013 c/u) + 4 finales opus con transcript. Resultados: z020 → agente rechaza el z del modelo (2/11) y recupera **z=0.204** = z_true (8/11), $0.094; z287 → reancla Lyα → **z=2.874** (z_true 2.866; el modelo decía 2.441), $0.131; lowconf_z157 → descarta el outlier por conf 0.18 ✓ pero su recuperación da z≈1.98 vs 1.574 (las líneas UV a z_true caen fuera de cobertura — limitación del verificador de picos, documentada honesta en el README), $0.125; trap → "**Indeterminate** — single-line trap", 3 hipótesis comparadas, "no redshift is defensible", $0.100.
+> [Account-specific operational detail removed during consolidation.]
 5. **README de spectra-copilot**: sección "The agent (Claude API)" (uso, costos medidos, transcripts) + reportes verbatim de z020 y trap + resumen honesto de z287/z157; salida del CLI actualizada (nuevos campos de picos); "13 passed"; la línea final quedó "The MCP server lands next."
 6. **Publicación**: commit `c9de49d` + push en spectra-copilot → **CI verde**. Repo principal: plan/08 reescrito como runbook real con DoD marcada, tracker 08 ✅, esta sección, commit + push + CI.
 
 ### Estado actual
 
 - **spectra-copilot**: `main` = `c9de49d`, CI verde, 13/13 tests. Nuevos: `copilot/agent.py`, `copilot/report.py`, `scripts/make_trap_example.py`, `examples/trap_single_line.npz` (noiseless), `tests/test_agent.py`, `eval/transcripts/*.json` (4); modificados: `copilot/tools.py` (picos expuestos), `README.md`.
-- **Repo principal**: solo docs (plan/08, tracker, HANDOFF). Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
-- **Crédito API**: quedaban ~US$ 4.99 recargados; esta sesión gastó ≈ US$ 0.49 → restan ~US$ 4.50.
+> [Private local configuration omitted.]
+> [Account-specific operational detail removed during consolidation.]
 
 ### Siguiente paso — Plan 09 (servidor MCP)
 
@@ -436,7 +442,7 @@ Se retomó exactamente desde el punto de corte del runbook anterior y el **plan 
 
 ### Avisos
 
-- **La key sigue en `~/.anthropic_key`** (chmod 600): leerla con `KEY=$(tr -d '\n' < ~/.anthropic_key)` y pasarla SOLO al proceso que la necesita. NUNCA exportarla global/`~/.zshrc` (Claude Code la captura y factura la sesión al crédito API — ya pasó una vez).
+> [Account-specific operational detail removed during consolidation.]
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py` y el SYSTEM; si se toca uno, tocar el otro.
 - En `heldout_lowconf_z157` la conclusión del agente (z≈1.98) difiere del catálogo (1.574): no es bug — a z_true solo 1/4 líneas del catálogo caen en cobertura con picos débiles. Si el plan 11 lo evalúa, contar "outlier detectado" como éxito y "z recuperado" como fallo honesto.
 - Los transcripts de `eval/transcripts/` son el insumo directo del plan 11 (assistant turns + tool_results completos).
@@ -463,7 +469,7 @@ El **plan 09 quedó ✅ de punta a punta**, repartido en dos sesiones: una sesi�
 ### Estado actual
 
 - **spectra-copilot**: `main` = `843ac92` (= origin), CI verde, 17/17 tests. Servidor + tests en `5340bae`; docs en `843ac92`.
-- **Repo principal**: cierre documental de esta sesión (plan/09 reescrito como runbook con DoD marcada, tracker 09 ✅, esta sección) — commit `plan-09: cerrado`. Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+> [Private local configuration omitted.]
 - Los 2 slots ZeroGPU gratis siguen ocupados (demo + API); el MCP server corre local por stdio, no necesita hosting.
 
 ### Siguiente paso — Planes 10–12 (Nivel 3) o 13 (cierre)
@@ -474,7 +480,7 @@ El **plan 09 quedó ✅ de punta a punta**, repartido en dos sesiones: una sesi�
 
 - **Permisos de Claude Code con tools MCP**: la primera llamada a cada tool pide permiso; un fallo transitorio del clasificador de permisos se resuelve reintentando la misma llamada (pasó en esta sesión con `predict_redshift`).
 - El server MCP registrado a scope usuario apunta al checkpoint **local** vía `DESI_FM_CKPT`; si ese path se mueve, borrar el env o actualizarlo (sin él, descarga del Hub en la primera llamada, ~104 MB).
-- La key sigue en `~/.anthropic_key` (chmod 600); el plan 09 no la tocó. Crédito API intacto: ~US$ 4.50.
+> [Account-specific operational detail removed during consolidation.]
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM del agente y las descripciones MCP; si se toca uno, tocar los tres.
 
 ---
@@ -483,7 +489,7 @@ El **plan 09 quedó ✅ de punta a punta**, repartido en dos sesiones: una sesi�
 
 ### Resumen ejecutivo
 
-El **plan 10 quedó ✅ de punta a punta** en una sesión: el encoder ahora es un modelo de embeddings (`encode()`/`embed_spectrum()` en desi-spectra-fm, commit `7a2f8ab`, 26/26 tests, CI verde), un índice FAISS de **15.000 espectros de entrenamiento** construido en 5.1 min y **publicado en el Hub** (`faiss/` en jirustaroure/desi-spectra-fm), la tool **`find_similar_spectra`** integrada en tools + agente + MCP server (spectra-copilot commit `75997c5`, 20/20 tests, CI verde) y el **UMAP coloreado por z** (`docs/img/umap_z.png`) con gradiente visible a simple vista, linkeado en el README de ambos repos. Sin costo de API (ver bloqueo de crédito abajo).
+> [Account-specific operational detail removed during consolidation.]
 
 ### Qué se hizo (cronología)
 
@@ -495,43 +501,43 @@ El **plan 10 quedó ✅ de punta a punta** en una sesión: el encoder ahora es u
 6. **UMAP** (`scripts/plot_umap.py`, `random_state=42`, viridis sobre log(1+z) con ticks en z plano): gradiente violeta→verde nítido + isla de z bajo separada. En los README de ambos repos con la frase "nadie le enseñó a ordenarse por redshift".
 7. **Cierre**: spectra-copilot `75997c5` push + CI verde; repo principal: README (sección embeddings + snippet API + 26 tests), model card re-subida al Hub, plan/10 runbook con DoD marcada, tracker ✅, esta sección.
 
-### BLOQUEO — crédito API agotado (afecta plan 11 y 12)
+> [Account-specific operational detail removed during consolidation.]
 
-`python -m copilot.agent` falló con **"Your credit balance is too low"** (2026-08-17 ~06:40 UTC). La memoria decía "~US$ 4.50 restantes" — el saldo real es CERO (algo lo drenó o el dato estaba viejo; la memoria ya se corrigió). Impacto: la corrida demo del agente con la tool nueva quedó pendiente (integración verificada offline igual — DoD cumplida con esa adaptación anotada en el runbook). **El plan 11 (evals, necesita ~100 corridas) y el 12 (mini-RAG) NO pueden correr sin recarga.** Primera acción de la próxima sesión que los toque: confirmar recarga con Julián. Cuando haya crédito: una corrida haiku (~$0.013) sobre `heldout_z020` debería citar el rango de vecinos.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Estado actual
 
 - **desi-spectra-fm**: `main` = `7a2f8ab` (código) + el commit de cierre documental de esta sesión; CI verde; 26/26 tests. Hub: `faiss/spectra.faiss` + `faiss/spectra_meta.npz` + model card actualizada.
 - **spectra-copilot**: `main` = `75997c5` (= origin), CI verde, 20/20 tests. Nuevos: `scripts/build_index.py`, `scripts/plot_umap.py`, `tests/conftest.py`, `docs/img/umap_z.png` (excepción en .gitignore); `data/` local con índice + embeddings (30 MB c/u, NO en git). Venv: + `faiss-cpu` (dependencia), `umap-learn`/`matplotlib` (solo local, para el plot).
 - El server MCP registrado en Claude Code hereda `find_similar_spectra` sin re-registrar (mismo archivo); primera llamada puede bajar el índice del Hub si no encuentra `data/` (30 MB).
-- Residuos sin trackear de siempre preservados (`.agents/`, `.claude/`, `runs/...`).
+> [Private local configuration omitted.]
 
-### Siguiente paso — Planes 11–12 (Nivel 3, requieren crédito API) o 13 (cierre)
+> [Account-specific operational detail removed during consolidation.]
 
-Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como insumo, pero **bloqueado por crédito**), 12 (mini-RAG, también usa API), 13 (narrativa — **nunca se recorta**, no necesita API). Si el crédito no se recarga, el 13 es el único ejecutable y cierra el producto mínimo del sprint.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Avisos
 
 - **Regla faiss/torch en macOS**: importar faiss SOLO vía `tools._faiss()` (OMP Error #15 → abort). Los diálogos de crash de macOS que vio Julián durante esta sesión fueron eso — inofensivos, se cierran con OK.
 - El índice indexa SOLO lado de entrenamiento; si se reconstruye, mantener esa propiedad (las queries held-out deben seguir out-of-index) — está en el docstring de `build_index.py`.
-- La key sigue en `~/.anthropic_key` (chmod 600); NUNCA exportarla global.
+> [Account-specific operational detail removed during consolidation.]
 - El umbral 0.4 del verdict sigue sincronizado entre `tools.py`, el SYSTEM y las descripciones MCP; el SYSTEM ahora tiene además la regla 4 (vecinos complementan, no reemplazan) testeada por contrato en `test_agent.py` y `test_mcp_server.py`.
 - Los 2 slots ZeroGPU gratis siguen ocupados (demo + API); el índice FAISS corre local/CI, no necesita hosting.
 
 ---
 
-## Session — 2026-08-17 (plan 11 PARCIAL: arnés de evals completo y commiteado; corrida del agente bloqueada por crédito)
+> [Account-specific operational detail removed during consolidation.]
 
 ### Resumen ejecutivo
 
-**El crédito de la API sigue en CERO** (verificado al inicio con una llamada mínima a Haiku → "credit balance is too low"), así que la corrida paga del plan 11 no se pudo lanzar. Todo lo demás del plan quedó **construido, testeado y commiteado**: cuando haya crédito, cerrar el plan es correr dos comandos y pegar la tabla. spectra-copilot `main` = `8fb4a0f` (= origin), CI verde, **26/26 tests** (todos offline).
+> [Account-specific operational detail removed during consolidation.]
 
 ### Qué se hizo
 
 - **`eval/export_cases.py` + 150 casos exportados** (~20 min desatendido): lado **held-out** del split (stream canónico `filter(valid z) → skip(80000)`), selección **estratificada** sobre el CSV de predicciones v2.1 con 45 casos en z > 1.5. Cada z_true asserted contra el CSV (reordenamiento upstream → abort, nunca etiquetas malas). `eval/cases/labels.csv` commiteado (`case,heldout_index,z_true`); los 150 npz (15 MB) gitignoreados — se regeneran determinísticamente.
 - **CORRECCIÓN al sketch del plan**: muestreaba con `shuffle(buffer_size=4096)` desde el inicio del stream = casi todo del lado de ENTRENAMIENTO (visto por el modelo Y por el índice FAISS) → métricas infladas. También leía `z_pred` (cabeza secundaria) como baseline; lo correcto es `tools.official_z` (z_pred_map).
 - **`submit_report` + `run_structured()`** en `copilot/agent.py`: salida estructurada vía tool (dict `SUBMITTED`, cero parsing de prosa), tokens + usage completo para costo. Incluye `find_similar_spectra` (el sketch era pre-plan-10) y `request_kwargs()` (Haiku 4.5 rechaza thinking adaptive con 400).
-- **`eval/run_evals.py`**: baseline modelo-solo + agente por caso; el CSV se **reescribe tras cada caso** y `--resume` retoma una corrida muerta sin perder nada (clave con crédito justo); retry×2 por caso; summary con ambos sistemas, **`by_confidence`** (la correlación confianza↔acierto que pide la DoD) y costo estimado. `--baseline-only` corre sin API.
+> [Account-specific operational detail removed during consolidation.]
 - **Baseline modelo-solo YA CORRIDO** sobre los 150 casos → `eval/results_baseline.csv` commiteado: **rate<0.15 = 92.7 %, rate<0.05 = 77.3 %, MAE_norm = 0.061; 11 outliers catastróficos** para que el agente recupere.
 - **Hallazgo de protocolo**: sobre los mismos 150 índices, el CSV de `evaluate` da 84 %/68 %/0.090 — evaluate mide con masking; las tools usan contexto completo determinista. La fila "modelo solo" de la tabla final debe usar el protocolo de las tools (lo que el agente ve); el η = 14.95 % oficial es del otro protocolo, no comparable directo.
 - **Tests 20→26** offline: `run_structured` contra un tool runner falso (payload, tokens, submit_report ofrecida, regla en el system, sin thinking en Haiku, estado stale no se filtra), estratificación determinista del export, métricas de `summarize`, convención dz_norm.
@@ -539,31 +545,31 @@ Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como 
 
 ### Para retomar (primera acción de la próxima sesión que toque el 11)
 
-1. Confirmar recarga: `ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)"` + llamada mínima (o directamente el paso 2 con `--limit 20`).
-2. `cd ~/proyectos/spectra-copilot && ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python eval/run_evals.py --limit 20` (validación, ~US$ 0.4).
-3. `... eval/run_evals.py --resume` (150 casos, ~US$ 3–4.5 Haiku). Opcional: Opus 4.8 sobre los difíciles (`--model claude-opus-4-8 --out eval/results_opus.csv --limit 25`, +US$ 2.5–3.5). **Recarga recomendada ≥ US$ 10.**
+> [Account-specific operational detail removed during consolidation.]
+> [Account-specific operational detail removed during consolidation.]
+> [Account-specific operational detail removed during consolidation.]
 4. Tabla + metodología (n=150, semilla 7, estratos, LLM, costo real) en el README de spectra-copilot, commitear `results.csv`, cerrar DoD del runbook + tracker ✅.
 
 ### Estado actual
 
 - **spectra-copilot**: `main` = `8fb4a0f` (= origin), CI verde, 26/26 tests. Nuevos: `eval/{export_cases,run_evals}.py`, `eval/README.md`, `eval/heldout_predictions_v21.csv`, `eval/cases/labels.csv`, `eval/results_baseline.csv`, `tests/test_evals.py`; `.gitignore` + `eval/cases/*.npz`. Local: 150 npz en `eval/cases/`.
 - **Repo principal**: cierre documental de esta sesión (runbook 11, tracker ⏳, esta sección) — commit `plan-11: arnés cerrado`. Residuos sin trackear de siempre preservados.
-- La key sigue en `~/.anthropic_key` (chmod 600), solo pasada por proceso.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Avisos
 
-- **El plan 12 (mini-RAG) sigue bloqueado por el mismo crédito.** El 13 (narrativa) no necesita API y puede cerrar el producto mínimo; si se hace antes que el 11, dejar la tabla del README con la fila del agente como "pending".
+> [Account-specific operational detail removed during consolidation.]
 - Los 150 npz de `eval/cases/` NO están en git: si se pierden, `python eval/export_cases.py` los regenera idénticos (selección determinista, semilla 7 + aserción contra el CSV commiteado).
 - `results_baseline.csv` usa el protocolo de las tools — no mezclar con las métricas de `evaluate` (masking) en la misma tabla sin decirlo.
 - El stdout de un export redirigido a archivo se bufferea: usar `python -u` para progreso en vivo.
 
 ---
 
-## Session — 2026-08-17 (plan 12 PARCIAL: mini-RAG completo y commiteado; verificación con el agente bloqueada por crédito)
+> [Account-specific operational detail removed during consolidation.]
 
 ### Resumen ejecutivo
 
-**El crédito de la API sigue en CERO** (verificado al inicio con una llamada mínima a Haiku → "credit balance is too low"), así que ni la corrida pendiente del plan 11 ni la verificación paga del 12 se pudieron lanzar. Todo lo demás del plan 12 quedó **construido, testeado y commiteado**: spectra-copilot `main` = `3eea698` (= origin), **35/35 tests** (todos offline). Cerrar el 12 = una corrida de ~US$ 0.02 + pegar el reporte en el README.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Qué se hizo
 
@@ -575,17 +581,17 @@ Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como 
 
 ### Para retomar (primera acción de la próxima sesión que toque el 11 o el 12)
 
-1. Confirmar recarga: `KEY=$(tr -d '\n' < ~/.anthropic_key)` + llamada mínima (o directo el paso 2).
-2. **Cerrar 12** (~US$ 0.02): `cd ~/proyectos/spectra-copilot && ANTHROPIC_API_KEY="$(cat ~/.anthropic_key)" .venv/bin/python -m copilot.agent examples/heldout_lowconf_z157.npz --model claude-haiku-4-5` → verificar (a) consulta lookup_reference, (b) citas `[id]` en el reporte, (c) ids ∈ `rag.valid_ids()`; pegar el reporte en el README (reemplaza el aviso), commit, DoD 3 del runbook + tracker ✅.
+> [Account-specific operational detail removed during consolidation.]
+> [Account-specific operational detail removed during consolidation.]
 3. **Cerrar 11**: los 2 comandos del runbook plan/11 (validación `--limit 20` ~$0.4 + `--resume` 150 casos ~$3–4.5 Haiku). La tabla debe decir que el agente incluye la tool RAG desde `3eea698`.
-4. Costo total estimado para cerrar 11+12: **~US$ 5 solo Haiku** (+US$ 2.5–3.5 si se agrega la pasada Opus 4.8 opcional del 11; + ~$0.15 si el reporte demo del 12 se corre con Opus). **Recarga recomendada ≥ US$ 10** — sin cambios.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Estado actual
 
 - **spectra-copilot**: `main` = `3eea698` (= origin), 35/35 tests. Nuevos: `refs/` (16 archivos), `copilot/rag.py`, `tests/test_rag.py`; modificados: `agent.py`, `report.py`, `mcp_server.py`, `pyproject.toml` (+`rank_bm25`), README, eval/README, test_evals, test_mcp_server. CI: ver nota abajo.
 - **Repo principal**: cierre documental de esta sesión (runbook 12 con DoD 3/4, tracker 12 → ⏳, nota en runbook 11, esta sección) — commit `plan-12: mini-RAG cerrado offline`.
 - El server MCP registrado en Claude Code hereda `lookup_reference` al reiniciar la sesión (mismo archivo, sin re-registrar); el corpus se lee del repo, sin descargas.
-- La key sigue en `~/.anthropic_key` (chmod 600), pasada SOLO por proceso.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Avisos
 
@@ -596,13 +602,13 @@ Según el tracker: 11 (evals — transcripts de `eval/transcripts/` listos como 
 
 ---
 
-## Session — 2026-08-17 (planes 11 y 12 COMPLETADOS: recarga confirmada, corridas pagas hechas, tablas commiteadas)
+> [Account-specific operational detail removed during consolidation.]
 
 ### Resumen ejecutivo
 
-Julián recargó crédito y conectó la key (`sk-ant-api03-mr...DgAA`, verificada contra `~/.anthropic_key` + llamada mínima). Con eso se cerraron **los dos planes que estaban solo-por-crédito**: el **12** (mini-RAG — 3 corridas de verificación, 6/6 citas respaldadas, reporte en el README) y el **11** (evals — 150/150 casos, tabla honesta commiteada). spectra-copilot `main` = `6efbdfd` (= origin), CI verde, 35/35 tests. **Costo API total de la sesión: ~US$ 4.20 medidos** (probes <$0.01 + plan 12 $0.07 + validación n=20 $0.57 + corrida 130 casos $3.49); saldo restante ≈ US$ 1.7.
+> [Account-specific operational detail removed during consolidation.]
 
-### Incidente de contabilidad (importante para el trato futuro)
+> [Account-specific operational detail removed during consolidation.]
 
 A mitad de sesión Julián frenó el lanzamiento de los 130 casos al ver "Gasto este mes USD 23.31" en la consola, creyendo que la sesión lo había gastado. Aclaración que lo destrabó: **$22.71 ya estaban gastados ANTES de esta sesión** (visible en su propio screenshot matinal de la key; es el incidente del 16-ago de la key exportada global + plan 08) y el delta de la sesión cuadraba ($0.60 en ese momento). Regla nueva (en memoria persistente `feedback-corridas-pagas`): **go-ahead explícito por cada lote pago >$1 + reportar siempre sesión vs acumulado del panel**. La corrida de 130 se lanzó recién con su OK explícito ("Haz la corrida de los 130").
 
@@ -623,11 +629,11 @@ A mitad de sesión Julián frenó el lanzamiento de los 130 casos al ver "Gasto 
 
 - **spectra-copilot**: `main` = `6efbdfd` (= origin) — hoy: `3eea698` (RAG offline) → `ac04121` (citas verificadas) → `6efbdfd` (resultados evals); CI verde en los tres; 35/35 tests.
 - **Repo principal**: `7f77c50` (cierre offline del 12) + el commit de cierre de esta sesión (runbooks 11 y 12 ✅, tracker, esta sección). Residuos sin trackear de siempre preservados.
-- Saldo API ≈ **US$ 1.7**. La key sigue en `~/.anthropic_key` (chmod 600), solo por proceso.
+> [Account-specific operational detail removed during consolidation.]
 
 ### Siguiente paso — Plan 13 (narrativa, SIN API): el único que falta
 
-**Todo 01–12 está ✅.** El 13 cierra el portfolio: README maestro + pitch + bullets de CV. Materia prima nueva de hoy para la narrativa: (1) "construí evals que demostraron que mi agente barato empeoraba a mi modelo — y la señal de confianza para arreglarlo con una política híbrida"; (2) "RAG con citas verificadas programáticamente contra el corpus: 0 alucinadas en todas las corridas". Experimento opcional si se recarga (~US$ 3): Opus sobre los 31 casos que Haiku falló (comando en el runbook 11, sección "Si algo falla").
+> [Account-specific operational detail removed during consolidation.]
 
 ### Avisos
 
@@ -655,10 +661,10 @@ Se ejecutó **el plan 13** (el único pendiente), todo offline y US$ 0.00 de API
 ### Estado actual
 
 - Repo principal: commit de esta sesión con README + assets + script + runbooks. spectra-copilot: commit con su README. CI a verificar en ambos tras el push.
-- Sin gasto de API (plan 13 no la usa); saldo sigue ≈ US$ 1.7.
+> [Account-specific operational detail removed during consolidation.]
 - Protocolos separados y anotados: η 14.95 % (evaluate, masking) vs 92.7 % (eval de tools) — los READMEs nuevos mantienen la distinción.
 
 ### Para retomar
 
 1. Checklist manual del runbook 13 (pins ↔ prioridad 1 — es lo primero que ve un reclutador).
-2. Opcional si se recarga: Opus sobre los 31 casos fallados (~US$ 3, comando en runbook 11).
+> [Account-specific operational detail removed during consolidation.]

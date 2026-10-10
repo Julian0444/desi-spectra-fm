@@ -1,5 +1,11 @@
 # 02R · Fine-tuning v2.1: loss calibrada, split aislado y checkpoint seleccionable
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Fase 0 (recuperación del plan 02) · **Tiempo:** 1.5–2 h activas + 2.5–3 h de cómputo · **Depende de:** 01 y del diagnóstico del intento v2.0 registrado en `plan/HANDOFF.md` · **Entregable:** un checkpoint fine-tune candidato evaluado honestamente contra la v1, o una decisión explícita de publicar la v1
 
 ## Objetivo

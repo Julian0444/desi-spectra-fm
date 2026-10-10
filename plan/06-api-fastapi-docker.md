@@ -1,5 +1,11 @@
 # 06 · API FastAPI + Docker
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 1 · **Tiempo:** 2–3 h · **Depende de:** 04 · **Entregable:** endpoint público `/predict` respondiendo a `curl`
 >
 > **Namespaces (regla permanente):** GitHub **`Julian0444`** para código y enlaces; Hugging Face **`jirustaroure`** para modelo y Spaces.

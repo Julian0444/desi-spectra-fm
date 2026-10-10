@@ -1,5 +1,11 @@
 # 08 · El agente con la Claude API
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 2 · **Tiempo:** 2–3 h · **Depende de:** 07 · **Entregable:** reporte de observación generado end-to-end por el agente, citando herramientas — [reportes de ejemplo en el README de spectra-copilot](https://github.com/Julian0444/spectra-copilot#the-agent-claude-api)
 >
 > **Namespaces (regla permanente):** GitHub **`Julian0444`** para código y enlaces; Hugging Face **`jirustaroure`** para modelo y Spaces.
@@ -16,10 +22,10 @@ El corazón del portfolio de AI engineer: un agente (Claude + tool use) que reci
 
 ### 1. Credenciales — sin exportar nunca
 
-La key vive en `~/.anthropic_key` (chmod 600). **NUNCA exportarla global ni ponerla en `~/.zshrc`**: Claude Code la captura al arrancar y factura la sesión entera al crédito de la API (pasó el 2026-08-16 y quemó ~US$ 5.60). Patrón seguro — la key viaja solo al proceso del agente:
+> [Account-specific operational detail removed during consolidation.]
 
 ```bash
-KEY=$(tr -d '\n' < ~/.anthropic_key)
+> [Account-specific operational detail removed during consolidation.]
 ANTHROPIC_API_KEY="$KEY" .venv/bin/python -m copilot.agent examples/heldout_z020.npz
 ```
 

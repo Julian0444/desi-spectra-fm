@@ -1,5 +1,11 @@
 # 03 · Repo público en GitHub + CI
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 1 · **Tiempo:** 1.5–2 h · **Depende de:** — (no hace falta esperar la v2) · **Entregable:** repo público con GitHub Actions en verde
 
 ## Objetivo

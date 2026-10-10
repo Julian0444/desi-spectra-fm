@@ -1,5 +1,11 @@
 # 07 · spectra-copilot: repo nuevo + herramientas
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 2 · **Tiempo:** 3–4 h · **Depende de:** 04 — o de **ningún plan** si exportás `DESI_FM_CKPT` apuntando a un checkpoint local · **Entregable:** `tools.py` testeado + CLI de demo que imprime JSON
 >
 > **Namespaces (regla permanente):** GitHub **`Julian0444`** para código y enlaces; Hugging Face **`jirustaroure`** para modelo y Spaces.

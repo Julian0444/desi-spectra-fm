@@ -1,5 +1,11 @@
 # Plan de ejecución — de proyecto de curso a stack completo de AI Engineer
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > ⚡ **Este documento es la visión general (contexto, diagnóstico, narrativa).** La ejecución está subdividida en 13 planes concretos y auto-contenidos, uno por sesión de trabajo: ver el tracker en [`plan/README.md`](README.md).
 
 > **Proyecto base:** `desi_fm` — foundation model unimodal para espectros DESI (PHYS303/CS486, USF).
@@ -529,24 +535,11 @@ Chico y honesto: un catálogo de líneas espectrales (JSON con λ_rest, nombre, 
 
 ---
 
-## La narrativa final
+## Narrativa histórica
 
-**Pitch de una línea (EN, para CV/LinkedIn):**
-
-> "Trained a 26M-parameter foundation model for astronomical spectra from scratch (PyTorch), shipped it as a live demo and containerized API with CI, and built an LLM agent that uses the model as a tool — exposed via MCP — to generate validated observation reports, with an end-to-end eval harness."
-
-**Bullets de CV (elegir 3–4):**
-
-- Diseñé y entrené un transformer de 26M parámetros con masked-token prediction sobre 50k espectros DESI; rediseñé la cabeza de redshift (clasificación sobre bins de log(1+z)) reduciendo la fracción de outliers catastróficos de 25 % a X %.
-- Publiqué el modelo en Hugging Face Hub con demo Gradio en vivo y API FastAPI dockerizada con CI.
-- Construí un agente con la Claude API que usa el modelo como herramienta y valida sus predicciones contra líneas espectrales físicas; expuesto como servidor MCP.
-- Armé un harness de evals end-to-end (150 casos etiquetados) para medir la tasa de acierto del sistema agéntico completo.
-
-**Cómo contar el feedback del TA** (¡a favor!): "la v1 tenía bias alto y 25 % de outliers; lo diagnostiqué con métricas estándar (σ_NMAD, η₀.₁₅), identifiqué regresión-a-la-media + multimodalidad por confusión de líneas, y la v2 con cabeza de clasificación lo llevó a X %". Iterar sobre feedback con números es exactamente lo que hace un ingeniero senior.
-
-**Material visual para el README/LinkedIn:** GIF de la demo Gradio · scatter antes/después de la Fase 0 · screenshot del agente citando herramientas en Claude Code vía MCP · UMAP coloreado por z.
-
----
+Los borradores de CV se retiraron de la documentación pública. Ver
+[texto de publicación pendiente](../docs/PUBLICATION.md), que no atribuye
+contribuciones personales no comprobadas.
 
 ## Cronograma sugerido
 

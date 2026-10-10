@@ -1,5 +1,11 @@
 # 04 · Checkpoint en Hugging Face Hub + model card
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 1 · **Tiempo:** ~1 h · **Depende de:** 03 (y 02/02R: se publica la v2.1 promovida) · **Entregable:** model card pública + descarga funcionando desde cualquier máquina
 
 ## Objetivo

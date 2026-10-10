@@ -1,5 +1,11 @@
 # 09 · Servidor MCP — ✅ COMPLETADO (2026-08-16)
 
+> HISTÓRICO: planes y bitácora de mayo–agosto de 2026; no son instrucciones
+> vigentes ni evidencia de que cada afirmación se haya verificado. Los hechos
+> actuales, incluidos límites de independencia, confianza y agente, están en
+> [HISTORICAL_EVIDENCE.md](../docs/HISTORICAL_EVIDENCE.md). No ejecutar comandos
+> de entrenamiento/publicación de este archivo como parte del lote 1.
+
 > **Bloque:** Nivel 2 · **Tiempo real:** ~1.5 h (en dos sesiones) · **Dependía de:** 07 (no necesitó el 08, pero heredó sus picos) · **Entregable:** las tools del foundation model corriendo dentro de Claude Code vía MCP — verificado con una conversación real que ejecutó las 3 tools y completó el loop detect→refine.
 
 ## Qué quedó hecho
