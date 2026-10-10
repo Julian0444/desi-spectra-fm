@@ -61,6 +61,7 @@ def verify_record(path, record):
 def source_identity():
     root = Path(__file__).resolve().parents[3]
     paths = sorted((root / "src/desi_fm").rglob("*.py"))
+    paths += [root/'scripts'/name for name in ('batch4.py','prepare_batch4.py','check_batch4_data.py','check_batch4_resume.py') if (root/'scripts'/name).exists()]
     hashes = {str(p.relative_to(root)): sha256(p) for p in paths}
     return {"head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
             "files": hashes, "sha256": digest(hashes)}

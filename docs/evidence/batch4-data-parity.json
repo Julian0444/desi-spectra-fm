@@ -1,0 +1,393 @@
+{
+  "baseline_commit": "008ce03da7d8c3d74d522b03eedbf3d61b7e861a",
+  "derivative_manifest": {
+    "bytes": 7376,
+    "sha256": "4c412f03920cd12afb167ed6652fa6cb01a0f82d0c0d349e47a21590f9534547"
+  },
+  "exact_full_and_masked_normalization_validity": true,
+  "random_note": "Real nonconsecutive gathers in a warm OS cache; not a cold-disk or concurrent-load guarantee",
+  "reference_source_sha256": "7892c7f17077bd6b390ef31a71691161dd3bdf429848abe7eda37267e70bd683",
+  "representative_n": 60,
+  "ridge_profile": {
+    "features_seconds": 0.19973179209046066,
+    "fit_count": 3,
+    "n": 1024,
+    "role": "train",
+    "scope": "bounded cost only; no validation selection, models discarded",
+    "three_fits_seconds": 0.00627683405764401
+  },
+  "sample": [
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627752168489387",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627782396840335",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627757545589299",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9425222426210987,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627770275302528",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9927976274537494,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627758241843717",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9980228781245587,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627776327681407",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9706256178505861,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627770275299756",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627764256478189",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9960457562491174,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633448888960554",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9867250388363226,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627769625182486",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9843242479875723,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627763581194289",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627763597968247",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.997175540177941,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627764248087846",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633461144717031",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627752193660426",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627752197852166",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9449230334698488,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627776235408432",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627746128691789",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627740097286082",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9930800734359554,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627740109867747",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627770304662294",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9844654709786753,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627782271012054",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627770187222117",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9699195028950713,
+      "file": "edr_sv3/train-00002-of-00007.parquet",
+      "object_id": "1030507957583872",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9930800734359554,
+      "file": "edr_sv3/train-00002-of-00007.parquet",
+      "object_id": "39627746036416845",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9816410111566163,
+      "file": "edr_sv3/train-00002-of-00007.parquet",
+      "object_id": "39627733944238168",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9933625194181612,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633461153105581",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627770275302533",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633463535468638",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627764151619128",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9944923033469849,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627788310810612",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9953396412936026,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633461157301897",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627770292080896",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9817822341477193,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627752059442233",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9995763310266912,
+      "file": "edr_sv3/train-00002-of-00007.parquet",
+      "object_id": "39627746065779212",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9992938850444852,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633458745577270",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627757558171768",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9614461234288942,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627776336070506",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9956220872758085,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627782367483771",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9988702160711764,
+      "file": "edr_sv3/train-00002-of-00007.parquet",
+      "object_id": "39627746061584760",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633458749769402",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.530716000564892,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633461161495342",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627770187222428",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627757524619752",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627752160105649",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633456321265764",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9440756955232312,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627758136988641",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9946335263380879,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627764252283513",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.530716000564892,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627776357042551",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627758191510127",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.8964835475215365,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627763576997359",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00001-of-00007.parquet",
+      "object_id": "39627769620992410",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9889846066939698,
+      "file": "edr_sv3/train-00000-of-00007.parquet",
+      "object_id": "39633463535471418",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627746149668315",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9959045332580144,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627746141280231",
+      "zwarn": 1
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00006-of-00007.parquet",
+      "object_id": "39627776344463062",
+      "zwarn": 0
+    },
+    {
+      "coverage": 0.9925151814715436,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627758132791345",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00005-of-00007.parquet",
+      "object_id": "39627764235503518",
+      "zwarn": 0
+    },
+    {
+      "coverage": 1.0,
+      "file": "edr_sv3/train-00004-of-00007.parquet",
+      "object_id": "39627752164300098",
+      "zwarn": 1
+    },
+    {
+      "coverage": 0.9995763310266912,
+      "file": "edr_sv3/train-00003-of-00007.parquet",
+      "object_id": "39627758132794495",
+      "zwarn": 0
+    }
+  ],
+  "sample_order": "seeded random, across every shard, both ZWARN values, worst coverage and high z plus random IDs; train only",
+  "status": "passed",
+  "test_predictions_or_metrics": false,
+  "timings_seconds": {
+    "batch3_full_and_masked_preprocess": 0.0806954160798341,
+    "batch3_random_read": 5.742195630213246,
+    "derived_representative_full": 0.010799375013448298,
+    "derived_representative_masked": 0.015487957978621125,
+    "random_2048_memmap_only": 0.0266237499890849,
+    "random_2048_read_and_normalize": 0.3620739160105586
+  },
+  "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296"
+}
