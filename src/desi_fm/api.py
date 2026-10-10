@@ -39,6 +39,7 @@ from pydantic import BaseModel, Field
 
 from .predict import load_model_from_checkpoint, predict_spectra_batch, predict_spectrum, model_identity
 from .inputs import read_npz, SpectrumInputError
+from .assets import download_asset
 
 MODEL_REPO = "jirustaroure/desi-spectra-fm"
 CHECKPOINT_FILE = "checkpoint_last.pt"
@@ -69,9 +70,7 @@ def get_model():
     if _model is None:
         ckpt = os.environ.get("DESI_FM_CKPT")
         if not ckpt:
-            from huggingface_hub import hf_hub_download
-
-            ckpt = hf_hub_download(MODEL_REPO, CHECKPOINT_FILE)
+            ckpt = download_asset(CHECKPOINT_FILE)
         device = torch.device(os.environ.get("DESI_FM_DEVICE", "cpu"))
         _model = load_model_from_checkpoint(ckpt, device)
     return _model

@@ -91,3 +91,17 @@ demo text round to four decimals: tolerance 5.1e-5. Invalid inputs, gaps, masks,
 partial coverage and reversed grids are checked through real handlers; UI host
 layout/ZeroGPU allocation is simulated. MCP is separately checked over stdio.
 Real-checkpoint smoke is bounded and distinct from these contract tests.
+
+## Follow-up of batch-2 review (batch-3 branch)
+
+All default checkpoint downloads (API/demo/Copilot/index-builder) use
+`desi_fm.assets.download_asset`: immutable Hub revision
+`40ff2ed09e5e1584303052e1a5dfe218a4a396b3`, size and SHA-256 checked before
+loading. Published LFS identities were compared to the preserved local files.
+The FAISS index and metadata resolve at that same revision, with both hashes
+checked. This establishes release/byte identity; the historical index lacks a
+checkpoint/preprocessing provenance record and is **not newly certified as
+compatible with any encoder**. Local overrides remain explicit caller choices.
+Batch 3 requires local weights with expected hashes, without remote fallback.
+Old batch-2 wheels/manifests describe old bytes and must not be reused for this
+source revision. No new wheel was built for this follow-up.

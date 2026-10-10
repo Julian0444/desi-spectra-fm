@@ -24,7 +24,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import gradio as gr
-from huggingface_hub import hf_hub_download
+from desi_fm.assets import download_asset
 
 from desi_fm.inputs import read_npz, SpectrumInputError
 from desi_fm.predict import load_model_from_checkpoint, predict_spectrum, predict_file_single
@@ -32,7 +32,7 @@ from desi_fm.predict import load_model_from_checkpoint, predict_spectrum, predic
 MODEL_REPO = "jirustaroure/desi-spectra-fm"
 CODE_URL = "https://github.com/Julian0444/desi-spectra-fm"
 
-CKPT = os.environ.get("DESI_FM_CKPT") or hf_hub_download(MODEL_REPO, "checkpoint_last.pt")
+CKPT = os.environ.get("DESI_FM_CKPT") or download_asset("checkpoint_last.pt")
 # On ZeroGPU hosts CUDA is emulated at startup, so the model can sit on
 # 'cuda' at module level (per the ZeroGPU docs); locally this resolves to CPU.
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
