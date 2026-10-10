@@ -13,7 +13,6 @@ external/
 # checkpoints nunca a git; artefactos livianos del run final sí
 runs/*
 !runs/desi_50k_big/
-!runs/desi_150k_classhead/
 !runs/desi_80k_classhead_v21/
 !runs/calibration/
 runs/desi_50k_big/*.pt
@@ -23,3 +22,26 @@ runs/desi_80k_classhead_v21/*.log
 runs/desi_80k_classhead_v21/train.pid
 runs/calibration/*.log
 runs/calibration/*.npz
+# estado local de agentes/IDE (Claude Code y afines): nunca al repo público
+.agents/
+.claude/
+
+# Local credentials and generated artifacts (historical tracked results stay tracked).
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.key
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.parquet
+*.arrow
+*.faiss
+*.log
+*.pid
+*.npz
+data/
