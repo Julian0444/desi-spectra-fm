@@ -76,6 +76,25 @@ def class_weights(train, config):
     return weights, manifest
 
 
+class FixedAdaptivePool1d(nn.Module):
+    """Exactly the adaptive-average windows, expressed as a fixed linear map.
+
+    MPS does not implement non-divisible adaptive pooling. This performs the
+    same floor/ceil windows on-device and supports autograd without CPU copies.
+    """
+    def __init__(self, input_size, output_size=64):
+        super().__init__()
+        matrix = torch.zeros(input_size,output_size)
+        for i in range(output_size):
+            first = i*input_size//output_size
+            last = ((i+1)*input_size+output_size-1)//output_size
+            matrix[first:last,i] = 1./(last-first)
+        self.register_buffer('matrix',matrix,persistent=False)
+
+    def forward(self, x):
+        return x @ self.matrix.to(dtype=x.dtype)
+
+
 class SpectralCNN(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -85,7 +104,10 @@ class SpectralCNN(nn.Module):
             layers.extend([nn.Conv1d(previous, channels, kernel_size=9, stride=4, padding=4), nn.GELU()])
             previous = channels
         self.features = nn.Sequential(*layers)
-        self.pool = nn.AdaptiveAvgPool1d(64)
+        positions = config.n_pixels
+        for _ in range(3):
+            positions = (positions+3)//4
+        self.pool = FixedAdaptivePool1d(positions,64)
         self.head = nn.Linear(128*64, 100)
         # The base grid is logarithmic: this is the affine-normalized log lambda.
         self.register_buffer('log_lambda', torch.linspace(0., 1., config.n_pixels), persistent=False)

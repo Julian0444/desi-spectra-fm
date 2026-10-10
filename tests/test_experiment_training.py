@@ -170,3 +170,17 @@ def test_class_bin_boundary_out_of_range_and_weighted_ce_normalization():
     logits=torch.zeros(3,100)
     assert torch.allclose(classification_sum(logits,labels,model)/weights[bins].sum(),torch.tensor(1.))
     with pytest.raises(ValueError):target_bins(torch.tensor([-1.]),model.z_bin_edges)
+
+
+@pytest.mark.parametrize('length',[4,111,128])
+def test_fixed_pool_matches_adaptive_windows_and_gradients(length):
+    from desi_fm.experiment.models import FixedAdaptivePool1d
+    torch.manual_seed(19)
+    x=torch.randn(2,3,length,requires_grad=True)
+    actual=FixedAdaptivePool1d(length)(x)
+    reference=torch.nn.functional.adaptive_avg_pool1d(x,64)
+    torch.testing.assert_close(actual,reference,atol=1e-6,rtol=1e-6)
+    gradient=torch.randn_like(actual)
+    left=torch.autograd.grad(actual,x,gradient,retain_graph=True)[0]
+    right=torch.autograd.grad(reference,x,gradient)[0]
+    torch.testing.assert_close(left,right,atol=1e-6,rtol=1e-6)
