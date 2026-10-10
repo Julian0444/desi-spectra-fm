@@ -103,6 +103,7 @@ def preprocess_spectrum(
     wavelength: np.ndarray,
     mask: np.ndarray,
     config: SpectrumPreprocessConfig,
+    normalization_mask: np.ndarray | None = None,
 ) -> dict[str, np.ndarray | float]:
     """Interpolate and robustly normalize one observed spectrum.
 
@@ -141,7 +142,15 @@ def preprocess_spectrum(
     if support.sum() < MIN_VALID_PIXELS:
         raise SpectrumInputError(f"Fewer than {MIN_VALID_PIXELS} usable model-grid pixels; no usable coverage")
 
-    valid_values = flux_i[valid_i > 0.5]
+    normalization_support = support.copy()
+    if normalization_mask is not None:
+        normalization_mask = mask_array(normalization_mask)
+        if normalization_mask.shape != support.shape:
+            raise SpectrumInputError("Normalization mask must match the model grid")
+        normalization_support &= ~normalization_mask
+        if normalization_support.sum() < MIN_VALID_PIXELS:
+            raise SpectrumInputError("Fewer than 8 visible pixels for reconstruction normalization")
+    valid_values = flux_i[normalization_support]
     if valid_values.size < 8:
         center = 0.0
         scale = 1.0

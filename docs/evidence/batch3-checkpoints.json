@@ -1,0 +1,66 @@
+{
+  "v1": {
+    "path": "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/runs/desi_50k_big/checkpoint_last.pt",
+    "bytes": 103761424,
+    "sha256": "515b9a50d2e4ed6387acb06dff57595e881351bb7ebb34cdeeae9e9ce69f39b6",
+    "config": {
+      "n_pixels": 7081,
+      "n_tokens": 273,
+      "lambda_min": 3600.0,
+      "lambda_max": 9800.0,
+      "wavelength_grid": "log",
+      "d_model": 512,
+      "n_layers": 8,
+      "n_heads": 8,
+      "mlp_ratio": 4.0,
+      "dropout": 0.1,
+      "mask_ratio": 0.5,
+      "redshift_loss_weight": 10.0,
+      "reconstruction_loss_weight": 1.0,
+      "use_wavelength_embedding": true,
+      "use_learned_position": true
+    },
+    "step": 12500,
+    "epoch": 0,
+    "tensor_sha256": "9621853b2c1ffd77662e20b321e9e1e557531c6627f0a9cedbad133c7b6f17d4",
+    "selection": "final scalar checkpoint at documented budget step 12500; no MAP-best criterion",
+    "tensor_fingerprint_method": "SHA256 sorted tensor key UTF8 + dtype UTF8 + contiguous NumPy bytes; not same encoding as earlier audit tensor fingerprint"
+  },
+  "v21": {
+    "path": "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/runs/desi_80k_classhead_v21/checkpoint_last.pt",
+    "bytes": 103964688,
+    "sha256": "40247cbe0e706a66084d001b36424081554c26d3eb75c1f8b0ebec89cf5afe5a",
+    "config": {
+      "n_pixels": 7081,
+      "n_tokens": 273,
+      "lambda_min": 3600.0,
+      "lambda_max": 9800.0,
+      "wavelength_grid": "log",
+      "d_model": 512,
+      "n_layers": 8,
+      "n_heads": 8,
+      "mlp_ratio": 4.0,
+      "dropout": 0.1,
+      "mask_ratio": 0.5,
+      "redshift_loss_weight": 1.0,
+      "reconstruction_loss_weight": 1.0,
+      "use_wavelength_embedding": true,
+      "use_learned_position": true,
+      "n_z_bins": 100,
+      "z_max": 6.0,
+      "z_label_smoothing": 0.0,
+      "normalize_redshift_ce": true
+    },
+    "step": 30000,
+    "epoch": 2,
+    "tensor_sha256": "d55401106a5bbc7cd30dd48f73b2684d3c4d57ee65706b43cde8a5d5e16a93a7",
+    "selection": "historically published final checkpoint at step 30000; best/last tensors identical",
+    "best_alias": {
+      "path": "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/runs/desi_80k_classhead_v21/checkpoint_best.pt",
+      "sha256": "a924c0dfa6f10b5f90079567e5c3620dcc04ac24b872794f655f33f2e34ea835",
+      "identical_tensors": 117,
+      "evaluated_separately": false
+    },
+    "tensor_fingerprint_method": "SHA256 sorted tensor key UTF8 + dtype UTF8 + contiguous NumPy bytes; not same encoding as earlier audit tensor fingerprint"
+  }
+}
