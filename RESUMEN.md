@@ -1,4 +1,9 @@
-# Resumen del proyecto en simple
+# Resumen histórico del proyecto v1
+
+> Documento de la entrega inicial; no describe la versión publicada v2.1 ni
+> constituye evidencia de generalización. Consultar [README.es.md](README.es.md)
+> y [evidencia actual](docs/HISTORICAL_EVIDENCE.md). Las métricas históricas se
+> conservan con su alcance, sin compararlas con otras ventanas.
 
 ## La idea en una frase
 
@@ -43,20 +48,15 @@ Construir un modelo de IA que, al darle un espectro:
 1. **Prediga el redshift `z`** del objeto.
 2. **Reconstruya partes "tapadas"** del espectro (igual que GPT completa palabras faltantes en una oración).
 
-Y que funcione no solo con espectros del telescopio DESI (con los que se entrena) sino **también con espectros de otros telescopios** que el modelo nunca vio. Esta última parte es la prueba de que aprendió algo profundo sobre espectros en general, no solo memorizó cómo se ven los de DESI. A eso se le llama **foundation model**.
+La generalización a otros telescopios era un objetivo del proyecto. La interpolación de grillas no demuestra que se haya alcanzado; falta una evaluación independiente.
 
 ---
 
-## ¿Qué hizo mal AION-1 (el modelo anterior)?
+## Referencia de diseño
 
-AION-1 es un modelo grande de astrofísica que existe. El profesor lo critica porque trata al **redshift como si fuera un dato más** entre otros 273 tokens del espectro. Eso tiene dos problemas:
-
-1. **No le da suficiente importancia al redshift.** El redshift es UNA cantidad clave, no es como uno más de los pedacitos del espectro. Pero AION lo trata igual.
-2. **El modelo nunca aprende a representar el redshift internamente.** Como casi nunca tiene que adivinarlo, no se ve forzado a entenderlo.
-
-Resultado: AION-1 termina necesitando un parche externo (otra red neuronal encima) para poder predecir redshifts, y aun así no lo hace especialmente bien.
-
----
+La consigna proponía rediseñar el tratamiento de redshift mediante un token
+siempre oculto y una cabeza conjunta. AION-1 fue una referencia; no se entrenó
+ni se reprodujo aquí, y este proyecto no prueba defectos generales de AION-1.
 
 ## ¿Qué hicimos nosotros para arreglarlo?
 
@@ -73,7 +73,7 @@ Le pusimos un pequeño MLP que toma la representación interna del modelo y devu
 ## ¿Qué le entregamos al profesor?
 
 1. **Un modelo entrenado**: el checkpoint `runs/desi_50k_big/checkpoint_last.pt` (~26 millones de parámetros, entrenado con 50.000 espectros reales de DESI).
-2. **Código que puede correr sobre cualquier espectro**: `src/desi_fm/predict.py`. El profesor le pasa un espectro (de DESI o de cualquier otro instrumento) y obtiene `z` predicho + reconstrucción.
+2. **Código de inferencia que remuestrea grillas**: `src/desi_fm/predict.py`. El profesor le pasa un espectro (de DESI o de cualquier otro instrumento) y obtiene `z` predicho + reconstrucción.
 3. **Documentación**: `DELIVERABLE.md` explica cómo usarlo.
 
 ---
@@ -85,16 +85,15 @@ Le pusimos un pequeño MLP que toma la representación interna del modelo y devu
 | Error medio en `z` (normalizado por `1+z`) | **0.124** |
 | Reconstrucción de regiones tapadas (RMSE) | **0.864** |
 
-Para comparar: el pipeline oficial de DESI da errores de `z` del orden de `0.0001`. Nuestro modelo está 1000 veces peor que la pipeline oficial — pero la pipeline usa código diseñado a mano por físicos durante años. Nuestro modelo aprendió todo solo, mirando datos durante una hora en una laptop. **El punto del proyecto no era ganarle a la pipeline. Era demostrar que un foundation model unimodal con el redshift bien diseñado SÍ aprende espectros.** Y eso lo logramos.
-
-Además, en pruebas con datos sintéticos (que NO son DESI), nuestro modelo grande dio predicciones razonables — primera señal de que sí generaliza fuera de su distribución de entrenamiento, que es lo que define a un foundation model.
-
----
+Esas cifras pertenecen a la evaluación antigua, con otra ventana; no miden
+el checkpoint v2.1 ni generalización independiente. La reconstrucción sigue
+siendo un objetivo auxiliar cuyo beneficio para redshift necesita una ablación.
+Las sondas sintéticas no validan precisión en otros instrumentos.
 
 ## Lo que NO hicimos (a propósito, porque la consigna lo prohibía)
 
 - ❌ Nada de imágenes de telescopios (Subaru, HSC, etc.).
 - ❌ Nada de magnitudes ni catálogos.
-- ❌ Nada de CNN que "regresione directamente" `z` desde el espectro (eso no es un foundation model, es un especialista).
+- ❌ Nada de CNN que "regresione directamente" `z` desde el espectro (una comparación CNN queda para un experimento posterior).
 
 Solo espectros + redshift, treinta y nueve tipos de datos menos que AION-1, una sola modalidad tratada en profundidad.

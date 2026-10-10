@@ -179,18 +179,17 @@ DESI EDR/SV3 spectra, predicting redshift jointly (course project, USF). The
 official prediction is **`z_pred_map`** (argmax of a 100-bin posterior over
 `log(1+z)`); `z_confidence` says how concentrated that posterior is.
 
-The four examples are **real DESI spectra from the canonical held-out split** —
-never seen during training. Ground truth (`z_true`) is shown next to the
-prediction, including one catastrophic outlier (z_true 1.57 → predicted 0.96,
-flagged by `z_confidence` 0.18 vs ≥ 0.6 on the well-predicted examples): on the
-full 2,000-spectrum held-out set the model reaches σ_NMAD = 0.030 with 14.95 %
-catastrophic outliers — honest numbers for an 80k-spectra laptop run, ~3 orders
-of magnitude away from the real DESI pipeline.
+The four examples are historical DESI validation objects, excluded from v2.1
+fine-tuning but with strongly supported exposure during v1. They also served
+checkpoint selection and are not an independent test. The stored 2,000-object
+measurement gives 14.95% catastrophic errors with 50% random token masking;
+this demo defaults to full-spectrum inference. Confidence measures posterior
+concentration, not a calibrated probability. The z≈2.87 example is within the
+0.15 error tolerance with moderate concentration; z≈1.57 is a known failure.
 
-Move the slider to hide a fraction of the input before the forward pass and
-watch the model fill the shaded regions in (the self-supervised task it was
-trained on). Upload your own spectrum as a `.npz` with `flux` and `wavelength`
-(Å) arrays — any instrument works, optional `ivar`/`mask` are used if present.
+Move the slider to explore masked reconstruction. Upload a `.npz` with `flux`
+and `wavelength` in Å, optionally `ivar`/`mask`. Resampling other grids does not
+establish accuracy outside DESI or under partial coverage.
 
 [Code + tests + evaluation notebook]({CODE_URL}) ·
 [Model checkpoint](https://huggingface.co/{MODEL_REPO})
@@ -219,7 +218,7 @@ demo = gr.Interface(
         "**Input format** — `.npz` with `flux` (P,) or (N, P) and `wavelength` "
         "(P,) in Ångströms; optional `ivar`, `mask`, `z_true`. Spectra are "
         "interpolated onto the model's internal log-λ grid (3600-9800 Å), so "
-        "instruments other than DESI work out of the box. "
+        "accuracy outside DESI and under partial coverage is unvalidated. "
         f"Details in the [README]({CODE_URL})."
     ),
 )

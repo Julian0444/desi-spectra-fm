@@ -4,8 +4,8 @@ Default mode exports **real DESI spectra from the canonical held-out split**
 (the same `filter(valid z) -> skip(80000) -> take(...)` stream used by
 `desi_fm.evaluate`, so example i here is row i+1 of
 `runs/desi_80k_classhead_v21/predictions.csv`). Four spectra are selected to
-be honest and diverse: three across the redshift range that v2.1 predicts
-well, plus one catastrophic outlier (low `z_confidence`) so the demo shows a
+be honest and diverse: three within the 0.15 normalized-error tolerance (not all high-confidence),
+plus one catastrophic outlier (low `z_confidence`) so the demo shows a
 real failure mode. Raw `flux/ivar/wavelength/mask` are saved BEFORE any
 preprocessing, with the DESI pipeline `z_true`.
 

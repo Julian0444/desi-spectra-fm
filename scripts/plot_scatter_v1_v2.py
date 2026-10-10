@@ -70,7 +70,7 @@ def main() -> None:
         ax.scatter(
             z_true[out], z_pred[out], s=8, alpha=0.6, color="#d62728",
             linewidths=0, zorder=3,
-            label=f"catastrophic outliers: η = {eta:.1%}",
+            label=f"catastrophic outliers: η = {eta:.2%}",
         )
         ax.set_title(title, fontsize=12)
         ax.set_xlabel("z_true (DESI pipeline)")
@@ -81,7 +81,7 @@ def main() -> None:
 
     axes[0].set_ylabel("z_pred")
     fig.suptitle(
-        "Held-out redshift predictions (same 2,000 never-seen DESI spectra)",
+        "Historical validation: same 2,000 DESI objects (not independent)\n50% random token mask; v1 scalar vs v2.1 last MAP",
         fontsize=13,
     )
     fig.tight_layout()

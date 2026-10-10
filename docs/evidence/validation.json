@@ -1,0 +1,37 @@
+{
+  "date_local": "2026-10-09",
+  "timezone": "America/Los_Angeles",
+  "network_for_tests": "Hub offline; local checkpoint; no paid LLM calls",
+  "historical_assets": "All inventoried SHA-256 and sizes unchanged (74 model repository + 169 copilot repository).",
+  "tests": [
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONPATH=src python3 -m pytest tests/ -q",
+      "python": "3.9.6",
+      "result": {
+        "passed": 26,
+        "warnings": 19
+      },
+      "notes": "Includes FastAPI tests with FastAPI 0.128.8; existing LibreSSL/urllib3 and PyTorch nested tensor warnings."
+    },
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONPATH=src /path/to/spectra-copilot/.venv/bin/python -m pytest tests/ -q",
+      "python": "3.12",
+      "result": {
+        "passed": 18,
+        "skipped": 1,
+        "warnings": 10
+      },
+      "notes": "Earlier alternate-environment run: FastAPI module unavailable; the Python 3.9.6 run above completes those checks."
+    }
+  ],
+  "artifact_check": {
+    "command": "/path/to/spectra-copilot/.venv/bin/python scripts/check_historical_evidence.py --copilot-root /path/to/spectra-copilot --check-weights",
+    "result": "passed; stored output historical-metrics.json; no forward passes"
+  },
+  "preservation_checks": [
+    "Initial hashes of all 10 preexisting edited files verified against private copies.",
+    "Notebook code cells and outputs equal to the initial user copy; only Markdown edited.",
+    "predict.py executable AST unchanged from initial HEAD; only module documentation edited.",
+    "git diff --check passed; 8/8 representative secret/heavy paths ignored; no credential-pattern hits in current tracked text."
+  ]
+}

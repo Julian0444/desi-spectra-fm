@@ -5,12 +5,16 @@
 [![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm.svg)](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)
 [![API](https://img.shields.io/badge/REST_API-live-009688)](https://jirustaroure-desi-fm-api.hf.space/api/docs)
 
-A 26M-parameter transformer trained **from scratch** with masked-token prediction on spectra
-from the [DESI](https://www.desi.lbl.gov/) galaxy survey. Given a spectrum from **any
-instrument**, it predicts the object's redshift — how much the expansion of the universe has
-stretched its light, i.e. how far away it is — and reconstructs masked spectral regions.
-Trained on a laptop; shipped as a public demo, a containerized REST API, and the engine of an
-LLM agent.
+A 26M-parameter multitask transformer for DESI spectra (galaxies, quasars and
+stars), estimating redshift and reconstructing masked regions. No external
+pretrained weights: v1 started from random initialization; the published v2.1
+fine-tunes v1. The project provides Python inference, a Gradio demo, a FastAPI
+service on a Gradio Space, and tools used by an experimental LLM agent.
+
+Local consolidation for historical checkpoint v2.1, October 2026; publication is
+pending. [Evidence and limitations](docs/HISTORICAL_EVIDENCE.md) identify the
+weights, sample selection and protocols. The historical repository name does
+not establish transfer to other tasks or instruments.
 
 **[▶ Live demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** ·
 **[🤗 Model weights](https://huggingface.co/jirustaroure/desi-spectra-fm)** ·
@@ -25,7 +29,7 @@ LLM agent.
 ## Results: diagnosing and fixing a real failure mode
 
 The v1 baseline predicted redshift with a scalar regression head — and regressed to the mean:
-**22.6 % catastrophic outliers** on held-out data, a hard prediction ceiling at z = 2, and an
+**22.6 % catastrophic outliers** on the historical validation set, an observed maximum prediction near z = 2, and an
 82.7 % failure rate exactly where quasars live (z ∈ [1.5, 2.5)). After diagnosing this with the
 standard survey metrics (η, σ_NMAD, per-bin bias), the head was redesigned as a **100-bin
 classification over log(1+z)** (with sqrt-inverse class weights from the real label histogram)
@@ -33,55 +37,65 @@ and v1 was fine-tuned into the shipped **v2.1**:
 
 ![Held-out scatter, v1 vs v2.1: the z=2 ceiling and the regression-to-the-mean cloud disappear](docs/img/scatter_v1_v2.png)
 
-| metric (same 2,000 never-seen DESI spectra) | v1 baseline | **v2.1 (shipped)** |
+| metric (same 2,000 historical validation spectra; 50% random token mask) | v1 baseline | **v2.1 (shipped)** |
 |---|---|---|
 | catastrophic outlier fraction η₀.₁₅ | 22.6 % | **14.95 %** |
 | σ_NMAD (robust scatter) | 0.083 | **0.030** |
-| mean |Δz| / (1+z) | 0.107 | **0.096** |
+| mean \|Δz\| / (1+z) | 0.107 | **0.096** |
 | η₀.₁₅ in z ∈ [1.5, 2.5) — the quasar band | 82.7 % | **23.5 %** |
-| prediction ceiling (max z_pred) | 2.00 | **3.52** |
-| masked-reconstruction RMSE (arcsinh space) | 0.819 | **0.817** |
+| maximum observed prediction (not the configured range) | 2.00 | **3.52** |
+| masked-reconstruction RMSE (arcsinh space) | 0.819 | 0.817 |
 
-Classification also buys a **calibrated confidence** for free: `z_confidence` (posterior
-concentration) flags the predictions not to trust. Full progression, release gates and the
-machine-readable promote decision: [DELIVERABLE.md](DELIVERABLE.md) §5 +
-[`runs/desi_80k_classhead_v21/comparison.json`](runs/desi_80k_classhead_v21/comparison.json).
+These 2,000 objects were excluded from v2.1 fine-tuning, but the reconstructed
+v1 loader history strongly supports prior exposure. They also selected checkpoints.
+Treat them as **historical, non-independent validation**, not a generalization test.
+The CSV uses `checkpoint_last.pt`; best and last have identical tensors at step
+30,000. Their 15.15% and 14.95% evaluations used different unseeded random masks;
+this is not a confidence interval or evidence that last is better.
 
-## The encoder is a foundation model, not just a z-head
+`z_confidence = 1 − H(p)/log(100)` ranks risk retrospectively: a threshold of
+0.5 retains 1,175/2,000 (58.75%), with 9 errors (0.77%); AUROC 0.9038. It is not
+a calibrated probability or a validated service policy. Reconstruction RMSE is
+about 0.82; a visible-pixel moving average was similar on 50 stored examples,
+with widths explored on those same examples. Neither superiority nor equivalence
+has been established. Multiple changes separate v1 and v2.1; no single-change
+causal attribution is justified. [Recalculation and sources](docs/HISTORICAL_EVIDENCE.md).
+
+## Encoder embeddings
 
 `embed_spectrum()` mean-pools the encoder's valid spectral tokens into a 512-d vector. 15k
 training spectra embedded and projected with UMAP, colored by their catalog redshift:
 
 ![UMAP of the embedding space, colored by redshift](docs/img/umap_z.png)
 
-The model was never told to order spectra by redshift — the smooth gradient emerges from
-masked-spectrum pretraining alone. These embeddings power a FAISS semantic-search index
-([published on the Hub](https://huggingface.co/jirustaroure/desi-spectra-fm/tree/main/faiss))
-used by the agent below.
+The encoder was trained jointly with a supervised redshift loss. This UMAP
+shows 15,000 training objects and is descriptive, not independent evidence of
+transfer. The embeddings power the [FAISS index](https://huggingface.co/jirustaroure/desi-spectra-fm/tree/main/faiss).
 
 ## From model to product
 
-Everything public, everything CI-tested (26 tests here, 35 in the agent repo):
+CI covers unit tests. Space wrappers, Docker and the real checkpoint are not exercised by that CI:
 
 - **[Live demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** (Gradio on
-  HF Spaces) — real held-out spectra, interactive masking, upload your own `.npz`.
-- **[REST API](https://jirustaroure-desi-fm-api.hf.space/api/docs)** (FastAPI + Docker) —
+  HF Spaces) — real held-out spectra, interactive masking, upload your own `.npz`. (The four
+  example spectra live in `examples/`, which is gitignored here — see
+  [Repository layout](#repository-layout).)
+- **[REST API](https://jirustaroure-desi-fm-api.hf.space/api/docs)** (FastAPI on a Gradio Space; Dockerfile supplied for self-hosting) —
   `curl` a spectrum, get redshift + confidence back in ~1–3 s. [Details below](#rest-api-fastapi).
 - **[spectra-copilot](https://github.com/Julian0444/spectra-copilot)** — an LLM agent (Claude
-  API tool use) that treats this model as one instrument among several: it *physically
-  verifies* predictions against known spectral lines, cross-checks them with FAISS
-  nearest-neighbors, grounds its reasoning in a cited mini-RAG corpus (BM25; 0 hallucinated
-  citations across all verified runs), and exposes the whole toolset as an **MCP server**.
+  API tool use) that treats this model as one instrument among several: it compares predictions with spectral lines using an emission-peak heuristic, cross-checks them with FAISS
+  nearest-neighbors, grounds its reasoning in a cited mini-RAG corpus (BM25; 6/6 citation IDs found in retrieved documents across three historical runs; scientific support is a separate question), and exposes the whole toolset as an
+  **MCP server**.
 - **[End-to-end evals](https://github.com/Julian0444/spectra-copilot#end-to-end-evals-does-verification-actually-help-n--150)**
   (n = 150 held-out spectra) with the honest headline: the bare model beats its own
   cheap-LLM agent (92.7 % vs 79.3 % within its protocol) — but the agent's self-reported
   confidence tracks accuracy monotonically, so a hybrid "agent only when confident" policy
-  recovers 90.0 %. The eval caught a deployment-relevant failure the demos had hidden.
+  reaches 90.0 %, below the model alone, in a retrospective analysis. The eval caught a deployment-relevant failure the demos had hidden.
 
 ## Architecture
 
 ```
-spectrum from any instrument (flux + wavelength, any units)
+spectrum (flux + wavelength in Å; evidence currently limited to DESI)
   → interpolate onto a log-λ grid (3600–9800 Å, 7081 px; out-of-coverage px marked invalid)
   → 273 patches × 26 px → linear projection → tokens (+ sinusoidal log-λ positions)
   → 8-layer transformer encoder (d_model = 512, 8 heads, 26 M params)
@@ -89,8 +103,9 @@ spectrum from any instrument (flux + wavelength, any units)
   → redshift head (always-masked token)  → 100-bin posterior over log(1+z) → z + confidence
 ```
 
-Because positions encode *physical wavelength* (not token index), spectra from instruments
-with different coverage work out of the box — [details below](#how-it-handles-non-desi-spectra-ood).
+Resampling accepts other wavelength grids; accuracy outside DESI and under
+partial coverage has not been established. Position encoding alone does not
+prove generalization. [Input limitations](#how-it-handles-non-desi-spectra-ood).
 
 **Stack:** PyTorch · Hugging Face Hub + Spaces · Gradio · FastAPI · Docker · GitHub Actions ·
 FAISS · Claude API + MCP (agent repo).
@@ -106,8 +121,8 @@ CKPT=$(python3 -c "from huggingface_hub import hf_hub_download; print(hf_hub_dow
 
 Python 3.9+, PyTorch 2.x (MPS / CUDA / CPU). Inference needs only NumPy + PyTorch;
 `huggingface_hub` downloads the shipped v2.1 checkpoint once (~104 MB, cached). The tests
-confirm the model loads, the forward pass works, the redshift mechanism is
-information-leak-free, and the train/held-out split is disjoint and reproducible.
+exercise model shapes, synthetic forwards and the current split logic. They do
+not certify historical v1 membership, generalization or a real-checkpoint release.
 
 For the full evaluation with plots — metrics, bias/outlier analysis, reconstruction gallery,
 training curves, live inference — open [`notebooks/evaluation.ipynb`](notebooks/evaluation.ipynb)
@@ -118,20 +133,37 @@ training curves, live inference — open [`notebooks/evaluation.ipynb`](notebook
 Entirely on a MacBook (Apple MPS), streaming DESI EDR/SV3 spectra from the
 [Multimodal Universe](https://github.com/MultimodalUniverse/MultimodalUniverse) dataset:
 
-1. **v1** — masked-token pretraining + joint scalar z regression on the first 50k spectra.
+1. **v1** — masked-token pretraining + joint scalar z regression on 50k valid spectra drawn from a shuffled stream.
 2. **v2.1** — v1 fine-tuned on the first 80k spectra × 3 epochs with the classification head
    (cross-entropy normalized by log(n_bins), 1:1 loss weighting with reconstruction).
-3. **Held-out** — the 2,000 valid-label spectra after the first 80k: never seen by either
-   version, fixed membership, leak-free by construction (tested in CI).
+3. **Historical validation** — 2,000 valid-label objects after the first 80k;
+   excluded from v2.1 fine-tuning, with strongly supported v1 exposure and
+   checkpoint selection. No independent test is available for these weights.
 
-Reproduce with `python3 -m desi_fm.train` — the exact flags of the shipped run are committed in
-[`runs/desi_80k_classhead_v21/training_args.json`](runs/desi_80k_classhead_v21/training_args.json).
+The exact historical flags are in
+[`training_args.json`](runs/desi_80k_classhead_v21/training_args.json).
+Reproducing that fine-tune requires the local v1 checkpoint and class histogram;
+a clean clone lacks both. The commands document the recipe, not exact replay.
 
 ---
 
 ## Reference
 
 Everything below documents the interfaces in detail (formats, APIs, layout, design rationale).
+
+### Documentation map
+
+| file | for whom | what it contains |
+|---|---|---|
+| [README.md](README.md) | everyone (start here) | results, product links, quick start, interfaces |
+| [README.es.md](README.es.md) | Spanish-speaking readers | full Spanish translation of this README (the English one is the reference) |
+| [DELIVERABLE.md](DELIVERABLE.md) | instructor / TA, technical readers | technical report: architecture, design decisions, metric progression, release gates |
+| [model_card.md](model_card.md) | Hugging Face Hub visitors | the model card published as the Hub README (metrics, usage, limitations, files) |
+| [COMO_FUNCIONA.md](COMO_FUNCIONA.md) | Spanish-speaking readers new to the code | file-by-file walkthrough of the code, in Spanish |
+| [api/README.md](api/README.md) | API users / Space maintainers | the REST API Space: endpoints, curl examples, deployment |
+| [demo/README.md](demo/README.md) | demo users / Space maintainers | the Gradio demo Space: what it shows, how it is deployed |
+| [notebooks/evaluation.ipynb](notebooks/evaluation.ipynb) | reviewers of the numbers | pre-executed evaluation: metrics, bias/outlier plots, v1 → v2.1 comparison, reconstruction gallery, live inference |
+| [docs/HISTORICAL_EVIDENCE.md](docs/HISTORICAL_EVIDENCE.md) | reviewers | protocols, hashes and limits; historical plans are not current instructions |
 
 ### Input format
 
@@ -160,7 +192,7 @@ a single spectrum.
 |---|---|---|
 | `z_pred_map` | `(N,)` | **official predicted redshift** (posterior argmax; classification checkpoints like v2.1) |
 | `z_confidence` | `(N,)` | posterior concentration in [0, 1] (classification checkpoints) |
-| `z_pred` | `(N,)` | posterior-expectation redshift (backward compatibility; the only prediction for v1) |
+| `z_pred` | `(N,)` | `expm1(E[log(1+z)])` from the same posterior (v1 uses scalar regression) |
 | `reconstruction_input_grid` | `(N, P)` | reconstruction on your wavelength grid, in your flux units |
 | `reconstruction_model_grid` | `(N, 7081)` | reconstruction on the model's internal log-λ grid |
 | `model_wavelength` | `(7081,)` | the model's internal wavelength grid (3600–9800 Å, log-spaced) |
@@ -241,7 +273,7 @@ curl -s -X POST https://jirustaroure-desi-fm-api.hf.space/api/predict_json \
 
 Interactive Swagger docs: **<https://jirustaroure-desi-fm-api.hf.space/api/docs>**.
 As everywhere in this project, the official prediction is `z_pred_map` (with its
-`z_confidence`); `z_pred` is the secondary posterior mean. Limits: 32 spectra / 50 MB per
+`z_confidence`); `z_pred` is `expm1(E[log(1+z)])`, not the arithmetic posterior mean of z. Limits: 32 spectra / 50 MB per
 request.
 
 **Run it yourself:**
@@ -256,8 +288,11 @@ docker run -p 7860:7860 desi-fm-api
 ```
 
 Set `DESI_FM_CKPT=/path/to/checkpoint_last.pt` to serve a local checkpoint instead of
-downloading. The deployed Space source is in [`api/`](api/) — a ZeroGPU *Gradio* Space wrapping
-the same FastAPI app (REST calls run on CPU and spend no ZeroGPU visitor quota).
+downloading. **Note the path difference:** run locally (uvicorn or Docker), the Swagger UI is
+at `http://localhost:7860/docs` and the endpoints are `/healthz`, `/predict`, `/predict_json`
+— *no* `/api` prefix. The prefix exists only on the public Space, where the FastAPI app is
+mounted as a sub-app at `/api` inside a ZeroGPU *Gradio* Space (source in [`api/`](api/);
+REST calls run on CPU and spend no ZeroGPU visitor quota).
 
 ### How it handles non-DESI spectra (OOD)
 
@@ -271,7 +306,7 @@ an arbitrary token index. So when a non-DESI spectrum arrives:
    it represents.
 4. The reconstruction is interpolated back to the caller's grid in original flux units.
 
-This is transparent to the caller — just pass any `(flux, wavelength)` arrays to `predict.py`.
+This describes resampling, not validated accuracy on other instruments. Supply wavelengths in Å; current input validation and internal-gap handling still have limitations scheduled for the next consolidation batch.
 
 ### Repository layout
 
@@ -284,17 +319,22 @@ src/desi_fm/
   predict.py          instrument-agnostic inference  ← use this for benchmarking
   api.py              FastAPI REST API (/predict, /predict_json, /healthz)
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
-tests/                26 unit tests (shapes, no-leakage, split isolation, calibrated loss, MAP outputs, embeddings, API)
+tests/                26 unit tests (shapes, no-leakage, split isolation, normalized loss, MAP outputs, embeddings, API)
 demo/                 Gradio app deployed to the live HF Space (jirustaroure/desi-spectra-fm-demo)
 api/                  API app deployed to the live HF Space (jirustaroure/desi-fm-api)
 Dockerfile            CPU-only container image for the REST API
+examples/             4 real held-out demo spectra (.npz) — NOT in git (gitignored); regenerate
+                      with scripts/make_demo_examples.py. Copilot includes only 3 of these 4
+                      (heldout_z083.npz is absent there); the Space has its own copies.
 scripts/
-  make_demo_examples.py    exports the demo's real held-out example spectra
+  make_demo_examples.py    exports the demo's real held-out example spectra (examples/)
   estimate_z_histogram.py  estimates the training-label histogram (v2.1 class weights)
   plot_scatter_v1_v2.py    regenerates the README's v1-vs-v2.1 held-out scatter
 notebooks/
-  evaluation.ipynb            ready-to-run evaluation notebook for v2.1 (metrics, plots, live demo)
-  evaluation_v1_baseline.ipynb  the executed v1 "before" picture (bias/outlier diagnosis)
+  evaluation.ipynb            ready-to-run evaluation notebook: v2.1 metrics + plots, v1 → v2.1
+                              comparison on the canonical held-out split, live demo
+  evaluation_v1_baseline.ipynb  historical: the executed v1 "before" picture (bias/outlier
+                              diagnosis, pre-canonical split)
 runs/desi_80k_classhead_v21/
   checkpoint_last.pt        the shipped model — v2.1 fine-tune of v1 (26 M parameters)
                             (not in git — download from hf.co/jirustaroure/desi-spectra-fm)
@@ -307,7 +347,8 @@ runs/desi_80k_classhead_v21/
 runs/calibration/
   predictions_v1_heldout_canonical.csv   the v1 baseline on the same held-out split
 DELIVERABLE.md        full deliverable documentation (architecture, decisions, metric progression)
-README.es.md          Spanish development walkthrough · RESUMEN.md project summary · COMO_FUNCIONA.md code walkthrough
+README.es.md          Spanish-language README · COMO_FUNCIONA.md code walkthrough in Spanish
+RESUMEN.md            historical Spanish project summary (superseded by README.es.md)
 ```
 
 ### Design summary (one paragraph)
@@ -323,9 +364,9 @@ token forcibly masked on every training example (Approach B). The v1 checkpoint 
 used a scalar SmoothL1 regression on `log(1+z)`; the shipped **v2.1 checkpoint fine-tunes v1**
 on the first 80 k spectra × 3 epochs with a **100-bin classification head over `log(1+z)`** —
 cross-entropy normalized by `log(n_bins)`, sqrt-inverse class weights from the real
-training-label histogram, 1:1 loss weighting with reconstruction, and a leak-free
-train/held-out split — which removes the regression-to-the-mean collapse and the z ≈ 2
-prediction ceiling diagnosed in v1. Full design rationale and oral-question answers are in
+training-label histogram and 1:1 loss weighting with reconstruction. The historical
+comparison improves aggregate redshift metrics but does not isolate which change helped.
+The inherited validation set is not independent. Full design rationale and oral-question answers are in
 [DELIVERABLE.md §4–5](DELIVERABLE.md).
 
 ### Troubleshooting
@@ -343,8 +384,8 @@ Built as the final project for PHYS303 / CS486 / CS686 (University of San Franci
 **Julian Irusta Roure**; the redshift mechanism was redesigned per the project specification
 after TA feedback flagged the v1 bias/outlier problem — the diagnosis and fix are the
 [Results](#results-diagnosing-and-fixing-a-real-failure-mode) story above. Full grader-facing
-documentation: [DELIVERABLE.md](DELIVERABLE.md). Spanish-language walkthroughs:
-[README.es.md](README.es.md), [RESUMEN.md](RESUMEN.md), [COMO_FUNCIONA.md](COMO_FUNCIONA.md).
+documentation: [DELIVERABLE.md](DELIVERABLE.md). Spanish-language documents:
+[README.es.md](README.es.md), [COMO_FUNCIONA.md](COMO_FUNCIONA.md).
 
 ### References
 
@@ -354,3 +395,5 @@ documentation: [DELIVERABLE.md](DELIVERABLE.md). Spanish-language walkthroughs:
 - Multimodal Universe dataset: <https://github.com/MultimodalUniverse/MultimodalUniverse>
 - AION-1 (reference, not reproduced): <https://github.com/PolymathicAI/AION>
 - AION-1 checkpoints (not used at inference time): <https://huggingface.co/polymathic-ai/aion-base>
+
+Code license: [MIT](LICENSE). DESI data retain [CC BY 4.0 attribution and release citations](ATTRIBUTIONS.md).

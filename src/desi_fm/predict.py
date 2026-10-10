@@ -1,10 +1,15 @@
 """Instrument-agnostic inference for the DESI foundation model.
 
-This module is the entry point intended for the held-out benchmark evaluation.
-It accepts spectra from any instrument as raw NumPy arrays (wavelength + flux,
+This module is the inference entry point. Accuracy outside DESI or under partial
+coverage is unvalidated; historical validation is not an independent test.
+It resamples wavelength grids in Angstroms from raw NumPy arrays (wavelength + flux,
 plus optional ivar and bad-pixel mask) and returns:
 
-    * the predicted redshift `z`
+    * the predicted redshift: `z_pred_map` (posterior argmax — the official
+      prediction for classification checkpoints such as v2.1) with its
+      `z_confidence` (posterior concentration in [0, 1]); `z_pred` (expm1 of
+      the posterior mean in log(1+z)) is kept for backward compatibility and is the only
+      prediction of scalar-head checkpoints (v1)
     * the reconstructed spectrum, in the caller's wavelength grid and in
       original flux units
 
@@ -20,15 +25,18 @@ Python API
     result = predict_spectrum(
         flux=flux_array,            # 1D NumPy, any flux units
         wavelength=wavelength_array,# 1D NumPy, Angstroms
-        checkpoint_path="runs/desi_50k_zw10_mask50/checkpoint_last.pt",
+        # shipped v2.1 checkpoint; the same file is on the Hub as
+        # jirustaroure/desi-spectra-fm / checkpoint_last.pt
+        checkpoint_path="runs/desi_80k_classhead_v21/checkpoint_last.pt",
     )
-    z = result["z_pred"]
+    z = result["z_pred_map"]              # official prediction (v2.1)
+    conf = result["z_confidence"]         # posterior concentration in [0, 1]
     recon = result["reconstruction_input_grid"]  # same length as `flux`
 
 CLI
 ---
     python -m desi_fm.predict \
-        --checkpoint runs/desi_50k_zw10_mask50/checkpoint_last.pt \
+        --checkpoint runs/desi_80k_classhead_v21/checkpoint_last.pt \
         --input  spectra.npz \
         --output predictions.npz
 

@@ -1,0 +1,66 @@
+{
+  "initial_head": "dadc83e8f0b855723d7a3a81cf4f24f1ce9b9047",
+  "initial_branch": "main",
+  "records": [
+    {
+      "path": ".gitignore",
+      "preexisting_worktree_sha256": "84b0941799c82c4204b8d36ab7ffb822f8222c3aefbab4743591b3e8274e4385",
+      "reconciled_sha256": "5f08fd231d1436540d2ed879fc8d831f3a65c44d74b0f0d0def357772ba12a13",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "COMO_FUNCIONA.md",
+      "preexisting_worktree_sha256": "33895e3139435d9be645d312fb17963600ba861b8387ca1be14e1fcae254ee68",
+      "reconciled_sha256": "1aa9f4896c4f1d81f914b40de031c5215a854ff73284b50a16af610ba1462002",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "DELIVERABLE.md",
+      "preexisting_worktree_sha256": "ff99611fadf7848d4fef47b108dec91ee81058483cb9c5dc3bb76792931ca4f1",
+      "reconciled_sha256": "b280f698fa427340f890c08b6530be97e2b64d3f6d01e0193f9a01b3b1d96f47",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "README.es.md",
+      "preexisting_worktree_sha256": "36be5d05156a22885f510685731404a13e110eab97a1696c55d0ef640914b890",
+      "reconciled_sha256": "a6825ffcd110273bd1105302308080e99fb3a18af6fadbb69e15212606c6d8db",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "README.md",
+      "preexisting_worktree_sha256": "e7bf6286e527d87f7143e05f965712dd73a86a68f2b52622f11bf7f7a2151354",
+      "reconciled_sha256": "a10ce27aa75c215cbc83be139f79dcb3f310edd51f6cf16251b500969bc31b50",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "api/README.md",
+      "preexisting_worktree_sha256": "8d27b1bab79830ab05ac4088132400bd7817ac4ebe2aacf106c588ea6d0ebe7a",
+      "reconciled_sha256": "11a7f361ed5bf6b7407311e4ba27551628c418198aa22118f5739540688181be",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "demo/README.md",
+      "preexisting_worktree_sha256": "658245dc02eba0b499157cdcb51a30fccdb9eef8762bf2642d122946ae6feb0a",
+      "reconciled_sha256": "a372419026a3542a86e4f2284bd7ad7cefec9f77c497e9110168d7599c00a853",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "model_card.md",
+      "preexisting_worktree_sha256": "48a97d79c6034072cde05649c778807851b3907277e774b25960453c5d6826a6",
+      "reconciled_sha256": "b749644f12d23a6a89818c7ab370045c49bef40c5e2fa56d0491a405b8bd63d0",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "notebooks/evaluation.ipynb",
+      "preexisting_worktree_sha256": "0641aa5401baa2936a72b406097494569b8446996e9e9cb071e66baf6f95e228",
+      "reconciled_sha256": "73b9259b2ec13e6b30013f97bcc7fcef250ff99c4a37c2106fe7810944236309",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    },
+    {
+      "path": "src/desi_fm/predict.py",
+      "preexisting_worktree_sha256": "1325591c56cbb4ef0fd7723575a169d2a046a3887480d3a2559be3b4b9f471c0",
+      "reconciled_sha256": "7630efb3b20a969aa1327f1accb7384f5870b553c09dd0c292e3d06a1a70c3dc",
+      "disposition": "Reviewed and reconciled in scoped documentation/hygiene commits; original file and initial patch kept privately."
+    }
+  ]
+}
