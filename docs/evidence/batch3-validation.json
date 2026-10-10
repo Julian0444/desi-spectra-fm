@@ -1,0 +1,108 @@
+{
+  "scope": "batch-2 review follow-ups and batch 3; local source execution",
+  "source_implementation_heads": {
+    "fm": "89cfea1ed07c8e9f5b9cc7921ef6add52f13c1ad",
+    "copilot": "72e4f0bae0204ff4ee9b3129259d732f72799d8e"
+  },
+  "branches": {
+    "fm": "codex/lote-3",
+    "copilot": "codex/lote-3"
+  },
+  "tests": [
+    {
+      "repo": "fm",
+      "environment": "Python 3.9.6 system",
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONPATH=src python3 -m pytest tests/ -q",
+      "result": "65 passed, 62 warnings in 15.05s",
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/fm-py39-tests.txt"
+    },
+    {
+      "repo": "fm",
+      "environment": "Python 3.12.13 batch-2 wheel-env, source imports",
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONPATH=src <ENV>/bin/python -m pytest tests/ -q",
+      "result": "65 passed, 47 warnings in 13.43s",
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/fm-py312-tests.txt"
+    },
+    {
+      "repo": "copilot",
+      "environment": "same Python 3.12.13; source imports from both originals; LLM simulated",
+      "command": "PYTHONPATH=<FM>/src HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 DESI_FM_CKPT=<local-v21> <ENV>/bin/python -m pytest tests/ -q",
+      "result": "85 passed, 22 warnings in 4.01s",
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/copilot-tests-final-85.txt"
+    }
+  ],
+  "pip_check": "No broken requirements found.",
+  "histories_preserved": {
+    "fm": 74,
+    "copilot": 169,
+    "sha256_and_sizes_unchanged": true,
+    "untracked_csv_sha256": "db2a7f4d26780d0787f9f9bea9118f7ccd992494b0a7cd382d9152ff92ce4eab",
+    "csv_not_added_to_git": true
+  },
+  "scientific_runs": [
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/historical-full-01",
+      "bytes": 350590767
+    },
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/historical-offline-repeat-01",
+      "bytes": 350590777
+    }
+  ],
+  "local_artifact_registry": [
+    {
+      "path": "/Users/jirustaroure/.local/share/spectra-data/933b9056b93b0f3e7790ee28c43412b49c39e232/snapshot.json",
+      "bytes": 9038,
+      "sha256": "933b7959138ea1ed3a45496dd679c52ce0d8dd8e522628da7ff99252fb68f7ee"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/share/spectra-data/derived-933b9056/spectra-input-v2.sqlite",
+      "bytes": 13443072,
+      "sha256": "36d1433bbf2457b1eeab8b1a27cb4c37228800b79a48403e247980c29eed57b0"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/share/spectra-data/derived-933b9056/spectra-input-v2.json",
+      "bytes": 1381,
+      "sha256": "fdc66fdb4bd34a63aa69257cec2530c3c3be38e56147b4fd857ccce89bb12793"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/audit-selection/manifest.json",
+      "bytes": 923,
+      "sha256": "da570f4854db51c955a5b713da9e049e91f194c06cc9699aa5bbac146a235d42"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/reference-cache.json",
+      "bytes": 1463,
+      "sha256": "cc5a025e3559c9a54c5a783a3bba60f0af03c1af6eb3d6a06fd56e0e246e1fb5"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/profile-mps-32/manifest.json",
+      "bytes": 9576,
+      "sha256": "6aba293d6177ec1a691d5074256c4fd4627c97e6481525b7cbab3551c7699d10"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/historical-full-01/manifest.json",
+      "bytes": 58939,
+      "sha256": "336ccdda7109219bf7db7acf20e565f7e313ceff22561e60de2c076ba2c59065"
+    },
+    {
+      "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/historical-offline-repeat-01/manifest.json",
+      "bytes": 58949,
+      "sha256": "81d7c7eceecbade48332d351f878fdf1b8fd24aadddedf92028260794f8ba14f"
+    }
+  ],
+  "offline_repeat_evidence": "batch3-offline-repeat.json",
+  "cpu_mps_control": "batch3-cpu-mps-control.json",
+  "reader_parity": "batch3-reader-parity.json",
+  "dependency_manifest": "batch3-dependencies.txt",
+  "distribution_note": "No new wheels. Installed metadata refers to batch-2 distributions; all acceptance/scientific source imports resolve to the batch-3 checkouts.",
+  "no_training_paid_services_paid_LLM_cloud_push_merge_deployment_publication": true,
+  "limitations": [
+    "Historical IDs reconstructed; only 150 direct export raw anchors",
+    "No explicit relationship keys in snapshot",
+    "Historical index encoder/preprocess provenance unknown",
+    "MPS complete repeat validated in recorded environment only",
+    "Training random-read performance not profiled; future splits/test unopened",
+    "Key rotation and publication remain unverified"
+  ]
+}

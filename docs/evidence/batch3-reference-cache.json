@@ -1,0 +1,26 @@
+{
+  "purpose": "HF local verified last-shard reference decode for bounded parity, unused for full evaluations",
+  "total_bytes": 1793510592,
+  "files": [
+    {
+      "path": "/Users/jirustaroure/.cache/huggingface/datasets/parquet/default-ecc1dcfcf87c23f5/0.0.0/a859584b6747f312c02efa800dcc0a33038f602cb670b65dc6103d3f269c5565/parquet-train-00003-of-00004.arrow",
+      "bytes": 286888320,
+      "sha256": "320cdfdf9204ec231a05711f024bfb005df1a2ac6284b8a8f60af674f6ee42f7"
+    },
+    {
+      "path": "/Users/jirustaroure/.cache/huggingface/datasets/parquet/default-ecc1dcfcf87c23f5/0.0.0/a859584b6747f312c02efa800dcc0a33038f602cb670b65dc6103d3f269c5565/parquet-train-00002-of-00004.arrow",
+      "bytes": 502207448,
+      "sha256": "a96e52d4d21dfd37d00f55a2762e31dc00f000f829e4edcad238b40c591c9985"
+    },
+    {
+      "path": "/Users/jirustaroure/.cache/huggingface/datasets/parquet/default-ecc1dcfcf87c23f5/0.0.0/a859584b6747f312c02efa800dcc0a33038f602cb670b65dc6103d3f269c5565/parquet-train-00000-of-00004.arrow",
+      "bytes": 502207376,
+      "sha256": "3cf5a528eb2c6ce97fd0c4ad015de6ee1bd1f513ec1c2c367b5bd9cabcfb4fc2"
+    },
+    {
+      "path": "/Users/jirustaroure/.cache/huggingface/datasets/parquet/default-ecc1dcfcf87c23f5/0.0.0/a859584b6747f312c02efa800dcc0a33038f602cb670b65dc6103d3f269c5565/parquet-train-00001-of-00004.arrow",
+      "bytes": 502207448,
+      "sha256": "62b5d7324e1a8b872094c1c3f1079c1baf99144d3ea783ea0dfa2b4005bc3dfc"
+    }
+  ]
+}

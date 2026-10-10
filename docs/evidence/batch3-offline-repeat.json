@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "first": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/historical-full-01",
+  "offline_repeat": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/historical-offline-repeat-01",
+  "n": 2000,
+  "manifest_sha256": [
+    "336ccdda7109219bf7db7acf20e565f7e313ceff22561e60de2c076ba2c59065",
+    "81d7c7eceecbade48332d351f878fdf1b8fd24aadddedf92028260794f8ba14f"
+  ],
+  "exact_inputs_IDs_masks_order_and_exclusions": true,
+  "prediction_reconstruction_max_abs_difference": {
+    "predictions.npz:v1_scalar": 0.0,
+    "predictions.npz:v21_map": 0.0,
+    "predictions.npz:v21_secondary": 0.0,
+    "predictions.npz:v21_confidence": 0.0,
+    "reconstruction.npz:v1": 0.0,
+    "reconstruction.npz:v21": 0.0
+  },
+  "metric_atol": 1e-08,
+  "network_connections_blocked": true,
+  "attempted_network_connections": 0
+}

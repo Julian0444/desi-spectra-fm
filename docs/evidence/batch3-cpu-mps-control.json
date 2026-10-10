@@ -1,0 +1,34 @@
+{
+  "scope": "bounded CPU reference against persisted MPS full-spectrum outputs",
+  "positions": [
+    0,
+    1,
+    10,
+    12,
+    27,
+    40,
+    500,
+    1000,
+    1999
+  ],
+  "ids": [
+    "39627776344457758",
+    "39627776344457814",
+    "39627776344457953",
+    "39627776344457978",
+    "39627776344458334",
+    "39627776344458525",
+    "39627776348654455",
+    "39627776352850938",
+    "39627782375870907"
+  ],
+  "deltas": {
+    "v1_scalar": 6.556510925292969e-07,
+    "v21_secondary": 2.384185791015625e-07,
+    "v21_map": 2.384185791015625e-07,
+    "v21_confidence": 2.384185791015625e-07
+  },
+  "MAP_exact_float_match": false,
+  "all_outputs_passed_atol_1e-6_rtol_1e-6": true,
+  "note": "Nine sampled IDs only. Decoded MAP float values need not be bit-identical across devices; all sampled output deltas meet the declared numerical tolerance. Full repetition was performed on the same MPS device."
+}

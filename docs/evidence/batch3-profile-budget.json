@@ -1,0 +1,35 @@
+{
+  "profile_manifest": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/profile-mps-32/manifest.json",
+  "profile_n": 32,
+  "profile_total_s": 7.469229707960039,
+  "timings_s": {
+    "verification": 3.9782298339996487,
+    "load_weights": 0.6880492919590324,
+    "reading": 0.4315926223061979,
+    "preprocessing": 0.03275395347736776,
+    "forward_full": 1.241951375035569,
+    "forward_reconstruction": 0.23663941700942814,
+    "baselines": 0.014937583007849753,
+    "writing": 0.15617008309345692,
+    "summary_figures": 0.3542865829076618
+  },
+  "hardware": {
+    "machine": "arm64",
+    "macos": "26.6.2",
+    "chip": "Apple M4 Pro",
+    "ram_bytes": 51539607552
+  },
+  "device": "mps",
+  "batch_size": 8,
+  "peak_rss_bytes": 981221376,
+  "mps_driver_allocated_bytes": 1472987136,
+  "estimate_per_full_run_s": 137.1483803294832,
+  "planning_ceiling_per_run_s": 300,
+  "planned_runs": 2,
+  "planning_ceiling_both_s": 600,
+  "method": "Conservative linear extrapolation of measured variable components plus fixed verification/load/summary; startup GPU compilation and first row-group read overestimate some components; excludes any claim about prior streaming duration",
+  "free_before_full_bytes": 72513617920,
+  "artifact_disk_budget_bytes": 1500000000,
+  "new_HF_reference_arrow_cache": "Dataset.from_parquet materialized one verified last-shard Arrow derivative; inventory recorded at closure",
+  "decision": "Fits local M4 Pro, 48 GiB; continue both authorized local runs"
+}
