@@ -1,0 +1,66 @@
+{
+  "scope": "4A only; no final series or real test inference",
+  "implementation_commits": [
+    "d7de1b3",
+    "9d6adb6",
+    "52e8d0d",
+    "182761a"
+  ],
+  "tests": [
+    {
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010/fm-py312-final.log",
+      "result": "89 passed, 75 warnings in 16.76s",
+      "scope": "complete suite"
+    },
+    {
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010/fm-py39-final.log",
+      "result": "89 passed, 90 warnings in 19.36s",
+      "scope": "complete suite"
+    },
+    {
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010/copilot-tests.log",
+      "result": "85 passed, 22 warnings in 4.69s",
+      "scope": "complete suite"
+    },
+    {
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010/signal-final-boundary-tests.log",
+      "result": "15 passed, 21 warnings in 2.45s",
+      "scope": "final interruption/accumulation regression"
+    },
+    {
+      "log": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010/py39-signal-final-tests.log",
+      "result": "15 passed, 22 warnings in 2.53s",
+      "scope": "final interruption/accumulation regression"
+    }
+  ],
+  "complete_suite_source_note": "Complete FM suites ran after the MPS pooling fix; the final interrupt-at-target status change was then verified by the 15 training regressions on each supported Python.",
+  "pip_check": "No broken requirements found.",
+  "derivative": "/Users/jirustaroure/.local/share/spectra-data/batch4a-v1",
+  "private_evidence": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010",
+  "data_acceptance": "batch4-acceptance.json",
+  "profile_budget": "batch4-budget.json",
+  "resume_evidence": "batch4-resume-check.json",
+  "full_size_train_profile_updates": {
+    "A": 32,
+    "B": 32,
+    "CNN": 32
+  },
+  "failed_cnn_profile": {
+    "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4a-20261010/profile-CNN",
+    "optimizer_updates": 0,
+    "reason": "MPS nondivisible adaptive pooling; preserved, replaced by mathematically equivalent fixed-window implementation"
+  },
+  "small_resume_checks": "synthetic CPU/MPS four-update trajectories, plus synthetic regression fixtures; no actual test inputs",
+  "test_status": "closed; acceptance inspected IDs/labels solely for metadata split integrity and hashed bytes, never model errors",
+  "historical_preservation": {
+    "FM": 74,
+    "Copilot": 169,
+    "untracked_csv_sha256": "db2a7f4d26780d0787f9f9bea9118f7ccd992494b0a7cd382d9152ff92ce4eab"
+  },
+  "recommended_4b_updates": 10000,
+  "estimated_hours": 10.16233597342578,
+  "planning_hours_with_margin": 15.243503960138668,
+  "copilot_changes": "none; branch codex/lote-4a at 6d4d8ed8acaeeec0d7cba64b37421f6459ce5c6e; integration suite passed",
+  "distribution": "source imports from original repositories; installed batch-2 wheel metadata is historical, no newly accepted wheel",
+  "no_remote_data_paid_service_LLM_push_merge_publish": true
+}

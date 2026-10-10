@@ -1,0 +1,76 @@
+{
+  "config": {
+    "accumulation": 2,
+    "adam_epsilon": 1e-08,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "checkpoint_every": 2,
+    "class_weights": "inverse_sqrt_max_count_1_mean_one",
+    "clip_grad_norm": 1.0,
+    "cpu_threads": 1,
+    "learning_rate": 0.0003,
+    "micro_batch": 2,
+    "minimum_lr_fraction": 0.1,
+    "model": {
+      "d_model": 16,
+      "dropout": 0.1,
+      "lambda_max": 9800.0,
+      "lambda_min": 3600.0,
+      "mask_ratio": 0.5,
+      "mlp_ratio": 2.0,
+      "n_heads": 2,
+      "n_layers": 1,
+      "n_pixels": 256,
+      "n_tokens": 8,
+      "n_z_bins": 100,
+      "normalize_redshift_ce": true,
+      "reconstruction_loss_weight": 1.0,
+      "redshift_loss_weight": 1.0,
+      "use_learned_position": true,
+      "use_wavelength_embedding": true,
+      "wavelength_grid": "log",
+      "z_label_smoothing": 0.0,
+      "z_max": 6.0
+    },
+    "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+    "num_workers": 0,
+    "precision": "float32",
+    "schema": "batch4-training-v1",
+    "seeds": [
+      17,
+      42,
+      101
+    ],
+    "updates": 4,
+    "validation_every": 2,
+    "warmup_updates": 1,
+    "weight_decay": 0.01
+  },
+  "devices": {
+    "cpu": {
+      "allclose_atol1e-6_rtol1e-5": true,
+      "class_weights_nonunit": true,
+      "exact_tensors": true,
+      "executed_updates": 8,
+      "max_abs_tensor_difference": 0.0,
+      "recovery_seconds": 0.0049793749349191785,
+      "trace_identical": true,
+      "updates_per_trajectory": 4
+    },
+    "mps": {
+      "allclose_atol1e-6_rtol1e-5": true,
+      "class_weights_nonunit": true,
+      "exact_tensors": true,
+      "executed_updates": 8,
+      "max_abs_tensor_difference": 0.0,
+      "recovery_seconds": 0.01939704199321568,
+      "trace_identical": true,
+      "updates_per_trajectory": 4
+    }
+  },
+  "limit": "MPS agreement only for this small run on this host. No bitwise guarantee for full-size runs, other devices or torch versions.",
+  "scope": "small synthetic interruption; no real test or validation inputs",
+  "status": "passed"
+}

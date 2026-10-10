@@ -1,0 +1,245 @@
+{
+  "disk": {
+    "estimated_retained_checkpoint_bytes": 5713388028,
+    "suggested_additional_4b_reserve_bytes": 12000000000
+  },
+  "estimates": {
+    "10000": {
+      "components": {
+        "checkpoints_seconds": 64.49229876464233,
+        "final_evaluation_seconds": 262.72773210394007,
+        "neural_validations_seconds": 5215.544526436133,
+        "persisted_predictions_seconds": 53.63675265471102,
+        "ridge_train_features_and_three_fits_seconds": 13.028234981176865,
+        "ridge_validation_seconds": 1.9505057821334049,
+        "six_transformer_training_seconds": 30082.068780320697,
+        "startup_hashes_and_final_analysis_allowance_seconds": 300.0,
+        "three_cnn_training_seconds": 590.9606732893735
+      },
+      "effective_train_epochs": 4.94139810682685,
+      "examples_per_run": 320000,
+      "planning_ceiling_with_50pct_margin_hours": 15.243503960138668,
+      "total_estimated_hours": 10.16233597342578,
+      "total_estimated_seconds": 36584.409504332805,
+      "updates_per_neural_run": 10000,
+      "validation_events_per_run": 20
+    },
+    "30000": {
+      "components": {
+        "checkpoints_seconds": 181.75102379126474,
+        "final_evaluation_seconds": 262.72773210394007,
+        "neural_validations_seconds": 15646.6335793084,
+        "persisted_predictions_seconds": 155.80199580654153,
+        "ridge_train_features_and_three_fits_seconds": 13.028234981176865,
+        "ridge_validation_seconds": 1.9505057821334049,
+        "six_transformer_training_seconds": 90246.20634096209,
+        "startup_hashes_and_final_analysis_allowance_seconds": 300.0,
+        "three_cnn_training_seconds": 1772.8820198681206
+      },
+      "effective_train_epochs": 14.82419432048055,
+      "examples_per_run": 960000,
+      "planning_ceiling_with_50pct_margin_hours": 45.2420755969182,
+      "total_estimated_hours": 30.161383731278796,
+      "total_estimated_seconds": 108580.98143260367,
+      "updates_per_neural_run": 30000,
+      "validation_events_per_run": 60
+    }
+  },
+  "limits": [
+    "32 updates per variant; first 4 excluded from steady estimate, all measured values retained",
+    "MPS synchronization brackets forward/backward/optimizer/inference; allocation is sampled, not a true device peak",
+    "Warm local cache and short sessions; thermal throttling, other load and long-run memory behavior unmeasured",
+    "Validation/test costs extrapolated from 128 train objects only; no validation or test inference in 4A",
+    "Checkpoint cost uses final full optimizer state; last+previous+best retained",
+    "A/B were measured at 9d6adb6; CNN at 52e8d0d after equivalent pooling MPS fix. Transformer code/parameters unchanged",
+    "Initial CNN attempt failed before its first optimizer update; its incomplete destination is preserved"
+  ],
+  "measured": {
+    "A": {
+      "all_updates_seconds": 17.627503792289644,
+      "checkpoint_bytes": 311919889,
+      "checkpoint_write_seconds": 0.5528143749106675,
+      "component_mean_seconds": {
+        "backward_seconds": 0.2715999480819197,
+        "forward_seconds": 0.1783971607510466,
+        "optimizer_seconds": 0.047369303418755795,
+        "read_preprocess_seconds": 0.005036056532324957
+      },
+      "effective_batch": 32,
+      "evaluation_seconds_per_object": 0.004305602210479265,
+      "maximum_sampled_mps_driver_bytes": 3454009344,
+      "median_update_seconds": 0.5013889170368202,
+      "normalization_fallbacks": 0,
+      "p95_update_seconds": 0.5083312297705561,
+      "parameters": 25980646,
+      "peak_host_rss_bytes": 810876928,
+      "prediction_persist_seconds_per_object": 3.3927733966265805e-05,
+      "profile_manifest": {
+        "bytes": 29336,
+        "sha256": "cb9cf9052bb5112b81c8f139825c79ee0484649e7f7781ae677b9531e6a1b546"
+      },
+      "recovery_seconds": 0.2948331660591066,
+      "source": {
+        "files": {
+          "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+          "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+          "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+          "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+          "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+          "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+          "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+          "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+          "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+          "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+          "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+          "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+          "src/desi_fm/experiment/final.py": "16e72b496ca342a557b8217020655a1ad696a9a7e57b42c0539089969ab145bc",
+          "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+          "src/desi_fm/experiment/models.py": "0232a0236392ed47f711fb77b37279a1a307b7126edf0953bd8af0c88875989f",
+          "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+          "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+          "src/desi_fm/experiment/training.py": "93b0d7916a3dcc7314beb2eaa1c2f51d92cc4f8d4c857c84f82f2b6bf8ce6a08",
+          "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+          "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+          "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+          "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+          "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+          "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+          "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+        },
+        "head": "9d6adb65ed23a401e4e0906dbc254f9547fb8dd6",
+        "sha256": "07250e410fbc52d6341bd74763946e06485e15c382c8c5e3f1c95462a2f5166e"
+      },
+      "steady_updates": 28,
+      "updates": 32
+    },
+    "B": {
+      "all_updates_seconds": 16.482292701723054,
+      "checkpoint_bytes": 311919889,
+      "checkpoint_write_seconds": 0.4085987920407206,
+      "component_mean_seconds": {
+        "backward_seconds": 0.27184319789687705,
+        "forward_seconds": 0.17841720845899545,
+        "optimizer_seconds": 0.04726754018754166,
+        "read_preprocess_seconds": 0.004797019251522475
+      },
+      "effective_batch": 32,
+      "evaluation_seconds_per_object": 0.004021784828182717,
+      "maximum_sampled_mps_driver_bytes": 3456106496,
+      "median_update_seconds": 0.5013467089738697,
+      "normalization_fallbacks": 0,
+      "p95_update_seconds": 0.5067014619300607,
+      "parameters": 25980646,
+      "peak_host_rss_bytes": 738492416,
+      "prediction_persist_seconds_per_object": 2.9677414204343222e-05,
+      "profile_manifest": {
+        "bytes": 29330,
+        "sha256": "537b2bee22197db19fa7ce3b1c4bdd9059ba44bf16a4baa3af2fcdc1f11ce124"
+      },
+      "recovery_seconds": 0.26754558307584375,
+      "source": {
+        "files": {
+          "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+          "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+          "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+          "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+          "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+          "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+          "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+          "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+          "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+          "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+          "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+          "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+          "src/desi_fm/experiment/final.py": "16e72b496ca342a557b8217020655a1ad696a9a7e57b42c0539089969ab145bc",
+          "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+          "src/desi_fm/experiment/models.py": "0232a0236392ed47f711fb77b37279a1a307b7126edf0953bd8af0c88875989f",
+          "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+          "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+          "src/desi_fm/experiment/training.py": "93b0d7916a3dcc7314beb2eaa1c2f51d92cc4f8d4c857c84f82f2b6bf8ce6a08",
+          "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+          "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+          "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+          "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+          "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+          "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+          "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+        },
+        "head": "9d6adb65ed23a401e4e0906dbc254f9547fb8dd6",
+        "sha256": "07250e410fbc52d6341bd74763946e06485e15c382c8c5e3f1c95462a2f5166e"
+      },
+      "steady_updates": 28,
+      "updates": 32
+    },
+    "CNN": {
+      "all_updates_seconds": 1.41178155655507,
+      "checkpoint_bytes": 10981114,
+      "checkpoint_write_seconds": 0.015742874937132,
+      "component_mean_seconds": {
+        "backward_seconds": 0.005504278507682362,
+        "forward_seconds": 0.006310995614122865,
+        "optimizer_seconds": 0.0026172262441832572,
+        "read_preprocess_seconds": 0.006063741141198469
+      },
+      "effective_batch": 32,
+      "evaluation_seconds_per_object": 0.0003651871720649069,
+      "maximum_sampled_mps_driver_bytes": 72155136,
+      "median_update_seconds": 0.019698689109645784,
+      "normalization_fallbacks": 0,
+      "p95_update_seconds": 0.022959371196338906,
+      "parameters": 912548,
+      "peak_host_rss_bytes": 547487744,
+      "prediction_persist_seconds_per_object": 2.1532554455916397e-05,
+      "profile_manifest": {
+        "bytes": 28921,
+        "sha256": "96646ead96d2664f0ac4f8f496195a1cf1f1e6295d4a53e1d8d959b704e0b9c1"
+      },
+      "recovery_seconds": 0.013299958081915975,
+      "source": {
+        "files": {
+          "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+          "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+          "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+          "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+          "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+          "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+          "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+          "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+          "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+          "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+          "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+          "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+          "src/desi_fm/experiment/final.py": "16e72b496ca342a557b8217020655a1ad696a9a7e57b42c0539089969ab145bc",
+          "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+          "src/desi_fm/experiment/models.py": "3a9f8fcd50b61504d86889cff43eb3cf59ed39ee9bc789a445e1d6e33da292f5",
+          "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+          "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+          "src/desi_fm/experiment/training.py": "93b0d7916a3dcc7314beb2eaa1c2f51d92cc4f8d4c857c84f82f2b6bf8ce6a08",
+          "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+          "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+          "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+          "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+          "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+          "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+          "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+        },
+        "head": "52e8d0d29f135a07f6a16e0fc65ba9fc4f1dbc6f",
+        "sha256": "42c1d16aaa774d6d478b393b9a99fe3f698ee39f6af0a1678e9d9c3e1f1201be"
+      },
+      "steady_updates": 28,
+      "updates": 32
+    }
+  },
+  "recommendation": "Common 10000 updates for all nine runs, same validation cadence and all three seeds; fixed before 4B. This bounds cost, not a convergence guarantee.",
+  "recommended_updates": 10000,
+  "ridge_estimation": "Feature cost scales by rows; three-fit subset cost scaled by train rows conservatively includes fixed 256x256 solve cost.",
+  "ridge_profile": {
+    "features_seconds": 0.19973179209046066,
+    "fit_count": 3,
+    "n": 1024,
+    "role": "train",
+    "scope": "bounded cost only; no validation selection, models discarded",
+    "three_fits_seconds": 0.00627683405764401
+  },
+  "scope": "4A measurement and prospective 4B cost; no final training/test results"
+}

@@ -1,0 +1,130 @@
+{
+  "ab_trace_and_class_weights_exact": true,
+  "all_derivative_file_hashes_verified": true,
+  "counts": {
+    "test": 10000,
+    "train": 64759,
+    "validation": 10000
+  },
+  "derivative_manifest": {
+    "bytes": 7376,
+    "sha256": "4c412f03920cd12afb167ed6652fa6cb01a0f82d0c0d349e47a21590f9534547"
+  },
+  "exclusions": 15241,
+  "full_architecture_paired_initialization_sha256": {
+    "101": "6ed322e53b9a4890b2f1b29f58d0f868905bac85f385bac446c8face6981c48f",
+    "17": "efc0e7309f053e610358cb1f8d28d84d1977da63f141dc3fbb9b0ba7dc7de7ff",
+    "42": "8e8fdb9c7b3b4bdf7c930289b72266ae1afec109bb96b4c2b9696324ffb33256"
+  },
+  "hardware": [
+    "Mac16,7",
+    "51539607552",
+    "14",
+    "14",
+    "Apple M4 Pro"
+  ],
+  "historical_assets": {
+    "copilot": {
+      "branch": "codex/lote-4a",
+      "head": "6d4d8ed8acaeeec0d7cba64b37421f6459ce5c6e",
+      "manifest": {
+        "bytes": 27198,
+        "sha256": "ea09f908e2549f45c27b83d5c0778794ffbfef53809d3dd2a14d05f664dc88b3"
+      },
+      "verified": 169
+    },
+    "fm": {
+      "branch": "codex/lote-4a",
+      "head": "52e8d0d29f135a07f6a16e0fc65ba9fc4f1dbc6f",
+      "manifest": {
+        "bytes": 13429,
+        "sha256": "b3212dba815d1365c8de61523cf35acdbd68be25e47d4a8496fa3904658fda58"
+      },
+      "verified": 74
+    }
+  },
+  "index": {
+    "bytes": 13443072,
+    "sha256": "36d1433bbf2457b1eeab8b1a27cb4c37228800b79a48403e247980c29eed57b0"
+  },
+  "metadata_only_test_integrity_check": true,
+  "profiles": {
+    "A": {
+      "evaluation_n": 128,
+      "evaluation_role": "train",
+      "manifest": {
+        "bytes": 29336,
+        "sha256": "cb9cf9052bb5112b81c8f139825c79ee0484649e7f7781ae677b9531e6a1b546"
+      },
+      "parameters": 25980646,
+      "updates": 32
+    },
+    "B": {
+      "evaluation_n": 128,
+      "evaluation_role": "train",
+      "manifest": {
+        "bytes": 29330,
+        "sha256": "537b2bee22197db19fa7ce3b1c4bdd9059ba44bf16a4baa3af2fcdc1f11ce124"
+      },
+      "parameters": 25980646,
+      "updates": 32
+    },
+    "CNN": {
+      "evaluation_n": 128,
+      "evaluation_role": "train",
+      "manifest": {
+        "bytes": 28921,
+        "sha256": "96646ead96d2664f0ac4f8f496195a1cf1f1e6295d4a53e1d8d959b704e0b9c1"
+      },
+      "parameters": 912548,
+      "updates": 32
+    }
+  },
+  "protected_development": {
+    "test": 0,
+    "train": 1528,
+    "validation": 472
+  },
+  "protected_n": 2000,
+  "raw_bytes_verified": 7639899016,
+  "raw_files_without_write_bits": true,
+  "real_ab_initial_tensors_exact": true,
+  "real_test_opening_absent": true,
+  "regenerated_splits_identical": true,
+  "source": {
+    "files": {
+      "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+      "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+      "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+      "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+      "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+      "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+      "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+      "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+      "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+      "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+      "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+      "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+      "src/desi_fm/experiment/final.py": "16e72b496ca342a557b8217020655a1ad696a9a7e57b42c0539089969ab145bc",
+      "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+      "src/desi_fm/experiment/models.py": "3a9f8fcd50b61504d86889cff43eb3cf59ed39ee9bc789a445e1d6e33da292f5",
+      "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+      "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+      "src/desi_fm/experiment/training.py": "93b0d7916a3dcc7314beb2eaa1c2f51d92cc4f8d4c857c84f82f2b6bf8ce6a08",
+      "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+      "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+      "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+      "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+      "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+      "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+      "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+    },
+    "head": "52e8d0d29f135a07f6a16e0fc65ba9fc4f1dbc6f",
+    "sha256": "42c1d16aaa774d6d478b393b9a99fe3f698ee39f6af0a1678e9d9c3e1f1201be"
+  },
+  "status": "passed",
+  "untracked_historical_csv": {
+    "bytes": 161796,
+    "sha256": "db2a7f4d26780d0787f9f9bea9118f7ccd992494b0a7cd382d9152ff92ce4eab"
+  }
+}

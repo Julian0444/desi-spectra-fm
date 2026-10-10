@@ -1,0 +1,16 @@
+{
+  "definition": "fewer than 30 objects in either evaluation split; distinct from impossible/zero allocation quotas",
+  "strata": {
+    "z4:zwarn0": {
+      "train": 12,
+      "validation": 2,
+      "test": 2
+    },
+    "z5:zwarn0": {
+      "train": 23,
+      "validation": 4,
+      "test": 4
+    }
+  },
+  "policy": "retain all, publish denominators; group separation and fixed seed unchanged; wide or degenerate intervals cannot establish precision in sparse strata"
+}
