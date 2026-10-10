@@ -156,6 +156,7 @@ def run(args):
                         mps_driver_allocated_bytes=torch.mps.driver_allocated_memory() if device.type=='mps' else None,
                         blocked_network_attempts=len(network_attempts),
                         artifacts={p.name:{'bytes':p.stat().st_size,'sha256':sha256(p)} for p in output.iterdir() if p.is_file() and p.name!='manifest.json'})
+        manifest['total_s']=time.perf_counter()-start
         json_write(output/'manifest.json',manifest)
         print(json.dumps({'output':str(output),'total_s':manifest['total_s'],'accounting':summary['accounting'],'redshift':summary['redshift'],'reconstruction':summary['reconstruction'],'timings_s':timings},indent=2))
     except BaseException as exc:

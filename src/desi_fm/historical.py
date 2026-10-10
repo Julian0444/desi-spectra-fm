@@ -79,6 +79,10 @@ def summarize(directory,make_figures=True):
     out1=abs((predictions['v1_scalar']-z)/(1+z))>.15;out2=abs((predictions['v21_map']-z)/(1+z))>.15
     summary['paired']={'common_ids':len(ids),'both_success':int((~out1 & ~out2).sum()),'both_outlier':int((out1 & out2).sum()),
                        'success_to_outlier':int((~out1 & out2).sum()),'outlier_to_success':int((out1 & ~out2).sum())}
+    transitions=[{'object_id':oid,'v1_outlier':int(out1[i]),'v21_outlier':int(out2[i]),
+                  'transition':('outlier' if out1[i] else 'success')+'_to_'+('outlier' if out2[i] else 'success')}
+                 for i,oid in enumerate(ids)]
+    write_csv(directory/'paired-transitions.csv',transitions,fields=['object_id','v1_outlier','v21_outlier','transition'])
     score=np.array([float(r['v21_confidence']) for r in rows]);order=np.lexsort((np.array(ids),-score))
     risk=[{'retained':i+1,'coverage':(i+1)/len(ids),'eta15':float(out2[order[:i+1]].mean()),'minimum_score':float(score[order[i]])} for i in range(len(ids))]
     write_csv(directory/'risk-coverage.csv',risk,fields=['retained','coverage','eta15','minimum_score'])
