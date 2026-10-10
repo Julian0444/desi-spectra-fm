@@ -97,7 +97,7 @@ del efecto de esa exposición sobre las métricas.
 
 El espectro crudo tiene problemas que hay que arreglar antes de que lo vea la red:
 
-1. **Píxeles rotos o con `NaN`.** Se define `good = ~mask & isfinite(flux) & isfinite(ivar) & (ivar > 0)`. Lo que no es `good` queda marcado como inválido y no cuenta ni para normalizar ni para el loss.
+1. **Píxeles rotos o con `NaN`.** Antes de sustituir valores no finitos, se define `good = ~mask & isfinite(flux) & isfinite(wavelength) & (wavelength > 0) & isfinite(ivar) & (ivar > 0)`. Lo que no es `good` queda marcado como inválido y no cuenta ni para normalizar ni para el loss.
 2. **La grilla de longitudes de onda no es la misma para todo instrumento.** Se interpola linealmente (`np.interp`) a una grilla común de **7081 puntos espaciados logarítmicamente entre 3600 y 9800 Å** (`SpectrumPreprocessConfig.target_wavelength`, un `np.geomspace`). La máscara de validez se interpola también y se binariza (`> 0.5`); fuera de la cobertura del instrumento queda en 0.
 3. **Distintos objetos brillan muy distinto.** Se normaliza de forma robusta: se resta la mediana de los píxeles válidos y se divide por `IQR / 1.349` (una estimación de la desviación estándar que ignora outliers). Después se aplica `arcsinh` (parecido a un logaritmo, pero funciona con valores negativos) y se recorta a ±8. Los píxeles inválidos se ponen en 0.
 
@@ -387,7 +387,7 @@ Utilitario de una sola función: baja el primer ejemplo del stream, imprime las 
 | **`z_confidence`** | 1 − entropía normalizada del posterior; 1 = concentrado, 0 = plano; no probabilidad calibrada |
 | **η₀.₁₅** | fracción de espectros con `\|Δz\| / (1+z) > 0.15` ("outliers catastróficos") |
 | **σ_NMAD** | dispersión robusta de `Δz / (1+z)`: `1.4826 · mediana(\|Δz_n − mediana(Δz_n)\|)`, con `Δz_n = Δz / (1+z)` (calculada en `notebooks/evaluation.ipynb`) |
-| **foundation model** | modelo que aprende un dominio en profundidad, reutilizable en varias tareas (acá: z, reconstrucción, embedding) |
+| **foundation model** | término histórico del proyecto; técnicamente es un transformer multitarea (z y reconstrucción, con embeddings). Falta evidencia de transferencia a otras tareas o poblaciones para sostener esa denominación |
 
 ---
 
@@ -429,3 +429,5 @@ Utilitario de una sola función: baja el primer ejemplo del stream, imprime las 
    → "~26 millones: 8 capas, `d_model` 512, 8 cabezas. Se entrenó en un MacBook con MPS; la arquitectura escala directamente en GPU dedicada."
 
 Evidencia y procedencia: [HISTORICAL_EVIDENCE.md](docs/HISTORICAL_EVIDENCE.md).
+
+Contrato vigente de arrays, huecos, cobertura y errores: [INPUT_CONTRACT.md](docs/INPUT_CONTRACT.md). Requiere ocho muestras utilizables y ocho píxeles cubiertos de la grilla del modelo; es un requisito numérico, no un umbral científico calibrado.

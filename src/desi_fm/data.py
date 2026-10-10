@@ -9,6 +9,8 @@ import numpy as np
 import torch
 from torch.utils.data import IterableDataset
 
+from .inputs import parse_arrays, SpectrumInputError, MIN_VALID_PIXELS, CONTRACT_VERSION, real_array, mask_array
+
 
 @dataclass(frozen=True)
 class SpectrumPreprocessConfig:
@@ -35,13 +37,13 @@ class SpectrumPreprocessConfig:
 
 
 def _as_float_array(x: Any) -> np.ndarray:
-    return np.asarray(x, dtype=np.float32)
+    return real_array(x, "MMU numeric array")
 
 
 def _as_bool_array(x: Any, length: int) -> np.ndarray:
     if x is None:
         return np.zeros(length, dtype=bool)
-    return np.asarray(x, dtype=bool)
+    return mask_array(x)
 
 
 def extract_redshift(example: dict[str, Any]) -> float:
@@ -110,32 +112,34 @@ def preprocess_spectrum(
     patches. Bad pixels are excluded from the robust normalization and from the
     reconstruction loss.
     """
-    flux = np.nan_to_num(flux.astype(np.float32), nan=0.0, posinf=0.0, neginf=0.0)
-    ivar = np.nan_to_num(ivar.astype(np.float32), nan=0.0, posinf=0.0, neginf=0.0)
-    wavelength = wavelength.astype(np.float32)
-    mask = mask.astype(bool)
-
-    order = np.argsort(wavelength)
-    wavelength = wavelength[order]
-    flux = flux[order]
-    ivar = ivar[order]
-    mask = mask[order]
-
-    good = (~mask) & np.isfinite(flux) & np.isfinite(ivar) & (ivar > 0)
+    flux, wavelength, ivar, mask = parse_arrays(flux, wavelength, ivar, mask).single()
+    # Construct validity before replacing nonfinite values. Keep invalid samples
+    # in the sorted grid so interpolation cannot bridge a masked region.
+    finite_w = np.isfinite(wavelength) & (wavelength > 0)
+    good = finite_w & np.isfinite(flux) & np.isfinite(ivar) & (ivar > 0) & ~mask
+    order = np.argsort(wavelength[finite_w], kind="stable")
+    wave = wavelength[finite_w][order]
+    values = flux[finite_w][order]
+    good = good[finite_w][order]
     target = config.target_wavelength
-
-    if good.sum() < 8:
-        flux_i = np.zeros(config.n_pixels, dtype=np.float32)
-        valid_i = np.zeros(config.n_pixels, dtype=np.float32)
-    else:
-        valid = good.astype(np.float32)
-        flux_i = np.interp(target, wavelength, np.where(good, flux, 0.0)).astype(
-            np.float32
-        )
-        valid_i = np.interp(target, wavelength, valid, left=0.0, right=0.0).astype(
-            np.float32
-        )
-        valid_i = (valid_i > 0.5).astype(np.float32)
+    right = np.searchsorted(wave, target, side="left")
+    exact = (right < wave.size) & (wave[np.minimum(right, wave.size - 1)] == target)
+    left = np.clip(right - 1, 0, wave.size - 1)
+    right = np.clip(right, 0, wave.size - 1)
+    support = (target >= wave[0]) & (target <= wave[-1]) & good[left] & good[right]
+    # Also preserve explicit missing-coordinate gaps relative to neighboring
+    # steps. This is a support rule, not a signal-to-noise criterion.
+    steps = np.diff(wave)
+    if steps.size > 1:
+        local = np.maximum(np.r_[steps[1], steps[:-1]], np.r_[steps[1:], steps[-2]])
+        gaps = steps > 1.5 * local
+        support &= ~gaps[np.minimum(left, gaps.size - 1)]
+    support[exact] = good[right[exact]]
+    flux_i = np.interp(target, wave, np.where(good, values, 0)).astype(np.float32)
+    valid_i = support.astype(np.float32)
+    flux_i[~support] = 0
+    if support.sum() < MIN_VALID_PIXELS:
+        raise SpectrumInputError(f"Fewer than {MIN_VALID_PIXELS} usable model-grid pixels; no usable coverage")
 
     valid_values = flux_i[valid_i > 0.5]
     if valid_values.size < 8:
@@ -158,6 +162,12 @@ def preprocess_spectrum(
         "valid": valid_i.astype(np.float32),
         "center": np.float32(center),
         "scale": np.float32(scale),
+        "coverage": {"contract": CONTRACT_VERSION, "n_input_pixels": int(flux.size),
+                     "n_valid_input_pixels": int(good.sum()),
+                     "n_model_pixels": int(target.size), "n_valid_model_pixels": int(support.sum()),
+                     "model_valid_fraction": float(support.mean()),
+                     "valid_wavelength_min_angstrom": float(target[support].min()),
+                     "valid_wavelength_max_angstrom": float(target[support].max())},
     }
 
 

@@ -26,46 +26,19 @@ import matplotlib.pyplot as plt
 import gradio as gr
 from huggingface_hub import hf_hub_download
 
-from desi_fm.predict import load_model_from_checkpoint, predict_spectrum
+from desi_fm.inputs import read_npz, SpectrumInputError
+from desi_fm.predict import load_model_from_checkpoint, predict_spectrum, predict_file_single
 
 MODEL_REPO = "jirustaroure/desi-spectra-fm"
 CODE_URL = "https://github.com/Julian0444/desi-spectra-fm"
 
-CKPT = hf_hub_download(MODEL_REPO, "checkpoint_last.pt")
+CKPT = os.environ.get("DESI_FM_CKPT") or hf_hub_download(MODEL_REPO, "checkpoint_last.pt")
 # On ZeroGPU hosts CUDA is emulated at startup, so the model can sit on
 # 'cuda' at module level (per the ZeroGPU docs); locally this resolves to CPU.
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL = load_model_from_checkpoint(CKPT, DEVICE)
 LAMBDA_MIN = MODEL.config.lambda_min
 LAMBDA_MAX = MODEL.config.lambda_max
-
-
-def _first_row(arr: np.ndarray, name: str) -> tuple[np.ndarray, bool]:
-    """Return a 1-D spectrum from a 1-D or (N, P) array."""
-    arr = np.asarray(arr)
-    if arr.ndim == 1:
-        return arr, False
-    if arr.ndim == 2:
-        if arr.shape[0] == 0:
-            raise gr.Error(f"'{name}' is empty (shape {arr.shape}).")
-        return arr[0], arr.shape[0] > 1
-    raise gr.Error(f"'{name}' must be 1-D or 2-D, got shape {arr.shape}.")
-
-
-def _load_npz(npz_file) -> dict:
-    path = npz_file if isinstance(npz_file, str) else getattr(npz_file, "name", None)
-    if not path:
-        raise gr.Error("Please select an example or upload a .npz file.")
-    try:
-        data = np.load(path, allow_pickle=False)
-    except Exception as exc:  # zip/format errors from arbitrary uploads
-        raise gr.Error(f"Could not read the file as a NumPy .npz archive: {exc}")
-    if "flux" not in data.files or "wavelength" not in data.files:
-        raise gr.Error(
-            f"The .npz must contain 'flux' and 'wavelength' arrays; "
-            f"found {sorted(data.files)}."
-        )
-    return data
 
 
 def _masked_spans(spectrum_mask: np.ndarray, model_wavelength: np.ndarray,
@@ -93,34 +66,15 @@ def _masked_spans(spectrum_mask: np.ndarray, model_wavelength: np.ndarray,
 @spaces.GPU(duration=8)
 def analyze(npz_file, mask_ratio: float):
     plt.close("all")
-    data = _load_npz(npz_file)
-
-    flux, multi = _first_row(data["flux"], "flux")
-    flux = flux.astype(np.float32)
-    wavelength, _ = _first_row(data["wavelength"], "wavelength")
-    wavelength = wavelength.astype(np.float32)
-    if flux.shape != wavelength.shape:
-        raise gr.Error(
-            f"flux {flux.shape} and wavelength {wavelength.shape} must have "
-            f"the same length."
-        )
-    if flux.size < 16:
-        raise gr.Error(f"Spectrum too short ({flux.size} pixels).")
-
-    ivar = mask = None
-    if "ivar" in data.files:
-        ivar = _first_row(data["ivar"], "ivar")[0].astype(np.float32)
-        if ivar.shape != flux.shape:
-            ivar = None
-    if "mask" in data.files:
-        mask = _first_row(data["mask"], "mask")[0].astype(bool)
-        if mask.shape != flux.shape:
-            mask = None
-
-    result = predict_spectrum(
-        flux=flux, wavelength=wavelength, ivar=ivar, mask=mask,
-        model=MODEL, mask_ratio=float(mask_ratio),
-    )
+    path = npz_file if isinstance(npz_file, str) else getattr(npz_file, "name", None)
+    if not path:
+        raise gr.Error("Please select a .npz file")
+    try:
+        flux, wavelength, ivar, mask = read_npz(path).single()
+        result = predict_file_single(path, model=MODEL, mask_ratio=mask_ratio)
+    except SpectrumInputError as exc:
+        raise gr.Error(str(exc)) from exc
+    data = np.load(path, allow_pickle=False)  # historical labels displayed only in this human demo
 
     # --- headline text: z_pred_map is the official prediction of v2.1 ---
     z_map = result.get("z_pred_map")
@@ -130,7 +84,7 @@ def analyze(npz_file, mask_ratio: float):
         lines.append(f"z_pred_map = {z_map:.4f}   (official prediction, posterior argmax)")
         lines.append(f"z_confidence = {conf:.2f}   (posterior concentration, 0-1; "
                      f"low values mean the model itself is unsure)")
-    lines.append(f"z_pred = {result['z_pred']:.4f}   (posterior expectation, secondary)")
+    lines.append(f"z_pred = {result['z_pred']:.4f}   (expm1(E[log(1+z)]), secondary)")
     if "z_true" in data.files:
         z_true = float(np.asarray(data["z_true"]).reshape(-1)[0])
         lines.append(f"z_true = {z_true:.4f}   (DESI pipeline ground truth)")
@@ -138,8 +92,7 @@ def analyze(npz_file, mask_ratio: float):
             dz = abs(z_map - z_true) / (1.0 + z_true)
             flag = "catastrophic outlier (>0.15)" if dz > 0.15 else "ok"
             lines.append(f"|Δz|/(1+z) = {dz:.4f} → {flag}")
-    if multi:
-        lines.append("note: the file contains several spectra; showing the first one.")
+    lines.append(f"usable model-grid coverage = {result['coverage']['model_valid_fraction']:.3f}")
 
     # --- plot: input + reconstruction, masked regions shaded ---
     in_range = (wavelength >= LAMBDA_MIN) & (wavelength <= LAMBDA_MAX)

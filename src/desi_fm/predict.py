@@ -40,7 +40,8 @@ CLI
         --input  spectra.npz \
         --output predictions.npz
 
-The input .npz must contain `flux` (N, P) and `wavelength` (N, P) or (P,).
+The input .npz follows docs/INPUT_CONTRACT.md: `flux` (N, P),
+`wavelength` (N, P) or shared (P,).
 Optional: `ivar` (N, P), `mask` (N, P) bool. A 1-D input is treated as a
 single spectrum.
 """
@@ -48,6 +49,8 @@ single spectrum.
 from __future__ import annotations
 
 import argparse
+import hashlib
+from contextlib import contextmanager
 import json
 import os
 import sys
@@ -60,6 +63,7 @@ import torch
 from .data import SpectrumPreprocessConfig, preprocess_spectrum
 from .model import DESIFoundationModel, DESIFoundationModelConfig
 from .train import pick_device
+from .inputs import parse_arrays, read_npz, bounded_real, SpectrumInputError
 
 
 # ---------------------------------------------------------------------------
@@ -75,14 +79,20 @@ def load_model_from_checkpoint(
     Tolerant of older checkpoints where the learned positional embedding was
     named `pos_embed` instead of `learned_pos_embed`.
     """
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
     config = DESIFoundationModelConfig(**checkpoint["config"])
     model = DESIFoundationModel(config).to(device)
-    state_dict = checkpoint["model"]
+    state_dict = dict(checkpoint["model"])
     if "pos_embed" in state_dict and "learned_pos_embed" not in state_dict:
         state_dict["learned_pos_embed"] = state_dict.pop("pos_embed")
-    model.load_state_dict(state_dict, strict=False)
+    model.load_state_dict(state_dict, strict=True)
     model.eval()
+    digest = hashlib.sha256()
+    with open(checkpoint_path, "rb") as f:
+        for block in iter(lambda: f.read(4 * 1024 * 1024), b""):
+            digest.update(block)
+    model.checkpoint_identity = {"sha256": digest.hexdigest(), "step": checkpoint.get("step"),
+                                 "migration": "pos_embed rename" if "pos_embed" in checkpoint["model"] else None}
     return model
 
 
@@ -139,25 +149,41 @@ def _prepare_inputs(
         wavelength_grid=config.wavelength_grid,
     )
 
-    flux = np.asarray(flux, dtype=np.float32).reshape(-1)
-    wavelength = np.asarray(wavelength, dtype=np.float32).reshape(-1)
-    if flux.shape != wavelength.shape:
-        raise ValueError(
-            f"flux ({flux.shape}) and wavelength ({wavelength.shape}) must have the same shape."
-        )
-    if ivar is None:
-        ivar_arr = np.ones_like(flux)
-    else:
-        ivar_arr = np.asarray(ivar, dtype=np.float32).reshape(-1)
-    if mask is None:
-        mask_arr = np.zeros_like(flux, dtype=bool)
-    else:
-        mask_arr = np.asarray(mask, dtype=bool).reshape(-1)
+    flux, wavelength, ivar_arr, mask_arr = parse_arrays(flux, wavelength, ivar, mask).single()
 
     processed = preprocess_spectrum(flux, ivar_arr, wavelength, mask_arr, preprocess)
     flux_t = torch.from_numpy(processed["flux"]).to(device_t).unsqueeze(0)
     valid_t = torch.from_numpy(processed["valid"]).to(device_t).unsqueeze(0)
     return flux_t, valid_t, processed, preprocess
+
+
+@contextmanager
+def inference_mode(model):
+    """Temporarily disable dropout; restore each module's prior training flag.
+
+    Do not concurrently train and serve the same mutable model instance.
+    """
+    modes = [(m, m.training) for m in model.modules()]
+    try:
+        model.eval()
+        with torch.inference_mode():
+            yield
+    finally:
+        for module, training in modes:
+            module.training = training
+
+
+def model_identity(model):
+    identity = {"config": model.config.to_dict(),
+                "checkpoint": getattr(model, "checkpoint_identity", None),
+                "source": "checkpoint" if hasattr(model, "checkpoint_identity") else "caller-supplied model"}
+    if model.config.n_z_bins:
+        centers = torch.expm1(model.z_bin_centers).detach().cpu()
+        identity["redshift"] = {"configured_range": [0, model.config.z_max],
+                               "bin_center_range": [float(centers[0]), float(centers[-1])],
+                               "z_pred": "expm1(E[log(1+z)])", "z_confidence": "1 - H(p)/log(n_bins)",
+                               "observed_max": None}
+    return identity
 
 
 # ---------------------------------------------------------------------------
@@ -176,6 +202,7 @@ def predict_spectrum(
     device: str = "auto",
     mask_ratio: float = 0.0,
     model: DESIFoundationModel | None = None,
+    wavelength_unit: str = "angstrom",
 ) -> dict[str, Any]:
     """Run inference on a single spectrum from any instrument.
 
@@ -192,6 +219,10 @@ def predict_spectrum(
             full spectrum; use >0 to evaluate masked-region reconstruction.
         model: optional preloaded model. If provided, `checkpoint_path` is
             ignored and the model's device is used.
+
+    Supplied models run temporarily in eval mode; each prior module training
+    flag is restored. Concurrent training on that same instance is unsupported.
+    Input units default to Angstrom for legacy arrays, or declare wavelength_unit.
 
     Returns:
         dict with keys:
@@ -211,6 +242,8 @@ def predict_spectrum(
             center: float, per-spectrum normalization center.
             scale: float, per-spectrum normalization scale.
     """
+    mask_ratio = bounded_real(mask_ratio, "mask_ratio", 0, 0.9)
+    flux, wavelength, ivar, mask = parse_arrays(flux, wavelength, ivar, mask, wavelength_unit=wavelength_unit).single()
     if model is None:
         if checkpoint_path is None:
             raise ValueError("Either `model` or `checkpoint_path` must be provided.")
@@ -218,7 +251,6 @@ def predict_spectrum(
     device_t = _device_of(model)
 
     config = model.config
-    wavelength = np.asarray(wavelength, dtype=np.float32).reshape(-1)
     flux_t, valid_t, processed, preprocess = _prepare_inputs(
         model, flux, wavelength, ivar, mask
     )
@@ -232,7 +264,11 @@ def predict_spectrum(
             torch.rand(1, config.n_tokens, device=device_t) < float(mask_ratio)
         )
 
-    out = model(flux_t, valid_t, z=None, spectrum_mask=spectrum_mask)
+    with inference_mode(model):
+        out = model(flux_t, valid_t, z=None, spectrum_mask=spectrum_mask)
+    for key in ("z_pred", "z_pred_map", "z_confidence", "patch_pred"):
+        if key in out and not torch.isfinite(out[key]).all():
+            raise RuntimeError(f"Model produced nonfinite {key}")
     z_pred = float(out["z_pred"].item())
     recon_normalized = (
         model.unpatchify(out["patch_pred"]).squeeze(0).cpu().numpy().astype(np.float32)
@@ -249,6 +285,9 @@ def predict_spectrum(
 
     result = {
         "z_pred": z_pred,
+        "coverage": processed["coverage"],
+        "model_identity": model_identity(model),
+        "valid_model_grid": processed["valid"].astype(bool),
         "reconstruction_input_grid": recon_input_grid,
         "reconstruction_model_grid": recon_native,
         "normalized_reconstruction": recon_normalized,
@@ -275,6 +314,7 @@ def embed_spectrum(
     mask: np.ndarray | None = None,
     device: str = "auto",
     model: DESIFoundationModel | None = None,
+    wavelength_unit: str = "angstrom",
 ) -> np.ndarray:
     """Embed a single spectrum with the encoder (no masking, deterministic).
 
@@ -291,8 +331,13 @@ def embed_spectrum(
             raise ValueError("Either `model` or `checkpoint_path` must be provided.")
         model = load_model_from_checkpoint(checkpoint_path, pick_device(device))
 
+    flux, wavelength, ivar, mask = parse_arrays(flux, wavelength, ivar, mask, wavelength_unit=wavelength_unit).single()
     flux_t, valid_t, _, _ = _prepare_inputs(model, flux, wavelength, ivar, mask)
-    return model.encode(flux_t, valid_t).squeeze(0).cpu().numpy().astype(np.float32)
+    with inference_mode(model):
+        emb = model.encode(flux_t, valid_t).squeeze(0).cpu().numpy().astype(np.float32)
+    if not np.isfinite(emb).all() or np.linalg.norm(emb) == 0:
+        raise RuntimeError("Model produced an unusable embedding")
+    return emb
 
 
 def predict_spectra_batch(
@@ -305,8 +350,9 @@ def predict_spectra_batch(
     device: str = "auto",
     mask_ratio: float = 0.0,
     model: DESIFoundationModel | None = None,
-) -> dict[str, np.ndarray]:
-    """Vectorized inference over many spectra.
+    wavelength_unit: str = "angstrom",
+) -> dict[str, Any]:
+    """Sequential inference over a validated batch.
 
     Args:
         fluxes: (N, P) array of flux values.
@@ -320,88 +366,28 @@ def predict_spectra_batch(
         dict of stacked arrays. See `predict_spectrum` for field semantics.
         `model_wavelength` is shared across the batch and returned as 1D.
     """
-    fluxes = np.asarray(fluxes, dtype=np.float32)
-    if fluxes.ndim == 1:
-        fluxes = fluxes[None, :]
-    n = fluxes.shape[0]
-
-    wavelengths = np.asarray(wavelengths, dtype=np.float32)
-    if wavelengths.ndim == 1:
-        wavelengths = np.broadcast_to(wavelengths, fluxes.shape).copy()
-    elif wavelengths.shape != fluxes.shape:
-        raise ValueError(
-            f"wavelengths shape {wavelengths.shape} must match fluxes shape {fluxes.shape}."
-        )
-
-    if ivars is not None:
-        ivars = np.asarray(ivars, dtype=np.float32)
-        if ivars.ndim == 1:
-            ivars = np.broadcast_to(ivars, fluxes.shape).copy()
-    if masks is not None:
-        masks = np.asarray(masks, dtype=bool)
-        if masks.ndim == 1:
-            masks = np.broadcast_to(masks, fluxes.shape).copy()
-
+    batch = parse_arrays(fluxes, wavelengths, ivars, masks, wavelength_unit=wavelength_unit)
+    mask_ratio = bounded_real(mask_ratio, "mask_ratio", 0, 0.9)
     if model is None:
         if checkpoint_path is None:
-            raise ValueError("Either `model` or `checkpoint_path` must be provided.")
-        device_t = pick_device(device)
-        model = load_model_from_checkpoint(checkpoint_path, device_t)
-
-    z_pred = np.zeros(n, dtype=np.float32)
-    recon_input = np.zeros(fluxes.shape, dtype=np.float32)
-    recon_model = np.zeros((n, model.config.n_pixels), dtype=np.float32)
-    recon_norm = np.zeros((n, model.config.n_pixels), dtype=np.float32)
-    norm_input = np.zeros((n, model.config.n_pixels), dtype=np.float32)
-    centers = np.zeros(n, dtype=np.float32)
-    scales = np.zeros(n, dtype=np.float32)
-    masks_used = np.zeros((n, model.config.n_tokens), dtype=bool)
-    has_map = model.config.n_z_bins > 0
-    z_pred_map = np.zeros(n, dtype=np.float32) if has_map else None
-    z_confidence = np.zeros(n, dtype=np.float32) if has_map else None
-
-    model_wavelength: np.ndarray | None = None
-
-    for i in range(n):
-        r = predict_spectrum(
-            fluxes[i],
-            wavelengths[i],
-            ivar=ivars[i] if ivars is not None else None,
-            mask=masks[i] if masks is not None else None,
-            mask_ratio=mask_ratio,
-            model=model,
-        )
-        z_pred[i] = r["z_pred"]
-        recon_input[i] = r["reconstruction_input_grid"]
-        recon_model[i] = r["reconstruction_model_grid"]
-        recon_norm[i] = r["normalized_reconstruction"]
-        norm_input[i] = r["normalized_input"]
-        centers[i] = r["center"]
-        scales[i] = r["scale"]
-        masks_used[i] = r["spectrum_mask"]
-        if has_map:
-            z_pred_map[i] = r["z_pred_map"]
-            z_confidence[i] = r["z_confidence"]
-        if model_wavelength is None:
-            model_wavelength = r["model_wavelength"]
-
-    assert model_wavelength is not None
-    result = {
-        "z_pred": z_pred,
-        "reconstruction_input_grid": recon_input,
-        "reconstruction_model_grid": recon_model,
-        "normalized_reconstruction": recon_norm,
-        "normalized_input": norm_input,
-        "model_wavelength": model_wavelength,
-        "spectrum_mask": masks_used,
-        "center": centers,
-        "scale": scales,
-        "mask_ratio_used": np.float32(mask_ratio),
-    }
-    if has_map:
-        result["z_pred_map"] = z_pred_map
-        result["z_confidence"] = z_confidence
+            raise ValueError("Either model or checkpoint_path must be provided")
+        model = load_model_from_checkpoint(checkpoint_path, pick_device(device))
+    # Validate coverage for the entire batch before any forward pass.
+    for f, w, v, m in zip(batch.flux, batch.wavelength, batch.ivar, batch.mask):
+        _prepare_inputs(model, f, w, v, m)
+    rows = [predict_spectrum(f, w, ivar=v, mask=m, model=model, mask_ratio=mask_ratio)
+            for f, w, v, m in zip(batch.flux, batch.wavelength, batch.ivar, batch.mask)]
+    shared = {"model_wavelength", "mask_ratio_used", "model_identity", "coverage"}
+    result = {k: np.stack([row[k] for row in rows]) for k in rows[0] if k not in shared}
+    result.update(model_wavelength=rows[0]["model_wavelength"], mask_ratio_used=float(mask_ratio),
+                  model_identity=rows[0]["model_identity"], coverage=[r["coverage"] for r in rows])
     return result
+
+
+def predict_file_single(source, *, model, mask_ratio=0):
+    batch = read_npz(source)
+    f, w, v, m = batch.single()
+    return predict_spectrum(f, w, ivar=v, mask=m, model=model, mask_ratio=mask_ratio)
 
 
 # ---------------------------------------------------------------------------
@@ -449,22 +435,8 @@ def _parse_args() -> argparse.Namespace:
 def main() -> None:
     args = _parse_args()
 
-    data = np.load(args.input, allow_pickle=False)
-    if "flux" not in data or "wavelength" not in data:
-        raise KeyError(
-            f"Input {args.input} must contain at least 'flux' and 'wavelength'."
-        )
-    fluxes = np.asarray(data["flux"], dtype=np.float32)
-    wavelengths = np.asarray(data["wavelength"], dtype=np.float32)
-    ivars = np.asarray(data["ivar"], dtype=np.float32) if "ivar" in data.files else None
-    masks = np.asarray(data["mask"], dtype=bool) if "mask" in data.files else None
-
-    if fluxes.ndim == 1:
-        fluxes = fluxes[None, :]
-        if ivars is not None and ivars.ndim == 1:
-            ivars = ivars[None, :]
-        if masks is not None and masks.ndim == 1:
-            masks = masks[None, :]
+    batch = read_npz(args.input)
+    fluxes, wavelengths, ivars, masks = batch.flux, batch.wavelength, batch.ivar, batch.mask
 
     results = predict_spectra_batch(
         fluxes=fluxes,
@@ -478,7 +450,10 @@ def main() -> None:
 
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(out_path, **results)
+    arrays = {k: v for k, v in results.items() if k not in {"coverage", "model_identity"}}
+    arrays["coverage_json"] = json.dumps(results["coverage"], allow_nan=False)
+    arrays["model_identity_json"] = json.dumps(results["model_identity"], allow_nan=False)
+    np.savez_compressed(out_path, **arrays)
 
     print(
         json.dumps(
@@ -497,7 +472,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SpectrumInputError as exc:
+        raise SystemExit(f"SpectrumInputError: {exc}") from None
     sys.stdout.flush()
     sys.stderr.flush()
     os._exit(0)

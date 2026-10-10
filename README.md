@@ -397,3 +397,5 @@ documentation: [DELIVERABLE.md](DELIVERABLE.md). Spanish-language documents:
 - AION-1 checkpoints (not used at inference time): <https://huggingface.co/polymathic-ai/aion-base>
 
 Code license: [MIT](LICENSE). DESI data retain [CC BY 4.0 attribution and release citations](ATTRIBUTIONS.md).
+
+Batch 2 input, validity, inference and evaluation semantics: [INPUT_CONTRACT.md](docs/INPUT_CONTRACT.md).

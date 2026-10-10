@@ -84,3 +84,5 @@ Code, tests and evaluation notebook:
 <https://github.com/Julian0444/desi-spectra-fm> ·
 Model checkpoint: <https://huggingface.co/jirustaroure/desi-spectra-fm> ·
 REST API: <https://jirustaroure-desi-fm-api.hf.space/api/docs>
+
+Batch 2 input, validity, inference and evaluation semantics: [INPUT_CONTRACT.md](../docs/INPUT_CONTRACT.md). Single-spectrum files are required; multirow files use batch Python, CLI or REST.

@@ -66,7 +66,7 @@ curl -s -X POST $BASE/predict_json -H "Content-Type: application/json" \
 - Other grids can be resampled; accuracy outside DESI is unvalidated. Spectra are interpolated onto the model's internal
   3600–9800 Å log-λ grid.
 - Limits: 32 spectra and 50 MB per request; at least 16 pixels per spectrum.
-  Oversize requests get HTTP 413, malformed input HTTP 422.
+  Oversize requests get HTTP 413. Only malformed/unusable scientific inputs become HTTP 422; checkpoint and internal inference failures remain server errors.
 
 ## Checkpoint loading (differs between Space and local)
 
@@ -127,3 +127,5 @@ Code, tests and evaluation notebook:
 Model checkpoint: <https://huggingface.co/jirustaroure/desi-spectra-fm> ·
 Interactive demo:
 <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo>
+
+Both the REST API and Gradio tester retain mask/ivar and follow [the shared input contract](../docs/INPUT_CONTRACT.md). `/healthz` identifies the loaded model with config and checkpoint SHA-256; prediction responses include this identity and coverage. JSON supports `wavelength_unit` (`angstrom` by default, or explicit `nm`).

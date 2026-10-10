@@ -10,7 +10,7 @@ Hugging Face Hub) behind two endpoints:
 
 The official prediction of the v2.1 checkpoint is **`z_pred_map`** (argmax of
 a 100-bin posterior over log(1+z)), reported together with `z_confidence`
-(posterior concentration, 0-1). `z_pred` (posterior expectation) is kept as a
+(posterior concentration, 0-1). `z_pred` (expm1 of the posterior mean of log(1+z)) is kept as a
 secondary output for backwards compatibility.
 
 The checkpoint is downloaded lazily on the first request and cached; set
@@ -37,7 +37,8 @@ from fastapi import FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from .predict import load_model_from_checkpoint, predict_spectra_batch, predict_spectrum
+from .predict import load_model_from_checkpoint, predict_spectra_batch, predict_spectrum, model_identity
+from .inputs import read_npz, SpectrumInputError
 
 MODEL_REPO = "jirustaroure/desi-spectra-fm"
 CHECKPOINT_FILE = "checkpoint_last.pt"
@@ -46,11 +47,11 @@ MAX_SPECTRA_PER_REQUEST = 32  # keep worst-case CPU latency of one request bound
 
 app = FastAPI(
     title="desi-fm API",
-    version="1.0",
+    version="0.2.0",
     description=(
-        "Redshift prediction + masked reconstruction for galaxy spectra "
+        "Redshift prediction for DESI spectra "
         "(DESI foundation model v2.1). Official prediction: `z_pred_map` "
-        "with its `z_confidence`; `z_pred` is the secondary posterior mean. "
+        "with its `z_confidence`; `z_pred` is expm1(E[log(1+z)]) from the same posterior. "
         "Model card: https://huggingface.co/jirustaroure/desi-spectra-fm — "
         "code: https://github.com/Julian0444/desi-spectra-fm"
     ),
@@ -83,12 +84,15 @@ def _z_payload(result: dict) -> dict:
         payload["z_pred_map"] = np.asarray(result["z_pred_map"]).tolist()
         payload["z_confidence"] = np.asarray(result["z_confidence"]).tolist()
     payload["z_pred"] = np.asarray(result["z_pred"]).tolist()
+    payload["coverage"] = result["coverage"]
+    payload["model_identity"] = result["model_identity"]
     return payload
 
 
 @app.get("/healthz")
 def healthz():
-    return {"status": "ok", "model_loaded": _model is not None}
+    return {"status": "ok", "model_loaded": _model is not None,
+            "model_identity": model_identity(_model) if _model is not None else None}
 
 
 @app.post("/predict")
@@ -109,35 +113,12 @@ async def predict_npz(
     if len(raw) > MAX_UPLOAD_BYTES:
         raise HTTPException(413, f"File too large (>{MAX_UPLOAD_BYTES // 2**20} MB).")
     try:
-        data = np.load(io.BytesIO(raw), allow_pickle=False)
-    except Exception as exc:
-        raise HTTPException(422, f"Could not read the file as a .npz archive: {exc}")
-    if "flux" not in data.files or "wavelength" not in data.files:
-        raise HTTPException(
-            422,
-            f"The .npz must contain 'flux' and 'wavelength'; found {sorted(data.files)}.",
-        )
-
-    fluxes = np.asarray(data["flux"], dtype=np.float32)
-    wavelengths = np.asarray(data["wavelength"], dtype=np.float32)
-    ivars = np.asarray(data["ivar"], dtype=np.float32) if "ivar" in data.files else None
-    masks = np.asarray(data["mask"], dtype=bool) if "mask" in data.files else None
-    if fluxes.ndim == 1:
-        fluxes = fluxes[None, :]
-        if ivars is not None and ivars.ndim == 1:
-            ivars = ivars[None, :]
-        if masks is not None and masks.ndim == 1:
-            masks = masks[None, :]
-    if fluxes.ndim != 2:
-        raise HTTPException(422, f"'flux' must be 1-D or 2-D, got shape {fluxes.shape}.")
+        batch = read_npz(io.BytesIO(raw))
+    except SpectrumInputError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    fluxes, wavelengths, ivars, masks = batch.flux, batch.wavelength, batch.ivar, batch.mask
     if fluxes.shape[0] > MAX_SPECTRA_PER_REQUEST:
-        raise HTTPException(
-            413,
-            f"Too many spectra ({fluxes.shape[0]}); the limit is "
-            f"{MAX_SPECTRA_PER_REQUEST} per request.",
-        )
-    if fluxes.shape[1] < 16:
-        raise HTTPException(422, f"Spectra too short ({fluxes.shape[1]} pixels).")
+        raise HTTPException(413, "Too many spectra; limit is 32")
 
     try:
         result = predict_spectra_batch(
@@ -148,7 +129,7 @@ async def predict_npz(
             model=get_model(),
             mask_ratio=mask_ratio,
         )
-    except ValueError as exc:
+    except SpectrumInputError as exc:
         raise HTTPException(422, str(exc))
 
     payload = {"n": int(fluxes.shape[0])}
@@ -157,29 +138,27 @@ async def predict_npz(
 
 
 class SpectrumJSON(BaseModel):
-    flux: List[float] = Field(description="Flux values, any units.")
-    wavelength: List[float] = Field(description="Wavelengths in Angstroms.")
-    ivar: Optional[List[float]] = Field(None, description="Optional inverse variance.")
-    mask: Optional[List[bool]] = Field(None, description="Optional bad-pixel mask.")
-    mask_ratio: float = Field(0.0, ge=0.0, le=0.9)
+    flux: list = Field(description="Flux values, any units.")
+    wavelength: list = Field(description="Wavelengths in Angstroms.")
+    ivar: Optional[list] = Field(None, description="Optional inverse variance.")
+    mask: Optional[list] = Field(None, description="Optional bad-pixel mask.")
+    mask_ratio: float = Field(0.0, ge=0.0, le=0.9, strict=True)
+    wavelength_unit: str = "angstrom"
 
 
 @app.post("/predict_json")
 def predict_json(s: SpectrumJSON):
     """Predict the redshift of a single spectrum passed as JSON lists."""
-    flux = np.asarray(s.flux, dtype=np.float32)
-    wavelength = np.asarray(s.wavelength, dtype=np.float32)
-    if flux.size < 16:
-        raise HTTPException(422, f"Spectrum too short ({flux.size} pixels).")
     try:
         result = predict_spectrum(
-            flux=flux,
-            wavelength=wavelength,
-            ivar=np.asarray(s.ivar, dtype=np.float32) if s.ivar is not None else None,
-            mask=np.asarray(s.mask, dtype=bool) if s.mask is not None else None,
+            flux=s.flux,
+            wavelength=s.wavelength,
+            ivar=s.ivar,
+            mask=s.mask,
             model=get_model(),
             mask_ratio=s.mask_ratio,
+            wavelength_unit=s.wavelength_unit,
         )
-    except ValueError as exc:
+    except SpectrumInputError as exc:
         raise HTTPException(422, str(exc))
     return _z_payload(result)
