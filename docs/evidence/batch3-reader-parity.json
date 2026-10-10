@@ -1,0 +1,29 @@
+{
+  "selection_sha256": "fb2372bcffc5e1098922abaa5f1ea047d116eaada942a7901bab9224a0ebeb04",
+  "reference": "HF Dataset.from_parquet, verified fixed-shard bytes; shared MMU extraction and spectra-input-v2",
+  "raw_and_preprocess_exact_ID_matches": [
+    "39627776344457758",
+    "39627776344457814",
+    "39627776344457953",
+    "39627776344457978",
+    "39627776344458334",
+    "39627776344458525",
+    "39627776348654455",
+    "39627776352850938",
+    "39627782375870907"
+  ],
+  "workers": [
+    {
+      "workers": 0,
+      "n": 2000,
+      "arrays_sha256": "553aec541567504851fc95378f3bdf60ea210207071793460e33ed71554dbca4"
+    },
+    {
+      "workers": 2,
+      "n": 2000,
+      "arrays_sha256": "553aec541567504851fc95378f3bdf60ea210207071793460e33ed71554dbca4"
+    }
+  ],
+  "membership_order_arrays_exact": true,
+  "remote_streaming_required_for_evaluation": false
+}
