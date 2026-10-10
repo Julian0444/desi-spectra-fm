@@ -313,7 +313,7 @@ class Trainer:
                         checkpoints.append(self.checkpoint(best=best))
                 checkpoints.append(self.checkpoint())
                 manifest = read_json(self.directory/'run.json')
-                manifest.update(status='complete' if self.step==target and (self.profile or target==self.config['updates']) else 'interrupted',
+                manifest.update(status='complete' if not requested[0] and self.step==target and (self.profile or target==self.config['updates']) else 'interrupted',
                                 step=self.step, best=self.best, sampler_position=self.sampler.position,
                                 fallbacks=self.fallbacks, trace=self.trace, timings=self.timings,
                                 checkpoint_events=manifest.get('checkpoint_events',[])+checkpoints,

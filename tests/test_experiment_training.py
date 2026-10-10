@@ -184,3 +184,38 @@ def test_fixed_pool_matches_adaptive_windows_and_gradients(length):
     left=torch.autograd.grad(actual,x,gradient,retain_graph=True)[0]
     right=torch.autograd.grad(reference,x,gradient)[0]
     torch.testing.assert_close(left,right,atol=1e-6,rtol=1e-6)
+
+
+def test_sigint_finishes_update_saves_and_resumes(experiment_root,small_config,tmp_path,monkeypatch):
+    import os
+    import signal
+    train=ExperimentData(experiment_root,'train')
+    trainer=Trainer(train,small_config,'A',17,tmp_path/'signal',profile=True)
+    update=trainer.update
+    def interrupted_update():
+        result=update()
+        os.kill(os.getpid(),signal.SIGINT)
+        return result
+    monkeypatch.setattr(trainer,'update',interrupted_update)
+    # Even an interrupt exactly at the requested last step must stop the shell series.
+    report=trainer.run(until=1)
+    assert report['status']=='interrupted' and report['step']==1
+    resumed=Trainer(train,small_config,'A',17,trainer.directory,profile=True,resume=True)
+    assert resumed.step==1 and resumed.sampler.position==4
+    assert resumed.run(until=4,install_signals=False)['status']=='complete'
+
+
+def test_accumulation_uses_effective_batch_loss_denominators(experiment_root,small_config,tmp_path):
+    import copy
+    train=ExperimentData(experiment_root,'train')
+    config=copy.deepcopy(small_config);config['model']['dropout']=0.
+    a=Trainer(train,config,'A',17,tmp_path/'accumulated',profile=True)
+    a.run(until=1,install_signals=False)
+    full=copy.deepcopy(config);full.update(micro_batch=4,accumulation=1)
+    b=Trainer(train,full,'A',17,tmp_path/'full',profile=True)
+    b.run(until=1,install_signals=False)
+    assert a.trace==b.trace
+    assert a.timings[0]['loss_z']==pytest.approx(b.timings[0]['loss_z'],abs=1e-6)
+    assert a.timings[0]['loss_recon']==pytest.approx(b.timings[0]['loss_recon'],abs=1e-6)
+    for key,value in a.model.state_dict().items():
+        torch.testing.assert_close(value,b.model.state_dict()[key],atol=3e-6,rtol=1e-5)
