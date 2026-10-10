@@ -1,0 +1,376 @@
+{
+  "captured_date": "2026-10-09",
+  "root": "repository root",
+  "files": [
+    {
+      "path": "runs/calibration/eval_v1_canonical.log",
+      "bytes": 3263,
+      "sha256": "027594d1b209ee4162e4ec93255268924ef73f2793877e4ac48e35c425db88a3"
+    },
+    {
+      "path": "runs/calibration/metrics_v1_heldout_canonical.json",
+      "bytes": 307,
+      "sha256": "a3d84adc6170879b85c40c905214a5cf8069c76852425a96d38ca53f838d6ef1"
+    },
+    {
+      "path": "runs/calibration/predictions_v1_heldout_canonical.csv",
+      "bytes": 161786,
+      "sha256": "3ef6ce81a89b0d9c97f2834f834db896f2f263fa5a0b1436ea41d08a1323d3ca"
+    },
+    {
+      "path": "runs/calibration/z_hist_80k_100bins.npz",
+      "bytes": 1779,
+      "sha256": "1de2a676f2a7e991149ba9b2062c8439a9826fd33e0157b211b0b99bd0d0b7c0"
+    },
+    {
+      "path": "runs/calibration/z_hist_build.log",
+      "bytes": 9298,
+      "sha256": "1c5b9012c08a10017dce5175d8a421e3a923ad59a68311886ca07d493587be0c"
+    },
+    {
+      "path": "runs/desi_150k_classhead/checkpoint_last.pt",
+      "bytes": 104169808,
+      "sha256": "6b4695309a8026502a12b540f3ccb41f82868eefbe0b2d1bebaa0b2b78c850a8"
+    },
+    {
+      "path": "runs/desi_150k_classhead/checkpoint_step_10000.pt",
+      "bytes": 104170534,
+      "sha256": "0660d7d291ad49064cdbd4f76d0d18e416299eadf6c54978a07d76a5aa9ba8a5"
+    },
+    {
+      "path": "runs/desi_150k_classhead/checkpoint_step_15000.pt",
+      "bytes": 104170534,
+      "sha256": "3512fefbb4f580d6e2cff32e53d1437fa225c01fd3bda22dbbae1368961e6eae"
+    },
+    {
+      "path": "runs/desi_150k_classhead/checkpoint_step_20000.pt",
+      "bytes": 104170534,
+      "sha256": "bfa652db34f2d2dfe6a6a8afbc80c25d2d534d786411080e043cdb356fc7bc09"
+    },
+    {
+      "path": "runs/desi_150k_classhead/checkpoint_step_5000.pt",
+      "bytes": 104170413,
+      "sha256": "d97c60fb079448ec080c2b74a412938c1de05d5f76a33358cc5b545be23fe295"
+    },
+    {
+      "path": "runs/desi_150k_classhead/config.json",
+      "bytes": 428,
+      "sha256": "44cee5bd4011940acb9704bd334c6af7aed4f01a166fc470f1a4e269da945770"
+    },
+    {
+      "path": "runs/desi_150k_classhead/metrics.jsonl",
+      "bytes": 90311,
+      "sha256": "7e6e7337100177952dc5ef6964724e8dab30ef304b301172d8bff8c325ddc487"
+    },
+    {
+      "path": "runs/desi_150k_classhead/predictions.csv",
+      "bytes": 235112,
+      "sha256": "aa9a446add59ec7568ffa295d3817e6c554a307608ebbd66744bfbd4c15db2a6"
+    },
+    {
+      "path": "runs/desi_150k_classhead/reconstructions.npz",
+      "bytes": 2601203,
+      "sha256": "0ccf96130bb914e6d50150f322e013e0ab28a470eb5ef99854870a7c05e664b6"
+    },
+    {
+      "path": "runs/desi_150k_classhead/train.log",
+      "bytes": 3517382,
+      "sha256": "c7310b536f3f6d9f339dacdf44e269b5398fcd447fcbb23f1673c8b095766627"
+    },
+    {
+      "path": "runs/desi_50k_big/checkpoint_last.pt",
+      "bytes": 103761424,
+      "sha256": "515b9a50d2e4ed6387acb06dff57595e881351bb7ebb34cdeeae9e9ce69f39b6"
+    },
+    {
+      "path": "runs/desi_50k_big/checkpoint_step_10000.pt",
+      "bytes": 103762150,
+      "sha256": "e5014c56003f91ff9722dc5c530d95c3aaa99d70b00eb4d482f3b09a8a27027f"
+    },
+    {
+      "path": "runs/desi_50k_big/checkpoint_step_12500.pt",
+      "bytes": 103762150,
+      "sha256": "1df96984d271c44a10c0b10cb534bd8ce7e9d3e569aaa3dc990a95229201983a"
+    },
+    {
+      "path": "runs/desi_50k_big/checkpoint_step_2500.pt",
+      "bytes": 103762029,
+      "sha256": "0746d343911ca6d9db325d62d5eae955fd1c790108a376b08984589914f15dbf"
+    },
+    {
+      "path": "runs/desi_50k_big/checkpoint_step_5000.pt",
+      "bytes": 103762029,
+      "sha256": "c09054b21e7bbfbc71376c41891c52282f7f3fa38761e2c7bd19915de3f0855a"
+    },
+    {
+      "path": "runs/desi_50k_big/checkpoint_step_7500.pt",
+      "bytes": 103762029,
+      "sha256": "c6512b3062ffbf58bbb76fe4c127aa792ceb63fd71f50fb1e303f8caca498491"
+    },
+    {
+      "path": "runs/desi_50k_big/config.json",
+      "bytes": 364,
+      "sha256": "132d273b888735952b271f04b8987ad0f2ae9522e5db635d86e774445037a067"
+    },
+    {
+      "path": "runs/desi_50k_big/metrics.jsonl",
+      "bytes": 57187,
+      "sha256": "844bc9a988fcb2c9290e1df44d87c83b8fd2d1989eea4090f6ac2f35d17840ba"
+    },
+    {
+      "path": "runs/desi_50k_big/predictions.csv",
+      "bytes": 79277,
+      "sha256": "4f82dd61dc36c6d987d2c2e0fc682f37a64100821ccfd48e6fcd6e20715201ad"
+    },
+    {
+      "path": "runs/desi_50k_big/predictions_heldout.csv",
+      "bytes": 161796,
+      "sha256": "db2a7f4d26780d0787f9f9bea9118f7ccd992494b0a7cd382d9152ff92ce4eab"
+    },
+    {
+      "path": "runs/desi_50k_big/reconstructions.npz",
+      "bytes": 2607087,
+      "sha256": "7be4444613561899948c91a13fac3789c41aa6c14e904bb0e3ce9fd95c3eaf31"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_last.pt",
+      "bytes": 44359815,
+      "sha256": "8295f532c7a8ec74f255f106eb7b5c3307ec0a5daad2468efb6e09fc0a601a85"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_step_1000.pt",
+      "bytes": 44360300,
+      "sha256": "8236d47b059a18ac938e26043a1027a807590ea2088d496af15ebc6e82b236e7"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_step_2000.pt",
+      "bytes": 44360300,
+      "sha256": "ada69b91f2556b7e640e7174315213b7c0afa6c92f7a981b339c87bfcdb2b4c1"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_step_3000.pt",
+      "bytes": 44360300,
+      "sha256": "1b366a0904dd049034524d92c0990dd0a3c976d097056b70a856efac48e47fbe"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_step_4000.pt",
+      "bytes": 44360300,
+      "sha256": "7679da4ce19f03f18864613092720eee4bc36bd64fb82cbce8b8e13b29793e35"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_step_5000.pt",
+      "bytes": 44360300,
+      "sha256": "9c2b0684b09751f8b6dbbbc208ac1ef23d0c739fe413369db7ccfea9283293a3"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/checkpoint_step_6000.pt",
+      "bytes": 44360300,
+      "sha256": "61ebc1268abc1626e36a6021be789972265adb015636ae6c81d59270670c43d4"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/config.json",
+      "bytes": 364,
+      "sha256": "f098e2d1810ddbb4e93b2eba9a79545497337c268b8ff5188824883842fc4d56"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/metrics.jsonl",
+      "bytes": 28870,
+      "sha256": "8ba1471e50e2028db05512fd3e9357fb1b724bc18adc1346c265da9632e884d3"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/predictions.csv",
+      "bytes": 79156,
+      "sha256": "af171aed855cc5407efd4d62172ee496bd7e37ddd5bfd2f03a48b0e8b055b41b"
+    },
+    {
+      "path": "runs/desi_50k_zw10_mask50/reconstructions.npz",
+      "bytes": 2605638,
+      "sha256": "2c34a2c6e67ff90e969c6602ada3133c688ff0885aeeae0b609fcabfc52cc971"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_best.pt",
+      "bytes": 103964688,
+      "sha256": "a924c0dfa6f10b5f90079567e5c3620dcc04ac24b872794f655f33f2e34ea835"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_last.pt",
+      "bytes": 103964688,
+      "sha256": "40247cbe0e706a66084d001b36424081554c26d3eb75c1f8b0ebec89cf5afe5a"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_step_10000.pt",
+      "bytes": 103965414,
+      "sha256": "749d3a7842d01be27d90c328cb10ce0da5dafdc62240d5a7f27d61a87c9f31e6"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_step_15000.pt",
+      "bytes": 103965414,
+      "sha256": "0a346badabdc769ca95198c6a74cab6456bb17ebdee7364998ecb8ecf885bc55"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_step_20000.pt",
+      "bytes": 103965414,
+      "sha256": "b8cc274db755d67b6c38c792bcb5007b9d7c7c1954a0d91ec844f77aeaec7bf4"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_step_25000.pt",
+      "bytes": 103965414,
+      "sha256": "325f04d09b198d42d8fe9b2bb9f0cf559c0cd01279fc43bc43a246cb3497e8b3"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_step_30000.pt",
+      "bytes": 103965414,
+      "sha256": "27dd717aa7d81b2aeb69df93debc3496a3c795c6c94cf4299db5aa08733bdbdd"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/checkpoint_step_5000.pt",
+      "bytes": 103965293,
+      "sha256": "35738495281f63b66e5e503ef51c221c5f4d179cd6e8c226db6586573cc56fe4"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/comparison.json",
+      "bytes": 1688,
+      "sha256": "63d4f5c12db7b312f18db8e675ecde73b3ee30e77652d7bf6481a32203800814"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/config.json",
+      "bytes": 459,
+      "sha256": "1344b4d616b660619b6f5c6e0f5c57e9eeae50a361bf5c4c7c4f804e76e2a358"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/eval_best.log",
+      "bytes": 9160,
+      "sha256": "bcf922e80498c2367740a96806dc553c779a9cbef7283c05bcb49afb2d047bc5"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/eval_last.log",
+      "bytes": 12233,
+      "sha256": "d2cc58a62e5320a539c00a03f064a7b8465bd01295d8f11990cefca10a52a22d"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/metrics.jsonl",
+      "bytes": 161172,
+      "sha256": "1fdd8940724f51e049152704e0b1c01ac966f53c921586b7b36f52d3541fe3ed"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/metrics_best.json",
+      "bytes": 463,
+      "sha256": "539a88717ca73e454f66a4c12d4eb415660e787494ad836330787ff6c63382d2"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/metrics_last.json",
+      "bytes": 464,
+      "sha256": "937a9a53214c854517c4fd456455df13673156487ed8c7e965579020a7a37ad7"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/predictions.csv",
+      "bytes": 237797,
+      "sha256": "e579b2966fa6507faf3b0e3e801b057e690a85bae5312b29dd4e32815c6ddeae"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/predictions_best.csv",
+      "bytes": 237827,
+      "sha256": "9559118db8baa707513ed468feeb95e8a1cb91c8661854da18eb0b76369d4771"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/predictions_last.csv",
+      "bytes": 237797,
+      "sha256": "e579b2966fa6507faf3b0e3e801b057e690a85bae5312b29dd4e32815c6ddeae"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/reconstructions.npz",
+      "bytes": 2582458,
+      "sha256": "11d3ef0f0563c11673c606e06d18a60dbab2f6d6e7df20c11ce1da38bdd9d823"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/reconstructions_best.npz",
+      "bytes": 2582458,
+      "sha256": "11d3ef0f0563c11673c606e06d18a60dbab2f6d6e7df20c11ce1da38bdd9d823"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/train.log",
+      "bytes": 5216984,
+      "sha256": "af93463dbf9211eaf4175bdfb9fb110d4dcec581dc56c1748ea1e7603c0fe6a4"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/train.pid",
+      "bytes": 5,
+      "sha256": "4fb19b84702f9d48bd3bfe3ad55acbedbf2fedb8373c24d082b0e08a7aa0c1ec"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21/training_args.json",
+      "bytes": 1259,
+      "sha256": "4f0b7bb737e8a7783444ddee393e39bdb0628ea8bb06ffb431037bbcc24102dd"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21_preflight/checkpoint_best.pt",
+      "bytes": 103964688,
+      "sha256": "15e399629ef1d0588ad546eccb74f9f62ff0108da7a0ce424afbebdd8e7b41c8"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21_preflight/checkpoint_last.pt",
+      "bytes": 103964688,
+      "sha256": "a63392bce4656846e03dcae07edb88e7f2611124701a177865ccfb175433ffa1"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21_preflight/config.json",
+      "bytes": 459,
+      "sha256": "1344b4d616b660619b6f5c6e0f5c57e9eeae50a361bf5c4c7c4f804e76e2a358"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21_preflight/metrics.jsonl",
+      "bytes": 5991,
+      "sha256": "9a369b1c356e3e5510856818f1662126bbed7fdb2356079f47b4650dbdaa6016"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21_preflight/train.log",
+      "bytes": 173413,
+      "sha256": "9d5b56451823d142e49d6cefaf8695f0533ad205165f544b5a75f9eda962e6ea"
+    },
+    {
+      "path": "runs/desi_80k_classhead_v21_preflight/training_args.json",
+      "bytes": 1269,
+      "sha256": "d2c374ab1a2c5ab4ecfab39cf725229793417c9c4eaa3d10dde583f0f8c410b3"
+    },
+    {
+      "path": "runs/smoke_classhead/checkpoint_last.pt",
+      "bytes": 489559,
+      "sha256": "f60b515238b32e1448a9ec597bc5779b7cb4910b5cdcb8ee88e2d284878bbebc"
+    },
+    {
+      "path": "runs/smoke_classhead/config.json",
+      "bytes": 424,
+      "sha256": "10563deb9b70d873e22bc66d2860566b106c3b78c7d227220e62f5f45105f3a3"
+    },
+    {
+      "path": "runs/smoke_classhead/metrics.jsonl",
+      "bytes": 2736,
+      "sha256": "9770287b1964e9e0a44341527553a9dcfd6254d2b031a1cb3d87fcf7df2b3719"
+    },
+    {
+      "path": "runs/smoke_classhead/predictions_eval.csv",
+      "bytes": 15058,
+      "sha256": "196b623e797b51cab55760b7f0cf37d20a9c4970a4cb7e463916db9a0eb168f4"
+    },
+    {
+      "path": "examples/heldout_lowconf_z157.npz",
+      "bytes": 102713,
+      "sha256": "55d656e63ce605a065b023401dbb5c9f931d82d40d3cf7bced403de04fcbae22"
+    },
+    {
+      "path": "examples/heldout_z020.npz",
+      "bytes": 102713,
+      "sha256": "087b753d23d4d9ffcd4867bafc29456650410f12150759c0fc8a24118bce0d1a"
+    },
+    {
+      "path": "examples/heldout_z083.npz",
+      "bytes": 102713,
+      "sha256": "bc3a3ff5b1d24d6cf8f0143756ef549695ce6821101eec8b7068a36f396e345e"
+    },
+    {
+      "path": "examples/heldout_z287.npz",
+      "bytes": 102713,
+      "sha256": "17e5fa523163fe90d559840be5c81d271f55a3672b01929499621d40077ac769"
+    }
+  ]
+}

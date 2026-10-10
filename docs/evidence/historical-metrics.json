@@ -1,0 +1,46 @@
+{
+  "scope": "recalculation of historical artifacts; no new inference or independent test",
+  "masked_2000": {
+    "v1_outliers": 452,
+    "v21_last_outliers": 299,
+    "v21_best_outliers": 303,
+    "retained_at_confidence_05": 1175,
+    "retained_outliers": 9,
+    "confidence_auroc": 0.9037866767335366
+  },
+  "full_spectrum_150": {
+    "model_correct": 139,
+    "agent_correct": 119,
+    "broken": 21,
+    "recovered": 1,
+    "hybrid_correct": 135,
+    "tokens_successful_reports": 3268099,
+    "stratum_counts": [
+      40,
+      35,
+      30,
+      25,
+      10,
+      10
+    ]
+  },
+  "estimates_not_measurements_of_2000": {
+    "direct_reweighting_error_rate": 0.06540666666666668,
+    "paired_difference_error_rate": 0.08191666666666667
+  },
+  "reconstruction_50_best_mask": {
+    "model_rmse": 0.8184889554977417,
+    "visible_only_301px_rmse": 0.8168789744377136,
+    "width_was_explored_on_same_examples": true
+  },
+  "weights": {
+    "step": 30000,
+    "epoch": 2,
+    "equal_tensors": 117,
+    "last_sha256": "40247cbe0e706a66084d001b36424081554c26d3eb75c1f8b0ebec89cf5afe5a"
+  },
+  "unchanged_artifacts": {
+    "FINAL PROJECT DEEP LEARNING": 74,
+    "spectra-copilot": 169
+  }
+}
