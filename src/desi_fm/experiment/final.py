@@ -7,12 +7,29 @@ import time
 import numpy as np
 import torch
 
-from .artifacts import atomic_write, digest, file_record, read_json, source_identity, verify_record, write_json
+from .artifacts import atomic_write, digest, environment, file_record, read_json, source_identity, verify_record, write_json
 from .data import ExperimentData, TEST_PHRASE
 from .metrics import load_predictions, paired_analysis, save_predictions, selection_key
 from .models import make_model
 from .ridge import feature_matrix, ridge_predict
 from .training import load_checkpoint, predict, run_lock
+
+
+def common_identity(identity):
+    """The execution conditions are part of the experiment, including on resume."""
+    keys = ('config', 'train_identity', 'validation_identity',
+            'class_weights_sha256', 'source_sha256', 'device', 'environment')
+    if any(key not in identity for key in keys) or identity['device'] not in ('cpu', 'mps'):
+        raise ValueError('Missing or unsupported experiment device/environment identity')
+    return {key: identity[key] for key in keys}
+
+
+def check_ridge_environment(ridge, neural_environment):
+    # Ridge uses NumPy on the host CPU even when the neural candidates use MPS.
+    # It has no neural device field. The recorded Python/platform/dependencies
+    # must still match: identical version strings are our conservative contract.
+    if ridge['identity'].get('environment') != neural_environment:
+        raise ValueError('Ridge environment differs from the neural experiment')
 
 
 def eta_intervals(arrays, *, replicates=2000, seed=20261009):
@@ -52,9 +69,9 @@ def freeze(runs_root, ridge_directory, data_root, output):
             report = read_json(directory/'run.json'); identity = report['identity']
             if report['status']!='complete' or identity['mode']!='training' or identity['variant']!=variant or identity['seed']!=seed or report['step']!=identity['config']['updates']:
                 raise ValueError('Missing complete planned run; profiles are not final candidates')
-            shared = {key:identity[key] for key in ('config','train_identity','class_weights_sha256','source_sha256')}
+            shared = common_identity(identity)
             if common is not None and common != shared:
-                raise ValueError('Runs do not share the same recipe/data/code')
+                raise ValueError('Runs do not share the same recipe/data/code/device/environment')
             common = shared
             if common['source_sha256'] != source_identity()['sha256']:
                 raise ValueError('Experiment source changed since training')
@@ -94,6 +111,9 @@ def freeze(runs_root, ridge_directory, data_root, output):
             raise ValueError('A/B did not consume identical IDs and masks')
     ridge_directory = Path(ridge_directory)
     ridge = read_json(ridge_directory/'ridge.json')
+    if common['environment'] != environment():
+        raise ValueError('Current environment differs from the neural experiment')
+    check_ridge_environment(ridge, common['environment'])
     if ridge['status']!='complete' or ridge['fits']!=3 or ridge['identity']['train']!=common['train_identity'] or ridge['identity']['validation']!=validation_identity:
         raise ValueError('Ridge has not completed its train/validation-only three-fit plan')
     if ridge['identity']['source']['sha256'] != common['source_sha256']:
@@ -135,11 +155,40 @@ def evaluate_final(frozen_path, output, authorization, *, resume=False, device='
         raise ValueError('Final evaluation requires all nine neural candidates')
     root, output = Path(frozen['data_root']), Path(output).resolve()
     verify_record(root/'manifest.json',frozen['data_manifest'])
+    common = None
+    current_environment = environment()
+    # Complete this preflight for ALL candidates, including already-persisted
+    # predictions on resume, before registering, creating output or opening test.
     for row in frozen['neural']:
+        run_identity = row['run_identity']
+        shared = common_identity(run_identity)
+        if common is not None and shared != common:
+            raise ValueError('Frozen candidates differ in recipe/data/code/device/environment')
+        common = shared
+        if (run_identity['mode'] != 'training' or run_identity['variant'] != row['variant']
+                or run_identity['seed'] != row['seed']
+                or shared['source_sha256'] != frozen['source']['sha256']):
+            raise ValueError('Incompatible frozen candidate identity')
+        if shared['device'] != device:
+            raise ValueError('Final inference device differs from frozen training/validation device')
+        if shared['environment'] != current_environment:
+            raise ValueError('Current environment differs from frozen training/validation environment')
         verify_record(row['checkpoint'],row['file'])
         verify_record(row['validation_predictions'],row['validation_file'])
+        state = torch.load(row['checkpoint'], map_location='cpu', weights_only=True)
+        if state['identity'] != run_identity:
+            raise ValueError('Frozen checkpoint identity mismatch')
+        del state
     verify_record(frozen['ridge']['path'],frozen['ridge']['file'])
     verify_record(frozen['ridge']['ridge_manifest'],frozen['ridge']['manifest_file'])
+    ridge = read_json(frozen['ridge']['ridge_manifest'])
+    check_ridge_environment(ridge, current_environment)
+    if (ridge['identity']['source']['sha256'] != common['source_sha256']
+            or ridge['identity']['train'] != common['train_identity']
+            or ridge['identity']['validation'] != common['validation_identity']):
+        raise ValueError('Ridge and frozen neural experiment identities differ')
+    if device == 'mps' and not torch.backends.mps.is_available():
+        raise ValueError('Frozen MPS device is unavailable')
     identity = {'freeze':file_record(frozen_path),'output':str(output),'device':device}
     # One durable opening registration shared by every destination for this data.
     with run_lock(root):
