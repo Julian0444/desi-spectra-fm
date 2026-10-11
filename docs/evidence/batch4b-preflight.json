@@ -1,0 +1,108 @@
+{
+  "config": {
+    "bytes": 1091,
+    "sha256": "87d977ce78c40c1640a76257eb8497d29789501795e3e354bc7d317afad6c3a0"
+  },
+  "counts": {
+    "test": 10000,
+    "train": 64759,
+    "validation": 10000
+  },
+  "csv": {
+    "bytes": 161796,
+    "sha256": "db2a7f4d26780d0787f9f9bea9118f7ccd992494b0a7cd382d9152ff92ce4eab"
+  },
+  "dependencies_unchanged": true,
+  "derivative_manifest": {
+    "bytes": 7376,
+    "sha256": "4c412f03920cd12afb167ed6652fa6cb01a0f82d0c0d349e47a21590f9534547"
+  },
+  "environment": {
+    "packages": {
+      "numpy": "2.5.1",
+      "pyarrow": "25.0.0",
+      "scipy": "1.18.0",
+      "torch": "2.13.0"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "environment_metadata_note": "With source PYTHONPATH, pip freeze reports desi-fm==0.2.0 instead of the old wheel URL. Installed dependency inventory is byte-identical to 4A; imported code is the committed original FM src.",
+  "evidence_logs": {
+    "fm-py312.log": {
+      "bytes": 1038,
+      "sha256": "19e9fbd36266daace22f4a3201966a6769111a8e320175dddea216bdc9f8f004"
+    },
+    "fm-py39.log": {
+      "bytes": 3739,
+      "sha256": "19a32dd1e9432d11083b89d773dbaa8d6d47aee4138bd55058459295481c493b"
+    },
+    "original-repro.log": {
+      "bytes": 2489,
+      "sha256": "b4380ac5e5343849883a2ce18ffc57605e9775e08766ad3aa085b4a4a6e37932"
+    },
+    "preflight.log": {
+      "bytes": 1180,
+      "sha256": "ccf315e6762588fdf301f5ff07665c47066c1749e6f05d3879b2a07a0cd2418b"
+    },
+    "r4a01-green.log": {
+      "bytes": 699,
+      "sha256": "fe2fdaa401b82b287b7913f9d7a62b792a4fe847e47f25e1d9bad9e2a624a8f7"
+    },
+    "r4a01-red.log": {
+      "bytes": 36321,
+      "sha256": "1ff8c0f5aef3bc2075967a0eba482320b7c6d28da94861c262712c5195efea40"
+    }
+  },
+  "free_disk_bytes": 63840161792,
+  "historical_verified": {
+    "copilot": 169,
+    "fm": 74
+  },
+  "mps": true,
+  "pip_check": "No broken requirements found.",
+  "python": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-2-20261009/wheel-env/bin/python",
+  "r4a01_commit": "e5888d1b760940e8978d7d80dccd69ad3a3d9cac",
+  "raw_files_verified": 7,
+  "required_free_bytes": 12000000000,
+  "source": {
+    "files": {
+      "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+      "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+      "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+      "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+      "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+      "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+      "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+      "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+      "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+      "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+      "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+      "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+      "src/desi_fm/experiment/final.py": "36e1b7e576ae9ae7978f24e61961201b399b07ebb4fab9537c88df39ab2d575f",
+      "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+      "src/desi_fm/experiment/models.py": "3a9f8fcd50b61504d86889cff43eb3cf59ed39ee9bc789a445e1d6e33da292f5",
+      "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+      "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+      "src/desi_fm/experiment/training.py": "9526e70ecc104d9d14b8706ac0418cef8b0d0ef76a5cec6327a572320a39a484",
+      "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+      "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+      "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+      "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+      "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+      "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+      "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+    },
+    "head": "e5888d1b760940e8978d7d80dccd69ad3a3d9cac",
+    "sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c"
+  },
+  "status": "passed",
+  "test_access": "hashes and ID membership only; no test labels or spectra loaded",
+  "test_opening_absent": true,
+  "tests": {
+    "python_3_12": "99 passed, 137 warnings in 32.21s",
+    "python_3_9": "99 passed, 152 warnings in 38.69s",
+    "red": "9 failed, 1 passed",
+    "targeted": "29 passed, 90 warnings in 14.84s"
+  }
+}
