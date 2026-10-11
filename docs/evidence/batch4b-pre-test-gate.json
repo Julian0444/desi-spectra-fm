@@ -1,0 +1,54 @@
+{
+  "all_partition_hashes_verified": true,
+  "analysis_plan": {
+    "bytes": 3502,
+    "sha256": "4adcc6b021203883868114aeaa2ccf4464aad4235bfeda9f09cafa5f4ebb6e10"
+  },
+  "authorization": "User goal explicitly authorizes OPEN_FROZEN_BATCH4_TEST_ONCE after verified freeze conditions",
+  "candidate": {
+    "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-17/state-006000-03d5bfe5ce3045148145b9b19a32a30d.pt",
+    "checkpoint_file": {
+      "bytes": 11874874,
+      "sha256": "335b396c3e2ee737a5e62d51851eedb596b42fb815f9a3f4861e42a2cdc9d6f8"
+    },
+    "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+    "key": [
+      0.0855,
+      0.04933841019924026,
+      6000
+    ],
+    "method": "CNN",
+    "seed": 17,
+    "trace": "0e64aea1ae9af0289815d665a7959b7e260b8ea14b6859dca32910e969803faa"
+  },
+  "data_manifest": {
+    "bytes": 7376,
+    "sha256": "4c412f03920cd12afb167ed6652fa6cb01a0f82d0c0d349e47a21590f9534547"
+  },
+  "environment": {
+    "packages": {
+      "numpy": "2.5.1",
+      "pyarrow": "25.0.0",
+      "scipy": "1.18.0",
+      "torch": "2.13.0"
+    },
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13"
+  },
+  "frozen": {
+    "bytes": 32286,
+    "sha256": "4344a4c67fbf31e81125e7cc0c8259e82b5c403c95f3137733c200b5d8bd901a"
+  },
+  "report_generator": {
+    "bytes": 15319,
+    "sha256": "1e8dcdb6505155542ce235705029f00074ba3916bee682906530c96085ac2e1e"
+  },
+  "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+  "status": "passed",
+  "test_opening_absent": true,
+  "validation_review": {
+    "bytes": 25472,
+    "sha256": "1dcd9204ec55700c2750282a6bcebb8be6292e158274a34ec8b5aa0611fa39a8"
+  },
+  "verified_utc": "2026-10-11T12:42:52.764993+00:00"
+}

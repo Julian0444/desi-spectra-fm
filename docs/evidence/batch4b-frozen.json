@@ -1,0 +1,897 @@
+{
+  "criterion": "all three eta_A-eta_B<0, paired mean interval95 upper<0, mean MAE_norm_A<=B",
+  "data_manifest": {
+    "bytes": 7376,
+    "sha256": "4c412f03920cd12afb167ed6652fa6cb01a0f82d0c0d349e47a21590f9534547"
+  },
+  "data_root": "/Users/jirustaroure/.local/share/spectra-data/batch4a-v1",
+  "neural": [
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/A-17/state-005500-2593e7397af14cc6b0859875a7feae65.pt",
+      "file": {
+        "bytes": 312765585,
+        "sha256": "8675b52e7a69b6412425b903775685267d44ef08d3320c6d27338fcc493c685f"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 17,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "A"
+      },
+      "seed": 17,
+      "step": 5500,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "0c1d297713ded9873341962b2a571d6b799435c573e7b11a955d726f9ef25f9a"
+      },
+      "validation_key": [
+        0.189,
+        0.1716610007620371,
+        5500
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/A-17/validation-005500.npz",
+      "variant": "A"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/A-42/state-010000-7d207d89fb5c48f3b853d5638259e989.pt",
+      "file": {
+        "bytes": 313463121,
+        "sha256": "0f83cd3017de40ff2b22f9f89e950b85fa074caf3e065493cda88864ae1b2251"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 42,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "A"
+      },
+      "seed": 42,
+      "step": 10000,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "b78f7da9869ed272692b6cb73d850b12b24be6d157cb7489bc00e3290a915f29"
+      },
+      "validation_key": [
+        0.1533,
+        0.10538913735967707,
+        10000
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/A-42/validation-010000.npz",
+      "variant": "A"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/A-101/state-008000-517f357a24da423fa1427c3b2353aa61.pt",
+      "file": {
+        "bytes": 313153041,
+        "sha256": "efdc5108268811869109116d9c6b504ee9ee913378776cc224982d42af2625c4"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 101,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "A"
+      },
+      "seed": 101,
+      "step": 8000,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "abbe33d0c072012ebd6ebdbad9865d8ad216f5a3fb7a7aa09ecfd8f3f04df739"
+      },
+      "validation_key": [
+        0.2096,
+        0.1994486656954962,
+        8000
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/A-101/validation-008000.npz",
+      "variant": "A"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/B-17/state-008500-a8abc6dddbfe4d56b52474990063dc12.pt",
+      "file": {
+        "bytes": 313230609,
+        "sha256": "e7edb44716b33adbe9190925a871809a4b46ce3231df0e2b51c702930d79a76a"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 17,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "B"
+      },
+      "seed": 17,
+      "step": 8500,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "526483a51693fca518541ae700a155aed035b460c63a34f35adeebae68546593"
+      },
+      "validation_key": [
+        0.1969,
+        0.12462297521234222,
+        8500
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/B-17/validation-008500.npz",
+      "variant": "B"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/B-42/state-009500-c9421446f81440d8bb8d640ef0615ba6.pt",
+      "file": {
+        "bytes": 313385617,
+        "sha256": "d959d3b8bf930daaca6e1724b4d17fb303c337e60b58eecde140da72b4538a94"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 42,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "B"
+      },
+      "seed": 42,
+      "step": 9500,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "52e600c74d0de3625d02db31c54420a5de5c27658e7425d6407eaef96600f030"
+      },
+      "validation_key": [
+        0.2321,
+        0.2605646977853231,
+        9500
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/B-42/validation-009500.npz",
+      "variant": "B"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/B-101/state-002500-3666bb6bad2d488cb92b9cbc365caae0.pt",
+      "file": {
+        "bytes": 312300561,
+        "sha256": "8984c89af90541f64e0d3ab707ae82a350ef55d24366f2766f0dc8655e1fe2a0"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 101,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "B"
+      },
+      "seed": 101,
+      "step": 2500,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "9c27b81fb6196bba21433c562a88a5c5c61dd17db8d60b02173c2d9d081748f4"
+      },
+      "validation_key": [
+        0.2332,
+        0.1674107459480932,
+        2500
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/B-101/validation-002500.npz",
+      "variant": "B"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-17/state-006000-03d5bfe5ce3045148145b9b19a32a30d.pt",
+      "file": {
+        "bytes": 11874874,
+        "sha256": "335b396c3e2ee737a5e62d51851eedb596b42fb815f9a3f4861e42a2cdc9d6f8"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 17,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "CNN"
+      },
+      "seed": 17,
+      "step": 6000,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "808c6008eec1143efa5808184b098519c3b52d7999d057e01906d3431fd37f87"
+      },
+      "validation_key": [
+        0.0855,
+        0.04933841019924026,
+        6000
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-17/validation-006000.npz",
+      "variant": "CNN"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-42/state-007000-2cd9753d95834f2786c8e501bb7007ba.pt",
+      "file": {
+        "bytes": 12024506,
+        "sha256": "e6cf4c37c346b9de9538cde80a3b3f7021270fb26a9bdf70180ef3dd8689710a"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 42,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "CNN"
+      },
+      "seed": 42,
+      "step": 7000,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "02e9ee88930eef51489df53b707f236ab5d9f0334938973e8476b96497fee348"
+      },
+      "validation_key": [
+        0.0854,
+        0.05063825937283622,
+        7000
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-42/validation-007000.npz",
+      "variant": "CNN"
+    },
+    {
+      "checkpoint": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-101/state-005500-e8ee318a2cdf45f39a70ecc339e84e9f.pt",
+      "file": {
+        "bytes": 11799930,
+        "sha256": "9c9ff165a80ea384e4e0c898ad920c011afa71f6192b65cbc4133306ac39c993"
+      },
+      "run_identity": {
+        "class_weights_sha256": "045355e8ca454db7a8c9cb7acbf6f04e6cddc39534e2ce80b8b74bb3b3734f11",
+        "config": {
+          "accumulation": 4,
+          "adam_epsilon": 1e-08,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "checkpoint_every": 500,
+          "class_weights": "inverse_sqrt_max_count_1_mean_one",
+          "clip_grad_norm": 1.0,
+          "cpu_threads": 4,
+          "learning_rate": 0.0003,
+          "micro_batch": 8,
+          "minimum_lr_fraction": 0.1,
+          "model": {
+            "d_model": 512,
+            "dropout": 0.1,
+            "lambda_max": 9800.0,
+            "lambda_min": 3600.0,
+            "mask_ratio": 0.5,
+            "mlp_ratio": 4.0,
+            "n_heads": 8,
+            "n_layers": 8,
+            "n_pixels": 7081,
+            "n_tokens": 273,
+            "n_z_bins": 100,
+            "normalize_redshift_ce": true,
+            "reconstruction_loss_weight": 1.0,
+            "redshift_loss_weight": 1.0,
+            "use_learned_position": true,
+            "use_wavelength_embedding": true,
+            "wavelength_grid": "log",
+            "z_label_smoothing": 0.0,
+            "z_max": 6.0
+          },
+          "normalization": "visible_only_median_iqr_std_eps_identity_if_lt8",
+          "num_workers": 0,
+          "precision": "float32",
+          "schema": "batch4-training-v1",
+          "seeds": [
+            17,
+            42,
+            101
+          ],
+          "updates": 10000,
+          "validation_every": 500,
+          "warmup_updates": 200,
+          "weight_decay": 0.01
+        },
+        "device": "mps",
+        "environment": {
+          "packages": {
+            "numpy": "2.5.1",
+            "pyarrow": "25.0.0",
+            "scipy": "1.18.0",
+            "torch": "2.13.0"
+          },
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "python": "3.12.13"
+        },
+        "mode": "training",
+        "schema": "batch4-run-v1",
+        "seed": 101,
+        "source_sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c",
+        "train_identity": "529bb2eb7c7f984aeb57ff1fbdcec74c84ee7acd2687e6d361b1e7b9212f4296",
+        "validation_identity": "a370bd1e4b01db71ad595567c62eca51d4f238e8af71f0d431a5a8fc1c76f202",
+        "variant": "CNN"
+      },
+      "seed": 101,
+      "step": 5500,
+      "validation_file": {
+        "bytes": 2211992,
+        "sha256": "7f1e381c514ebf1088dfe2714e24c93eee6ab660bb72706d48ea39ce4dce2861"
+      },
+      "validation_key": [
+        0.0868,
+        0.05198193526907664,
+        5500
+      ],
+      "validation_predictions": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/CNN-101/validation-005500.npz",
+      "variant": "CNN"
+    }
+  ],
+  "paired_bootstrap": {
+    "replicates": 5000,
+    "seed": 20261009,
+    "unit": "observed group, jointly over models and seeds"
+  },
+  "ridge": {
+    "alpha": 0.1,
+    "file": {
+      "bytes": 7396,
+      "sha256": "7ee1be6b254d203b50732dba55d04df5def2173a0f4cc00a3ddf1d0ef3c6f8f5"
+    },
+    "manifest_file": {
+      "bytes": 4901,
+      "sha256": "32fe5535572e29552a2d80242c881b4eaa57466c382e180d2bd88a2cacb9028d"
+    },
+    "path": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/ridge/ridge-0.1.npz",
+    "ridge_manifest": "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/ridge/ridge.json"
+  },
+  "schema": "batch4-final-v1",
+  "scope": "test remains closed until separate explicit evaluation command",
+  "sensitivity": {
+    "assumptions": "Validation discordance transports to test; independent observed units; normal approximation. Selected validation is optimistic. Unknown physical dependencies can widen intervals; this is not a power guarantee.",
+    "estimates": [
+      {
+        "approx_80pct_power_detectable_delta": 0.009932921949831648,
+        "approx_null_95_half_width": 0.006949022377284448,
+        "assumed_test_n": 10000,
+        "seed": 17,
+        "validation_discordance": 0.1257
+      },
+      {
+        "approx_80pct_power_detectable_delta": 0.011150310794136342,
+        "approx_null_95_half_width": 0.0078007015069159,
+        "assumed_test_n": 10000,
+        "seed": 42,
+        "validation_discordance": 0.1584
+      },
+      {
+        "approx_80pct_power_detectable_delta": 0.011414671777096378,
+        "approx_null_95_half_width": 0.007985647124685639,
+        "assumed_test_n": 10000,
+        "seed": 101,
+        "validation_discordance": 0.166
+      }
+    ]
+  },
+  "source": {
+    "files": {
+      "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+      "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+      "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+      "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+      "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+      "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+      "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+      "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+      "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+      "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+      "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+      "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+      "src/desi_fm/experiment/final.py": "36e1b7e576ae9ae7978f24e61961201b399b07ebb4fab9537c88df39ab2d575f",
+      "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+      "src/desi_fm/experiment/models.py": "3a9f8fcd50b61504d86889cff43eb3cf59ed39ee9bc789a445e1d6e33da292f5",
+      "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+      "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+      "src/desi_fm/experiment/training.py": "9526e70ecc104d9d14b8706ac0418cef8b0d0ef76a5cec6327a572320a39a484",
+      "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+      "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+      "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+      "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+      "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+      "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+      "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+    },
+    "head": "a3020a25e3f184800497e7c4891807f2c02958d4",
+    "sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c"
+  }
+}
