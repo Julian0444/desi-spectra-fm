@@ -1,0 +1,227 @@
+{
+  "continuation": {
+    "events": [
+      {
+        "ended_utc": "2026-10-11T12:42:45.315340+00:00",
+        "exit_code": 0,
+        "label": "ridge",
+        "log": {
+          "bytes": 777,
+          "sha256": "89437febb079d44fe68b5567adb36b442cc11796debd1e9baff47fcf4f036d8e"
+        },
+        "started_utc": "2026-10-11T12:42:28.688027+00:00",
+        "wall_seconds": 16.62720237497706
+      },
+      {
+        "ended_utc": "2026-10-11T12:42:48.053544+00:00",
+        "exit_code": 0,
+        "label": "validation-review",
+        "log": {
+          "bytes": 1538,
+          "sha256": "b4cd63cc1b395f4303a20756b16c9c4ba3dd97f0b30663d9a30619a4469002fc"
+        },
+        "started_utc": "2026-10-11T12:42:45.316346+00:00",
+        "wall_seconds": 2.737251791986637
+      },
+      {
+        "ended_utc": "2026-10-11T12:42:51.630413+00:00",
+        "exit_code": 0,
+        "label": "freeze",
+        "log": {
+          "bytes": 777,
+          "sha256": "00437d2f603c797f3a2007514dc847ec94742acef6c7a54de3da1b5c74e237af"
+        },
+        "started_utc": "2026-10-11T12:42:48.054643+00:00",
+        "wall_seconds": 3.5758048749994487
+      },
+      {
+        "ended_utc": "2026-10-11T12:47:14.045419+00:00",
+        "exit_code": 0,
+        "label": "final-test",
+        "log": {
+          "bytes": 1062,
+          "sha256": "473c61c87775ea4afa791b6901214153dce052c5e56427917ed369e592950c61"
+        },
+        "started_utc": "2026-10-11T12:42:52.883477+00:00",
+        "wall_seconds": 261.1618905409705
+      },
+      {
+        "ended_utc": "2026-10-11T12:47:15.381768+00:00",
+        "exit_code": 0,
+        "label": "paired-analysis",
+        "log": {
+          "bytes": 777,
+          "sha256": "98a477db81bb31e23ac90d70b45336425cf575f6dc5ccc838e19d8b651fed110"
+        },
+        "started_utc": "2026-10-11T12:47:14.047092+00:00",
+        "wall_seconds": 1.334712416981347
+      },
+      {
+        "ended_utc": "2026-10-11T12:47:20.954459+00:00",
+        "exit_code": 0,
+        "label": "report",
+        "log": {
+          "bytes": 1398,
+          "sha256": "900e59798fccb30397ae850054a421ce2f94a92a9976b1069b3b89a3f04d8c05"
+        },
+        "started_utc": "2026-10-11T12:47:15.382821+00:00",
+        "wall_seconds": 5.571691291988827
+      }
+    ],
+    "pid": 28338,
+    "script": {
+      "bytes": 6589,
+      "sha256": "86637830024b0dd15ca140e3880bddc0f0fe2fb5715c15852b9eb9f8b934926a"
+    },
+    "status": "artifacts_complete_documentation_pending",
+    "updated_utc": "2026-10-11T12:47:20.955264+00:00"
+  },
+  "criterion_met": true,
+  "final_candidates": 10,
+  "final_test_resumptions": 0,
+  "interrupted_real_runs": 0,
+  "neural_runs": 9,
+  "paired_ab_traces_and_class_weights_exact": true,
+  "preservation": {
+    "checked_utc": "2026-10-11T12:49:20.515182+00:00",
+    "final_prediction_files_verified": 10,
+    "hardware": [
+      "Mac16,7",
+      "51539607552",
+      "14",
+      "14",
+      "Apple M4 Pro"
+    ],
+    "historical": {
+      "copilot": {
+        "branch": "codex/lote-4b",
+        "head": "6d4d8ed8acaeeec0d7cba64b37421f6459ce5c6e",
+        "status": "",
+        "verified": 169
+      },
+      "fm": {
+        "branch": "codex/lote-4b",
+        "head": "049b748f39b58199fe2818575af7435ae2e114cd",
+        "status": "?? runs/desi_50k_big/predictions_heldout.csv",
+        "verified": 74
+      }
+    },
+    "historical_csv": {
+      "bytes": 161796,
+      "sha256": "db2a7f4d26780d0787f9f9bea9118f7ccd992494b0a7cd382d9152ff92ce4eab"
+    },
+    "test_opening": {
+      "bytes": 234,
+      "sha256": "12880cec226ee91690284d88219e93502398d779748bc0fa46e92d5954e79a4b"
+    },
+    "test_opening_matches_final_identity": true
+  },
+  "push_merge_publish_faiss_rebuild": false,
+  "regeneration": {
+    "byte_identical": {
+      "paired-effect.png": true,
+      "results-table.md": true,
+      "results.json": true,
+      "risk-coverage.png": true,
+      "test-eta15.png": true,
+      "validation-trajectories.png": true
+    },
+    "environment_unchanged": true,
+    "report_generator": {
+      "bytes": 15319,
+      "sha256": "1e8dcdb6505155542ce235705029f00074ba3916bee682906530c96085ac2e1e"
+    },
+    "scientific_source_unchanged": true
+  },
+  "ridge_fits": 3,
+  "same_test_ids_per_candidate": 10000,
+  "scientific_source": {
+    "files": {
+      "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+      "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+      "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+      "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+      "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+      "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+      "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+      "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+      "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+      "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+      "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+      "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+      "src/desi_fm/experiment/final.py": "36e1b7e576ae9ae7978f24e61961201b399b07ebb4fab9537c88df39ab2d575f",
+      "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+      "src/desi_fm/experiment/models.py": "3a9f8fcd50b61504d86889cff43eb3cf59ed39ee9bc789a445e1d6e33da292f5",
+      "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+      "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+      "src/desi_fm/experiment/training.py": "9526e70ecc104d9d14b8706ac0418cef8b0d0ef76a5cec6327a572320a39a484",
+      "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+      "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+      "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+      "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+      "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+      "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+      "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+    },
+    "head": "a3020a25e3f184800497e7c4891807f2c02958d4",
+    "sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c"
+  },
+  "series_execution": {
+    "command": [
+      "/usr/bin/caffeinate",
+      "-i",
+      "sh",
+      "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/scripts/run_batch4b.sh",
+      "/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01"
+    ],
+    "config": {
+      "bytes": 1091,
+      "sha256": "87d977ce78c40c1640a76257eb8497d29789501795e3e354bc7d317afad6c3a0"
+    },
+    "ended_utc": "2026-10-11T12:42:28.231546+00:00",
+    "exit_code": 0,
+    "pid": 25069,
+    "preflight": {
+      "bytes": 3965,
+      "sha256": "8dcbac02ee80cafd59ff7da0a6dd852dddc94ccf149b37b7ad526e7acf98eb4a"
+    },
+    "source": {
+      "files": {
+        "scripts/batch4.py": "6164f177ff9a1b170f7f27ed5e93a7789071dc2803396ee8c52aec7e0a7ad1c3",
+        "scripts/check_batch4_data.py": "a2fe62d4ce0ffb5171e664d999972e12f999e791e0d20ae5e5c57e62dd45e249",
+        "scripts/check_batch4_resume.py": "4e47384f1b5a4c76f3a74d444e0f15213555362f1e1479c29b7e989662941b04",
+        "scripts/prepare_batch4.py": "dc185c79d79c4abff2353ddbeb486d132b8a129f8b810626937c28892993f57e",
+        "src/desi_fm/__init__.py": "da64b2dd45657dda388c280af97305459078843266a3abe632d2b47366c57976",
+        "src/desi_fm/api.py": "fcd601c3dbcedde5d8c93de38542ce23c5e3ebc8fb4aee82e91d5e19ca393db0",
+        "src/desi_fm/assets.py": "82762af295c81b5bcbab9430a93dcea950d8d0096a6fe73e6c13c2e095ff0bd6",
+        "src/desi_fm/data.py": "8cd81bb83da17e0996ed5637cb07072efc1ff2df018ad1bd3a5632e4b6dfb6f7",
+        "src/desi_fm/evaluate.py": "3216e2c35ca30b0ad9f471d1da480f1a86e23318f5fa6a8e224aeae923fc65d2",
+        "src/desi_fm/experiment/__init__.py": "1368f944c9a12d42a6289544fbcc8ef8ebd3fd843e9f92fb3458dd126a1b936b",
+        "src/desi_fm/experiment/artifacts.py": "ad2efca5f3c72749de5078b84080d4db80d8777d34e1f7bd2449832a01a13fdb",
+        "src/desi_fm/experiment/data.py": "5400c7307aeec5382e6e4a2727ccd31dad10e30be6614ec7681dbe76df642211",
+        "src/desi_fm/experiment/final.py": "36e1b7e576ae9ae7978f24e61961201b399b07ebb4fab9537c88df39ab2d575f",
+        "src/desi_fm/experiment/metrics.py": "14e4c4da2f8d111cefb2c9cdc8e015d7fa563564bd532418f192d9192071a71d",
+        "src/desi_fm/experiment/models.py": "3a9f8fcd50b61504d86889cff43eb3cf59ed39ee9bc789a445e1d6e33da292f5",
+        "src/desi_fm/experiment/ridge.py": "3b900422356f6355dbbb5ba0bdb8975c460d2b55777014764e1d222af81c08ad",
+        "src/desi_fm/experiment/splits.py": "8f7aca221fbdc7c673c68be6185a40f45c794fd0da7c5ddeffd46871c00f3ec6",
+        "src/desi_fm/experiment/training.py": "9526e70ecc104d9d14b8706ac0418cef8b0d0ef76a5cec6327a572320a39a484",
+        "src/desi_fm/historical.py": "799f1267341f5238833f2977af25e3c725b9c58da77bedd277be749e0fb2c1fd",
+        "src/desi_fm/inputs.py": "c7a3ca7a9b2ba9a1a4a5398aa26ab529a163b7fd4c0a41d6318a17f5f9425a23",
+        "src/desi_fm/inspect_schema.py": "ed116a9c344c8d77acdc53d5b1d351f18496e4a418647406bd03a7bbecfc3c8c",
+        "src/desi_fm/local_data.py": "3b61452b1c3da0e71e4176494ee991e21129dd696ff3fe9f9be9590e9986d3dc",
+        "src/desi_fm/model.py": "75012f0114496e6343b67c7bf84bfd736d2b48ba31baae07aee4b2a1072bc019",
+        "src/desi_fm/predict.py": "5d73adec302d5a57584c83277c5e0d5f8c7a257b8e91016cd7d137161cd123e7",
+        "src/desi_fm/train.py": "712af03239f140e6a195af441b574665db6ea764841e17a7a6d88201e0035dc1"
+      },
+      "head": "e5888d1b760940e8978d7d80dccd69ad3a3d9cac",
+      "sha256": "828a7187545d30c9dbab55a9b49cc64925cfbdbeaa9160f3f52567c6f6f2152c"
+    },
+    "started_utc": "2026-10-11T02:44:32.117239+00:00",
+    "status": "complete",
+    "wall_seconds": 35875.94834879204
+  },
+  "served_model_changed": false,
+  "status": "passed",
+  "updates_per_run": 10000,
+  "validation_points_per_run": 20
+}

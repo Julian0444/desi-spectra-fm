@@ -1,9 +1,12 @@
-# Exact commands for the next session (4B)
+# Batch 4B execution commands and recovery reference
 
-These commands are prepared, **not executed in 4A**. Run from the original FM
-repository on `codex/lote-4a`. Source imports intentionally override the old
-batch-2 installed wheels. Python 3.12 is the recorded experiment environment.
-No installation or network access is needed. Do not reuse any profile weights.
+These commands were prepared in 4A and executed in 4B on `codex/lote-4b`.
+The fixed series and final test are complete; see [BATCH_4B.md](BATCH_4B.md)
+for results and the command to regenerate reports without training or inference.
+The commands below document execution and recovery, not a new authorized series.
+Source imports intentionally override the old batch-2 installed wheels.
+Python 3.12 is the recorded environment; no installation or network access is
+needed. No profile weights were reused.
 
 ## Start the fixed nine-run series
 

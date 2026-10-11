@@ -1,0 +1,123 @@
+{
+  "bootstrap_replicates": 5000,
+  "bootstrap_seed": 20261009,
+  "criterion_met": true,
+  "delta_eta_per_seed": [
+    -0.0121,
+    -0.07319999999999999,
+    -0.0305
+  ],
+  "interval_scope": "group/object sampling conditional on these three training seeds; physical independence of singleton IDs is unverified",
+  "mean_delta_eta": -0.038599999999999995,
+  "mean_delta_mae_norm": -0.026413283354376732,
+  "n_objects": 10000,
+  "n_observed_groups": 10000,
+  "paired_95_interval": [
+    -0.04310083333333333,
+    -0.03386666666666666
+  ],
+  "pairing": "one sampled group multiplicity shared by A/B and every seed; seeds are not extra objects",
+  "seeds": [
+    17,
+    42,
+    101
+  ],
+  "strata": {
+    "no_warning": {
+      "delta_eta_per_seed": [
+        -0.014468743096973713,
+        -0.08493483543185332,
+        -0.04351667771150872
+      ],
+      "n": 9054,
+      "paired_mean_interval95": [
+        -0.05224210293792799,
+        -0.043148516309550106
+      ]
+    },
+    "warning": {
+      "delta_eta_per_seed": [
+        0.010570824524312905,
+        0.039112050739957716,
+        0.09408033826638473
+      ],
+      "n": 946,
+      "paired_mean_interval95": [
+        0.02958949964763918,
+        0.06659619450317125
+      ]
+    },
+    "z[0,0.5)": {
+      "delta_eta_per_seed": [
+        0.043609671848013815,
+        -0.09822970639032816,
+        -0.03324697754749567
+      ],
+      "n": 4632,
+      "paired_mean_interval95": [
+        -0.03475820379965458,
+        -0.023747841105354058
+      ]
+    },
+    "z[0.5,1)": {
+      "delta_eta_per_seed": [
+        -0.018484958318231243,
+        -0.10003624501631025,
+        -0.017397607828923523
+      ],
+      "n": 2759,
+      "paired_mean_interval95": [
+        -0.054246707744351814,
+        -0.03636583303129153
+      ]
+    },
+    "z[1,1.5)": {
+      "delta_eta_per_seed": [
+        -0.10136157337367624,
+        -0.014120020171457387,
+        0.03227433182047404
+      ],
+      "n": 1983,
+      "paired_mean_interval95": [
+        -0.04017481929736089,
+        -0.015128593040847202
+      ]
+    },
+    "z[1.5,2)": {
+      "delta_eta_per_seed": [
+        -0.14699792960662528,
+        0.09523809523809523,
+        -0.17598343685300208
+      ],
+      "n": 483,
+      "paired_mean_interval95": [
+        -0.10628019323671496,
+        -0.045548654244306416
+      ]
+    },
+    "z[2,2.5)": {
+      "delta_eta_per_seed": [
+        0.0,
+        -0.1547619047619048,
+        -0.6190476190476191
+      ],
+      "n": 84,
+      "paired_mean_interval95": [
+        -0.3055555555555555,
+        -0.2103174603174603
+      ]
+    },
+    "z[2.5,inf)": {
+      "delta_eta_per_seed": [
+        0.0,
+        -0.1016949152542373,
+        -0.5084745762711864
+      ],
+      "n": 59,
+      "paired_mean_interval95": [
+        -0.2655367231638418,
+        -0.14124293785310735
+      ]
+    }
+  }
+}
