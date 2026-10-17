@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from desi_fm.assets import sha256
 from desi_fm.data import extract_mmu_desi_example, preprocess_spectrum, SpectrumPreprocessConfig
 from desi_fm.local_data import LocalDESIStore, LocalDESISpectra, object_id
+from desi_fm.inputs import CONTRACT_VERSION
 
 
 def check(root,index,selection,output):
@@ -41,7 +42,7 @@ def check(root,index,selection,output):
         assert got==ids and len(got)==len(set(got))==2000
         signatures.append({'workers':workers,'n':len(got),'arrays_sha256':digest.hexdigest()})
     assert signatures[0]['arrays_sha256']==signatures[1]['arrays_sha256']
-    report={'selection_sha256':sha256(selection),'reference':'HF Dataset.from_parquet, verified fixed-shard bytes; shared MMU extraction and spectra-input-v2',
+    report={'selection_sha256':sha256(selection),'reference':f'HF Dataset.from_parquet, verified fixed-shard bytes; shared MMU extraction and {CONTRACT_VERSION}',
             'raw_and_preprocess_exact_ID_matches':reference_ids,'workers':signatures,'membership_order_arrays_exact':True,'remote_streaming_required_for_evaluation':False}
     output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 

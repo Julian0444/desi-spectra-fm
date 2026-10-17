@@ -229,6 +229,7 @@ class Trainer:
         recon_denominator = max(1,batch['hidden_valid'])
         self.optimizer.zero_grad(set_to_none=True)
         seconds_forward, seconds_backward, loss_z, loss_rec = 0.,0.,0.,0.
+        reconstruction_coefficient = 1. if self.variant == 'A' else 0.
         for first in range(0,len(indices),config['micro_batch']):
             last = first+config['micro_batch']
             synchronize(self.device); start = time.perf_counter()
@@ -238,7 +239,7 @@ class Trainer:
             lz = classification_sum(out['z_logits'],z[first:last],self.model)/denominator
             lr = out.get('reconstruction_sse', torch.zeros((),device=self.device))/recon_denominator
             # Multiply by 0 for B, retaining the identical graph/auxiliary head.
-            loss = lz + (1. if self.variant == 'A' else 0.)*lr
+            loss = lz + reconstruction_coefficient*lr
             synchronize(self.device); seconds_forward += time.perf_counter()-start
             start = time.perf_counter(); loss.backward(); synchronize(self.device)
             seconds_backward += time.perf_counter()-start
@@ -251,6 +252,8 @@ class Trainer:
         record = {'step': self.step, 'read_preprocess_seconds': read_seconds,
                   'forward_seconds': seconds_forward, 'backward_seconds': seconds_backward,
                   'optimizer_seconds': update_seconds, 'loss_z': loss_z, 'loss_recon': loss_rec,
+                  'reconstruction_coefficient': reconstruction_coefficient,
+                  'loss_total': loss_z + reconstruction_coefficient*loss_rec,
                   'gradient_norm': float(norm), 'normalization_fallbacks': batch['fallbacks'],
                   **memory(self.device)}
         self.timings.append(record)

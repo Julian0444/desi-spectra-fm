@@ -118,7 +118,9 @@ def resample_spectrum(flux, ivar, wavelength, mask, config):
     # steps. This is a support rule, not a signal-to-noise criterion.
     steps = np.diff(wave)
     if steps.size > 1:
-        local = np.maximum(np.r_[steps[1], steps[:-1]], np.r_[steps[1:], steps[-2]])
+        # Use the smaller neighboring step: two gaps separated by a single
+        # observed sample must not legitimize each other's long interval.
+        local = np.minimum(np.r_[steps[1], steps[:-1]], np.r_[steps[1:], steps[-2]])
         gaps = steps > 1.5 * local
         support &= ~gaps[np.minimum(left, gaps.size - 1)]
     support[exact] = good[right[exact]]

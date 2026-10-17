@@ -1,4 +1,4 @@
-# Spectrum input and inference contract v2 (batch 2)
+# Spectrum input and inference contract v3 (batch 5A)
 
 All preprocess, Python, CLI, REST, Gradio handlers and Copilot tools use
 `desi_fm.inputs` and `preprocess_spectrum`. This changes validity/support,
@@ -33,8 +33,11 @@ permutations preserve preprocessing and predictions.
 Interpolate only between adjacent usable samples in that sorted input grid.
 Exact usable samples remain usable. Intervals touching invalid samples and
 outside support stay invalid; invalid values do not dilute neighboring signal.
-A missing-coordinate interval larger than 1.5 times its larger neighboring step
-also remains invalid. This support rule is local, not an instrument/unit guess.
+A missing-coordinate interval larger than 1.5 times its smaller neighboring step
+also remains invalid. This conservative local rule catches two gaps separated by one sample. It can
+reject abruptly changing native sampling; uniformly sparse input alone cannot
+reveal missing observations. This is not a physical coverage guarantee or an
+instrument/unit guess.
 Invalid model-grid flux is zero *with validity zero*, before robust median/IQR
 and arcsinh normalization; the reconstruction loss excludes these pixels.
 
@@ -105,3 +108,25 @@ compatible with any encoder**. Local overrides remain explicit caller choices.
 Batch 3 requires local weights with expected hashes, without remote fallback.
 Old batch-2 wheels/manifests describe old bytes and must not be reused for this
 source revision. No new wheel was built for this follow-up.
+
+## Version boundary and historical reproduction (5A)
+
+`spectra-input-v3` changes missing-coordinate gap support, including coordinates
+discarded as nonfinite. It does not change mask/ivar semantics or weights.
+The earlier `spectra-input-v2` results and `batch4-grid-v1` derivatives remain
+immutable. Future materialization labels `batch4-grid-v2:unnormalized-spectra-input-v3`
+and requires an index whose eligibility used v3. Current ExperimentData rejects
+v1 derivatives before loading arrays. Raw ID lookup may still read a verified
+v2 index: that does not certify eligibility for a new v3 experiment. No index
+or derivative was rebuilt in 5A. No new scientific accuracy measurement exists
+for v3, including with the unchanged default v2.1 weights.
+
+Use the pinned historical source and environment described in [BATCH_5.md](BATCH_5.md)
+for old runs, with original source-hash guards intact. Never rewrite run.json,
+checkpoint identities or frozen manifests to accept current source.
+
+Behavioral tests now use a genuinely absent-coordinate `gap` fixture, separate
+from `masked`; double gaps, nonfinite coordinates, reversed/permuted inputs and
+insufficient coverage are tested. The real demo/API/tools handlers are observed
+at the model's validity input for mask-only and ivar-only cases. The Gradio mock
+certifies handler propagation only; installed UI/hosting acceptance remains 5C.

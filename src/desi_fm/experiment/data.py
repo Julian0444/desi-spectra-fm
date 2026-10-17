@@ -8,7 +8,7 @@ import numpy as np
 from ..data import SpectrumPreprocessConfig, normalize_grid
 from .artifacts import read_json, verify_record, digest
 
-GRID_CONTRACT = "batch4-grid-v1:unnormalized-spectra-input-v2"
+GRID_CONTRACT = "batch4-grid-v2:unnormalized-spectra-input-v3"
 TEST_PHRASE = "OPEN_FROZEN_BATCH4_TEST_ONCE"
 
 

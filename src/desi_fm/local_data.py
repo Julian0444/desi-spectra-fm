@@ -11,7 +11,7 @@ from torch.utils.data import Dataset
 
 from .assets import sha256, verify_file
 from .data import SpectrumPreprocessConfig, extract_mmu_desi_example, preprocess_spectrum
-from .inputs import SpectrumInputError
+from .inputs import SpectrumInputError, CONTRACT_VERSION
 
 
 def object_id(value):
@@ -107,7 +107,7 @@ def build_index(root, output, config=None):
         db.close()
         report = {"status":"complete", "snapshot_sha256":sha256(root/"snapshot.json"), "index_sha256":sha256(output),
                   "counts":dict(counts), "input_rejection_causes":dict(causes), "preprocess":asdict(config),
-                  "contract":"spectra-input-v2", "id_storage":"TEXT; integer/string conversion without floating point",
+                  "contract":CONTRACT_VERSION, "id_storage":"TEXT; integer/string conversion without floating point",
                   "duplicate_ids":0, "label_rejections":label_rejections, "input_exclusions":input_exclusions,
                   "relationship_fields":sorted(set(groups)),
                   "relationships":"No explicit relationship identifier available" if not groups else "Relationship fields require grouping before future splits"}
@@ -128,6 +128,7 @@ class LocalDESIStore:
             raise ValueError("Index does not belong to this complete snapshot")
         if report["index_sha256"] != sha256(self.index):
             raise ValueError("Index identity mismatch")
+        self.index_contract = report.get("contract")
         self._cache_key, self._cache = None, None
 
     def rows_for_ids(self, ids):

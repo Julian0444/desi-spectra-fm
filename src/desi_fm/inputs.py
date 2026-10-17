@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import zipfile
 import numpy as np
 
-CONTRACT_VERSION = "spectra-input-v2"
+CONTRACT_VERSION = "spectra-input-v3"
 MIN_VALID_PIXELS = 8  # numerical requirement, not a calibrated quality cut
 
 class SpectrumInputError(ValueError):

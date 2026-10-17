@@ -17,7 +17,7 @@ import torch
 from desi_fm.assets import sha256, verify_file
 from desi_fm.data import SpectrumPreprocessConfig, extract_mmu_desi_example, preprocess_spectrum
 from desi_fm.historical import fixed_masks, visible_baselines, masked_rmse, write_csv, summarize
-from desi_fm.inputs import SpectrumInputError
+from desi_fm.inputs import SpectrumInputError, CONTRACT_VERSION
 from desi_fm.local_data import LocalDESIStore
 from desi_fm.predict import load_model_from_checkpoint, model_identity
 
@@ -52,7 +52,7 @@ def run(args):
               'source_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
               'code_sha256':{str(p.relative_to(ROOT)):sha256(p) for p in tracked},'command':sys.argv,
               'selection_sha256':sha256(args.ids),'requested_ids':requested,'full_historical_selection_n':selection['requested'],
-              'input_contract':'spectra-input-v2','mask_seed':20261009,'reconstruction_normalization':'visible-only; fixed before evaluation',
+              'input_contract':CONTRACT_VERSION,'mask_seed':20261009,'reconstruction_normalization':'visible-only; fixed before evaluation',
               'tolerances':{'arrays_masks_ids':'exact','prediction_atol':1e-6,'prediction_rtol':1e-6,'metric_atol':1e-8},
               'device':args.device,'batch_size':args.batch_size,'num_workers':0,'torch_cpu_threads':4,'offline_socket_block':args.offline,
               'environment':{name:importlib.metadata.version(name) for name in ('numpy','torch','pyarrow','datasets','matplotlib','huggingface_hub')},

@@ -18,6 +18,7 @@ from desi_fm.local_data import LocalDESIStore, spectrum_rows
 from desi_fm.experiment.artifacts import write_json, read_json, file_record, source_identity, environment
 from desi_fm.experiment.data import GRID_CONTRACT
 from desi_fm.experiment.splits import make_splits
+from desi_fm.inputs import CONTRACT_VERSION
 
 
 def prepare(args):
@@ -26,6 +27,8 @@ def prepare(args):
     if output.exists():
         raise ValueError('Use a new derivative destination')
     store = LocalDESIStore(root, index)  # full raw + index verification before use
+    if store.index_contract != CONTRACT_VERSION:
+        raise ValueError('Index eligibility uses a different input contract; use registered 4B code for historical derivatives')
     historical = read_json(args.historical)
     if historical['index_sha256'] != sha256(index) or historical['snapshot_sha256'] != sha256(root/'snapshot.json'):
         raise ValueError('Historical IDs belong to different data')
@@ -47,7 +50,8 @@ def prepare(args):
                  'label_cause': None if r['label_eligible'] else ('nonfinite' if r['z'] is None else 'negative')}
                 for r in all_rows if not (r['label_eligible'] and r['input_eligible'])]
     # Read metadata only. Equality of photometry is inspected, not promoted to a
-    # physical relationship identifier. This snapshot provides no such identifier.
+    # repeated-source identifier. TARGETID encodes spatial bricks; that locality
+    # is not a repeated observation and does not establish physical independence.
     schemas, seen, duplicate_vectors, degenerate = [], {}, [], 0
     for file in store.manifest['files']:
         pf = pq.ParquetFile(root/file['path'])
