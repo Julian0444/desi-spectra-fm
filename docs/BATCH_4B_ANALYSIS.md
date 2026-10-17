@@ -54,3 +54,5 @@ selection tie-breaks, exact paired A/B draw/mask traces and class weights,
 checkpoint hashes, common config/source/environment/device, three ridge fits
 and train-only scaling. Persist sensitivity and the future-use decision, then
 hash this plan and the report generator alongside the frozen manifest.
+
+Adenda 5A: este plan se commiteó con la serie ya iniciada, antes de la primera validación (224,8 s después del arranque; 74,5 s antes de validar). Criterio A/B y presupuesto ya estaban fijados. Véase BATCH_4B.md para la cronología local y sus límites.

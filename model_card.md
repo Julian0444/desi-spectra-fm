@@ -91,10 +91,14 @@ probability. Retrospectively, ≥0.5 keeps 1,175/2,000 objects and 9 outliers
 (58.75% coverage, 0.77% error; AUROC 0.9038), on the same masked, non-independent
 set. That threshold is not a validated service policy.
 
-The full-spectrum Copilot baseline has 11/150 errors (7.33%) on a stratified
-subset. Direct reweighting gives an estimate of 6.54%; a paired-difference
-estimator gives 8.19%. Neither is a measurement of all 2,000 or independent
-generalization. The agent reduced successes from 139/150 to 119/150.
+Batch 3 measured **240/2,000 outliers (12.00%)** with full spectra and input
+contract v2. This is a historical diagnostic on a non-independent population,
+not a generalization estimate. The earlier stratified 150-case baseline had
+11 errors (7.33%); 6.54% reweighting and 8.19% paired-difference estimates are
+historical antecedents superseded by the complete measurement. The agent
+reduced successes from 139/150 to 119/150. See [batch 3](docs/BATCH_3_RESULTS.md).
+The 12% cannot be compared to CNN's 9.29% on the different batch-4B test;
+v2.1 was not evaluated there. v2.1 remains the served predictor.
 
 Reconstruction RMSE remains about 0.82. On 50 stored examples the transformer
 scored 0.81849 and a 301-pixel visible-only moving average 0.81688. Widths were

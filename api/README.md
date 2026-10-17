@@ -15,7 +15,7 @@ models:
 
 # desi-fm API — REST endpoint
 
-FastAPI app (`desi_fm.api`) serving the DESI foundation model v2.1
+FastAPI app (`desi_fm.api`) serving the DESI multitask transformer v2.1
 (encoder-only transformer, ~26M parameters, `checkpoint_last.pt` from
 [jirustaroure/desi-spectra-fm](https://huggingface.co/jirustaroure/desi-spectra-fm)).
 The official prediction is `z_pred_map` (argmax of a 100-bin posterior over
@@ -65,7 +65,7 @@ curl -s -X POST $BASE/predict_json -H "Content-Type: application/json" \
   `ivar`, `mask`, plus `mask_ratio`).
 - Other grids can be resampled; accuracy outside DESI is unvalidated. Spectra are interpolated onto the model's internal
   3600–9800 Å log-λ grid.
-- Limits: 32 spectra and 50 MB per request; at least 16 pixels per spectrum.
+- Limits: 32 spectra and 50 MB per request; at least 8 usable input samples and 8 supported model-grid pixels (numerical minima, not quality thresholds).
   Oversize requests get HTTP 413. Only malformed/unusable scientific inputs become HTTP 422; checkpoint and internal inference failures remain server errors.
 
 ## Checkpoint loading (differs between Space and local)

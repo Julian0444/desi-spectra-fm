@@ -63,7 +63,7 @@ development machine; its local artifacts are now explicitly ignored and identifi
 ```bash
 python3 -m pip install -r requirements.txt
 python3 -m pip install -e .
-python3 -m pytest -q          # → 26 passed
+python3 -m pytest -q          # historical counts: see docs/BATCH_5.md
 ```
 
 Python 3.9+, PyTorch 2.x. Developed on macOS (Python 3.9, MPS); CI runs the

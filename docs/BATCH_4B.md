@@ -144,7 +144,7 @@ omitirlos. Estos análisis por estrato no son descubrimientos corregidos por
 multiplicidad. [Detalle completo](BATCH_4B_STRATA.md), incluidos calidad,
 cobertura de entrada, denominadores, MAE, NMAD y sesgo.
 
-![Efecto pareado](figures/batch4b/paired-effect.png)
+![Efecto pareado condicionado a los pares seleccionados 17/42/101](figures/batch4b/paired-effect.png)
 
 ## Riesgo–cobertura y trayectorias
 
@@ -265,9 +265,11 @@ PYTHONPATH=src /Users/jirustaroure/.local/state/spectra-consolidation/lote-2-202
 
 ## Conclusión defendible y siguiente lote
 
-Aprendimos que la tarea auxiliar mejora el criterio global de redshift **bajo
-esta receta y presupuesto**, con variación por semilla y perjuicio en las
-etiquetas advertidas. La CNN es la alternativa práctica más precisa y barata
+Corrección 5A: en los tres pares de checkpoints seleccionados mediante la regla
+de validación, A tuvo menos outliers que B y se cumplió el criterio predefinido.
+La generalización del beneficio a otras semillas o checkpoints no está establecida.
+A empeora en objetos con advertencia y su MAE empeora en 17 y 101; la mejora
+del MAE promedio está impulsada por 42. La CNN es la alternativa práctica más precisa y barata
 observada; el contraste causal de reconstrucción sigue siendo solo A/B.
 No demostramos un foundation model, transferencia, robustez a otros instrumentos,
 independencia física, probabilidad calibrada ni superioridad con otras recetas
@@ -286,3 +288,23 @@ presupuesto propio; quick start limpio y demostración; preparar después una
 publicación coherente. Antes de cualquier cambio del servicio, evaluar el
 candidato CNN ya nominado y su contrato de inferencia. No afinar métodos ni
 umbrales reutilizando este test como validación. Nada de ese lote se ejecutó aquí.
+
+## Adenda 5A (posterior, 2026-10-16)
+
+El intervalo principal está condicionado a los tres pares seleccionados, no
+solo al nombre de las semillas. [Sensibilidades posteriores](evidence/batch5a-analysis.md)
+recalculan validación por paso, márgenes y ΔMAE; no cambian la selección ni el
+criterio predefinido. B-101 ganó por 2/10.000 objetos frente al paso 8.000;
+los grandes efectos por z alto son sensibles a esa selección.
+La CNN ganó esta comparación práctica, que cambia también la entrada durante
+entrenamiento; no aísla únicamente arquitectura. El **12% histórico del lote 3**
+y el **9,29% del 4B** no permiten afirmar superioridad frente a v2.1, que no fue
+evaluado en este test. Los solapamientos impiden usarlo como nueva aceptación.
+
+Cronología comprobada por la auditoría local: el criterio A/B, selección de
+checkpoints y presupuesto precedían a la serie; el plan de análisis/nominación
+`a3020a2` se commiteó 224,8 s después de arrancar y 74,5 s antes de la primera
+validación. La apertura automática ocurrió 3,7 s después del congelado, sin
+inspección humana intermedia; el registro de apertura no lleva timestamp propio.
+Las marcas son locales, no un preregistro externo inmutable. En futuras series,
+el plan debe estar commiteado antes del arranque. JSON y figuras históricos intactos.

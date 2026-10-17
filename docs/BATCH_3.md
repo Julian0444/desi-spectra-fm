@@ -65,3 +65,20 @@ Versioned light manifests identify their hashes and locations. Each new run uses
 an exclusive destination and starts as incomplete; complete requires every
 requested object accounted for and all result files persisted. Publication,
 credential revocation and lots 4/5 remain outside this delivery.
+
+## Adenda 5A: alcance de reproducibilidad
+
+La repetición exacta corresponde al mismo entorno/dispositivo y código registrado.
+El comparador no fija literalmente el commit 008ce03: exige igualdad de
+`code_sha256` entre manifiestos. Cambios de fuente (incluso equivalentes) impiden
+usar una ejecución nueva como réplica idéntica. No se elimina esta guarda.
+Para reproducir el protocolo histórico usar el código registrado; ver
+[BATCH_5.md](BATCH_5.md). No ejecutar el quick start histórico desde HEAD como
+si certificara la misma identidad.
+
+H-12 queda acotado: el control original de nueve objetos no certifica todos los
+floats CPU/MPS. La sonda de Claude `16_cpu_tolerance_and_150.py` sobre 25 objetos
+reportó máximos 3,099e-6 (v1) y 4,828e-6 (v2.1), con fallos del criterio combinado
+atol=rtol=1e-6, aunque ΔRMSE fue <1e-9. En 5A se inspeccionaron código/salida;
+no se repitió inferencia ni se amplió retrospectivamente la tolerancia. No se
+promete paridad entre dispositivos para toda la población ni otras plataformas.

@@ -153,3 +153,5 @@ La salida secundaria es expm1(E[log(1+z)]), no la media aritmética de z. No int
 | CNN-42 | 10000 | 10.450 | 0.050467 | 0.010463 | 0.015677 |
 | CNN-101 | 10000 | 10.520 | 0.049546 | 0.010859 | 0.013226 |
 | ridge | 10000 | 38.930 | 0.157996 | 0.166198 | 0.029832 |
+
+Adenda posterior 5A: los grandes efectos en z≥2 de la semilla 101 dependen de B-101 paso 2.500, seleccionado por solo 2 outliers frente al paso 8.000. Véanse los márgenes reproducidos en [sensibilidades](evidence/batch5a-analysis.md). No cambia ningún valor de esta tabla ni autoriza otro checkpoint.

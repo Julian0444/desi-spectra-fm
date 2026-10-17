@@ -22,7 +22,6 @@ not establish transfer to other tasks or instruments.
 **[🤖 LLM agent: spectra-copilot](https://github.com/Julian0444/spectra-copilot)** ·
 **[📓 Evaluation notebook](notebooks/evaluation.ipynb)**
 
-[![The live demo: pick a real held-out DESI spectrum, mask part of it, get redshift + reconstruction](docs/img/demo.png)](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)
 
 ---
 
@@ -114,7 +113,7 @@ FAISS · Claude API + MCP (agent repo).
 
 ```bash
 python3 -m pip install -r requirements.txt && python3 -m pip install -e .
-python3 -m pytest tests/ -q        # → 26 passed
+python3 -m pytest tests/ -q        # historical counts: see docs/BATCH_5.md
 CKPT=$(python3 -c "from huggingface_hub import hf_hub_download; print(hf_hub_download('jirustaroure/desi-spectra-fm', 'checkpoint_last.pt'))") \
   && python3 -m desi_fm.predict --checkpoint "$CKPT" --input YOUR_SPECTRA.npz --output predictions.npz
 ```
@@ -316,7 +315,7 @@ src/desi_fm/
   data.py             spectrum preprocessing (interpolation, normalization, patching)
   train.py            training loop
   evaluate.py         validation metrics on DESI streaming data
-  predict.py          instrument-agnostic inference  ← use this for benchmarking
+  predict.py          shared DESI input-contract inference
   api.py              FastAPI REST API (/predict, /predict_json, /healthz)
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
 tests/                26 unit tests (shapes, no-leakage, split isolation, normalized loss, MAP outputs, embeddings, API)
@@ -399,3 +398,5 @@ documentation: [DELIVERABLE.md](DELIVERABLE.md). Spanish-language documents:
 Code license: [MIT](LICENSE). DESI data retain [CC BY 4.0 attribution and release citations](ATTRIBUTIONS.md).
 
 Batch 2 input, validity, inference and evaluation semantics: [INPUT_CONTRACT.md](docs/INPUT_CONTRACT.md).
+
+Current consolidation: [batch 5A](docs/BATCH_5.md). v2.1 remains the default. Model-z protection and the explanatory policy are pending in 5B; current code still permits experimental agent replacements. Archived 0.2.0 wheels certify batch 2, not current source.

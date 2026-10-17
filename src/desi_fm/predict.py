@@ -1,4 +1,6 @@
-"""Instrument-agnostic inference for the DESI foundation model.
+"""Shared-contract inference for the DESI multitask transformer.
+
+Resampling other wavelength grids does not validate accuracy on other instruments.
 
 This module is the inference entry point. Accuracy outside DESI or under partial
 coverage is unvalidated; historical validation is not an independent test.

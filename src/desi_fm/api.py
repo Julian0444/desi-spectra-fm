@@ -1,4 +1,4 @@
-"""REST API for the DESI foundation model (FastAPI).
+"""REST API for the DESI multitask transformer (FastAPI).
 
 Serves the public v2.1 checkpoint (`jirustaroure/desi-spectra-fm` on the
 Hugging Face Hub) behind two endpoints:
@@ -51,7 +51,7 @@ app = FastAPI(
     version="0.2.0",
     description=(
         "Redshift prediction for DESI spectra "
-        "(DESI foundation model v2.1). Official prediction: `z_pred_map` "
+        "(DESI multitask transformer v2.1). Official prediction: `z_pred_map` "
         "with its `z_confidence`; `z_pred` is expm1(E[log(1+z)]) from the same posterior. "
         "Model card: https://huggingface.co/jirustaroure/desi-spectra-fm — "
         "code: https://github.com/Julian0444/desi-spectra-fm"

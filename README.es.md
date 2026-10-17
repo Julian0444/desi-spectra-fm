@@ -23,7 +23,6 @@ tareas. [Evidencia y límites](docs/HISTORICAL_EVIDENCE.md).
 **[🤖 Agente LLM: spectra-copilot](https://github.com/Julian0444/spectra-copilot)** ·
 **[📓 Notebook de evaluación](notebooks/evaluation.ipynb)**
 
-[![La demo en vivo: se elige un espectro DESI held-out real, se enmascara una parte y se obtiene redshift + reconstrucción](docs/img/demo.png)](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)
 
 ---
 
@@ -118,7 +117,7 @@ FAISS · API de Claude + MCP (repo del agente).
 
 ```bash
 python3 -m pip install -r requirements.txt && python3 -m pip install -e .
-python3 -m pytest tests/ -q        # → 26 passed
+python3 -m pytest tests/ -q        # historical counts: see docs/BATCH_5.md
 CKPT=$(python3 -c "from huggingface_hub import hf_hub_download; print(hf_hub_download('jirustaroure/desi-spectra-fm', 'checkpoint_last.pt'))") \
   && python3 -m desi_fm.predict --checkpoint "$CKPT" --input YOUR_SPECTRA.npz --output predictions.npz
 ```
@@ -314,7 +313,7 @@ no un índice de token arbitrario. Entonces, cuando llega un espectro que no es 
 4. La reconstrucción se interpola de vuelta a la grilla de quien llama, en las unidades de
    flujo originales.
 
-Este procedimiento remuestrea los arrays; no valida precisión fuera de DESI. La validación de entradas y los huecos internos aún tienen limitaciones pendientes del lote 2.
+Este procedimiento remuestrea los arrays; no valida precisión fuera de DESI. El contrato compartido valida entradas y cobertura; véanse INPUT_CONTRACT.md y BATCH_5.md para su versión y límites.
 
 ### Estructura del repositorio
 

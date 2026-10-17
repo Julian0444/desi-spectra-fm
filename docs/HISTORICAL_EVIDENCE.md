@@ -32,7 +32,7 @@ execution table in the official consensus records its location.
 | `predictions_best.csv` | Same objects/weights, different random mask | 303 outliers, 15.15%; does not show that last weights are better |
 | Entropy score on last CSV | Retrospective threshold ≥0.5 on those 2,000 | 1,175 retained, 9 errors: 58.75% coverage, 0.77% error; AUROC 0.9038; not calibrated success probability or a validated policy |
 | Copilot `eval/results_baseline.csv` / `results.csv` | Same 150 stratified historical objects; full spectra; v2.1 / historical Haiku + five tools and RAG | 139 vs 119 successes; 21 broken, 1 recovered; hybrid 135/150, below baseline |
-| Full-spectrum estimates | Six strata, quotas 40/35/30/25/10/10, selection seed 7 | 11/150 errors (7.33%) measured on subset; direct reweighting 6.54% and paired-difference 8.19% are estimates for 2,000, not full measurements |
+| Earlier full-spectrum estimates (antecedents, superseded by batch 3 measurement) | Six strata, quotas 40/35/30/25/10/10, selection seed 7 | 11/150 errors (7.33%) measured on subset; direct reweighting 6.54% and paired-difference 8.19% are estimates for 2,000, not full measurements |
 | `reconstructions.npz` | 50 stored normalized examples, best evaluation mask | Model RMSE 0.81849; visible-only 301-pixel moving average 0.81688; width explored on same data, so neither equivalence nor superiority is established |
 
 Outlier convention for model CSVs: `abs(z_pred-z_true)/(1+z_true) > 0.15`.
@@ -100,3 +100,5 @@ empty scientific-loader handling, prompt facts/label clues, package data,
 MCP domain validation and the explanatory-agent policy remain later-batch work.
 They are not silently certified by passing existing tests. External publication
 and account revocation remain separate, unverified actions.
+
+Batch 3 measured 240/2,000 = **12.00%** outliers on full spectra under input contract v2: [results](BATCH_3_RESULTS.md). This historical diagnostic is not independent and is not comparable to the 9.29% CNN result on the different 4B test.

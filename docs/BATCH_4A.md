@@ -24,10 +24,13 @@ priority. Deterministic largest-remainder quotas, stable ID order and one fixed
 PCG64 seed; no reseeding to favor results. Rare strata are recorded, never dropped.
 
 All seven schemas have object_id, Z/ZERR, ZWARN, EBV and photometric fluxes;
-no sky coordinates, TARGETID, source or parent field. IDs are unique. Inspection
+no explicit sky-coordinate, TARGETID-named, source or parent columns.
+Correction 5A: object_id carries TARGETID; imaging IDs encode sky locality
+through BRICKID (see BATCH_5.md). IDs are unique. Inspection
 of exact photometric vectors found only two pairs with -99/0 fillers and matching
 EBV; all four have negative labels. These are not established relationships.
-No physical grouping key can be established from the available metadata. Use
+The encoded brick was not used for spatial grouping; it does not identify
+repeat observations of the same source. Such relationships remain unverified. Use
 object identity as the observed unit and explicitly retain this limitation;
 singletons do not prove physical independence. The splitter supports supplied,
 evidence-backed relationship groups and keeps mixed-stratum groups intact.
