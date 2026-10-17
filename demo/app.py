@@ -83,11 +83,11 @@ def analyze(npz_file, mask_ratio: float):
     if z_map is not None:
         lines.append(f"z_pred_map = {z_map:.4f}   (official prediction, posterior argmax)")
         lines.append(f"z_confidence = {conf:.2f}   (posterior concentration, 0-1; "
-                     f"low values mean the model itself is unsure)")
+                     f"not a calibrated probability of correctness)")
     lines.append(f"z_pred = {result['z_pred']:.4f}   (expm1(E[log(1+z)]), secondary)")
     if "z_true" in data.files:
         z_true = float(np.asarray(data["z_true"]).reshape(-1)[0])
-        lines.append(f"z_true = {z_true:.4f}   (DESI pipeline ground truth)")
+        lines.append(f"z_true = {z_true:.4f}   (DESI pipeline reference label)")
         if z_map is not None:
             dz = abs(z_map - z_true) / (1.0 + z_true)
             flag = "catastrophic outlier (>0.15)" if dz > 0.15 else "ok"

@@ -49,6 +49,17 @@ Promedio de los k mejores scores de cada variante (no ensemble ni nueva regla):
 | 3 | -0.59 | -7.87 | -1.84 |
 | 5 | -0.76 | -8.01 | -0.76 |
 
+Sensibilidad H-10 en **validación guardada**, A-101 paso 8.000 frente a B-101 pasos 2.500/8.000. No evalúa un checkpoint alternativo en test ni autoriza sustituir el seleccionado.
+
+| Paso B | Estrato | N | Outliers A/B | Δη (pp) | ΔMAE |
+|---:|---|---:|---|---:|---:|
+| 2500 | all | 10000 | 2096/2332 | -2.36 | +0.032038 |
+| 2500 | 2<=z<3 | 119 | 8/93 | -71.43 | -0.187971 |
+| 2500 | z>=3 | 24 | 1/11 | -41.67 | -0.223513 |
+| 8000 | all | 10000 | 2096/2334 | -2.38 | -0.051399 |
+| 8000 | 2<=z<3 | 119 | 8/27 | -15.97 | -0.024513 |
+| 8000 | z>=3 | 24 | 1/2 | -4.17 | -0.030026 |
+
 ΔMAE de test desde predicciones guardadas; IC95 bootstrap pareado por objeto, 5.000 réplicas, semilla 20261016, condicionado a cada par seleccionado. Independencia física no establecida.
 
 | Semilla | ΔMAE | IC95 |

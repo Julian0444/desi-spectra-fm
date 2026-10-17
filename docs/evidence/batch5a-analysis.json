@@ -1585,6 +1585,62 @@
       ]
     }
   },
+  "validation_101_sensitivity": [
+    {
+      "b_step": 2500,
+      "stratum": "all",
+      "n": 10000,
+      "a_outliers": 2096,
+      "b_outliers": 2332,
+      "delta_eta_pp": -2.359999999999998,
+      "delta_mae": 0.03203791974740304
+    },
+    {
+      "b_step": 2500,
+      "stratum": "2<=z<3",
+      "n": 119,
+      "a_outliers": 8,
+      "b_outliers": 93,
+      "delta_eta_pp": -71.42857142857143,
+      "delta_mae": -0.18797140747432656
+    },
+    {
+      "b_step": 2500,
+      "stratum": "z>=3",
+      "n": 24,
+      "a_outliers": 1,
+      "b_outliers": 11,
+      "delta_eta_pp": -41.666666666666664,
+      "delta_mae": -0.22351337482878786
+    },
+    {
+      "b_step": 8000,
+      "stratum": "all",
+      "n": 10000,
+      "a_outliers": 2096,
+      "b_outliers": 2334,
+      "delta_eta_pp": -2.379999999999999,
+      "delta_mae": -0.051398941236177255
+    },
+    {
+      "b_step": 8000,
+      "stratum": "2<=z<3",
+      "n": 119,
+      "a_outliers": 8,
+      "b_outliers": 27,
+      "delta_eta_pp": -15.966386554621847,
+      "delta_mae": -0.024512885703814696
+    },
+    {
+      "b_step": 8000,
+      "stratum": "z>=3",
+      "n": 24,
+      "a_outliers": 1,
+      "b_outliers": 2,
+      "delta_eta_pp": -4.166666666666666,
+      "delta_mae": -0.030026448929329316
+    }
+  ],
   "negative_steps_per_seed": [
     9,
     15,

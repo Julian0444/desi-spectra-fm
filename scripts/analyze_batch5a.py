@@ -46,6 +46,22 @@ def analyze(runs, data, index, output):
     top_k = {str(k): [100*(np.mean([r['eta'] for r in ranking[f'A-{s}'][:k]])-
                             np.mean([r['eta'] for r in ranking[f'B-{s}'][:k]])) for s in seeds]
              for k in (1, 2, 3, 5)}
+    sensitivity_101 = []
+    a_path = runs/'A-101'/'validation-008000.npz'
+    with np.load(a_path, allow_pickle=False) as a_data:
+        for step in (2500, 8000):
+            b_path = runs/'B-101'/f'validation-{step:06d}.npz'
+            with np.load(b_path, allow_pickle=False) as b_data:
+                assert np.array_equal(a_data['ids'], b_data['ids'])
+                assert np.array_equal(a_data['z_true'], b_data['z_true'])
+                z = a_data['z_true'].astype(float)
+                ae, be = errors(a_path), errors(b_path)
+                for label, mask in [('all', np.ones(len(z), bool)),
+                                    ('2<=z<3', (z>=2)&(z<3)), ('z>=3', z>=3)]:
+                    sensitivity_101.append(dict(b_step=step, stratum=label, n=int(mask.sum()),
+                        a_outliers=int((ae[mask]>.15).sum()), b_outliers=int((be[mask]>.15).sum()),
+                        delta_eta_pp=float(100*((ae[mask]>.15).mean()-(be[mask]>.15).mean())),
+                        delta_mae=float((ae[mask]-be[mask]).mean())))
     test = {}
     rng = np.random.default_rng(20261016)
     for s in seeds:
@@ -76,6 +92,7 @@ def analyze(runs, data, index, output):
     result = dict(scope='post-hoc exploratory; no replacement of prespecified criterion',
                   validation_scores=scores, delta_eta_by_step_pp=deltas, selection_margins=margins,
                   mean_top_k_delta_eta_pp=top_k, test_conditional_mae=test,
+                  validation_101_sensitivity=sensitivity_101,
                   negative_steps_per_seed=(np.array(deltas)<0).sum(axis=0).tolist(),
                   all_negative_steps=int((np.array(deltas)<0).all(axis=1).sum()),
                   final_validation_mean_delta_mae=float(np.mean([scores[f'A-{s}'][-1]['mae']-scores[f'B-{s}'][-1]['mae'] for s in seeds])),
@@ -96,6 +113,10 @@ def analyze(runs, data, index, output):
     lines += ['', 'Promedio de los k mejores scores de cada variante (no ensemble ni nueva regla):','',
               '| k | A−B 17 (pp) | A−B 42 (pp) | A−B 101 (pp) |','|---:|---:|---:|---:|']
     for k,ds in top_k.items(): lines.append(f'| {k} | '+' | '.join(f'{d:+.2f}' for d in ds)+' |')
+    lines += ['', 'Sensibilidad H-10 en **validación guardada**, A-101 paso 8.000 frente a B-101 pasos 2.500/8.000. No evalúa un checkpoint alternativo en test ni autoriza sustituir el seleccionado.', '',
+              '| Paso B | Estrato | N | Outliers A/B | Δη (pp) | ΔMAE |', '|---:|---|---:|---|---:|---:|']
+    for r in sensitivity_101:
+        lines.append(f'| {r["b_step"]} | {r["stratum"]} | {r["n"]} | {r["a_outliers"]}/{r["b_outliers"]} | {r["delta_eta_pp"]:+.2f} | {r["delta_mae"]:+.6f} |')
     lines += ['', 'ΔMAE de test desde predicciones guardadas; IC95 bootstrap pareado por objeto, 5.000 réplicas, semilla 20261016, condicionado a cada par seleccionado. Independencia física no establecida.','',
               '| Semilla | ΔMAE | IC95 |','|---:|---:|---|']
     for s,t in test.items(): lines.append(f'| {s} | {t["delta_mae"]:+.6f} | [{t["delta_mae_ci"][0]:+.6f}, {t["delta_mae_ci"][1]:+.6f}] |')
