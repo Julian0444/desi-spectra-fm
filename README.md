@@ -118,6 +118,8 @@ CKPT=$(python3 -c "from huggingface_hub import hf_hub_download; print(hf_hub_dow
   && python3 -m desi_fm.predict --checkpoint "$CKPT" --input YOUR_SPECTRA.npz --output predictions.npz
 ```
 
+Current test evidence and scope: [Batch 5](docs/BATCH_5.md).
+
 Python 3.9+, PyTorch 2.x (MPS / CUDA / CPU). Inference needs only NumPy + PyTorch;
 `huggingface_hub` downloads the shipped v2.1 checkpoint once (~104 MB, cached). The tests
 exercise model shapes, synthetic forwards and the current split logic. They do
@@ -318,7 +320,7 @@ src/desi_fm/
   predict.py          shared DESI input-contract inference
   api.py              FastAPI REST API (/predict, /predict_json, /healthz)
   inspect_schema.py   sanity-check utility for the MMU/DESI dataset
-tests/                26 unit tests (shapes, no-leakage, split isolation, normalized loss, MAP outputs, embeddings, API)
+tests/                Unit and regression tests (shapes, no-leakage, split isolation, normalized loss, MAP outputs, embeddings, API)
 demo/                 Gradio app deployed to the live HF Space (jirustaroure/desi-spectra-fm-demo)
 api/                  API app deployed to the live HF Space (jirustaroure/desi-fm-api)
 Dockerfile            CPU-only container image for the REST API

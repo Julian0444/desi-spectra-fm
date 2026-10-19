@@ -48,7 +48,7 @@ scripts/
   make_demo_examples.py    → exporta los 4 espectros held-out de ejemplo (examples/*.npz)
   plot_scatter_v1_v2.py    → figura v1 vs v2.1 del README
 
-tests/                → 26 tests (shapes, sin fuga de z, split disjunto, loss normalizada, salidas MAP, embeddings, API)
+tests/                → Tests unitarios y de regresión (shapes, sin fuga de z, split disjunto, loss normalizada, salidas MAP, embeddings, API)
 notebooks/            → evaluation.ipynb (v2.1) y evaluation_v1_baseline.ipynb (el "antes")
 demo/                 → app Gradio del Space jirustaroure/desi-spectra-fm-demo
 api/                  → Space que sirve la API (FastAPI montada en /api dentro de un Space Gradio ZeroGPU)
@@ -57,6 +57,8 @@ runs/desi_80k_classhead_v21/   → config.json, training_args.json, metrics.json
                                  (los .pt no van en git: se bajan del Hub)
 runs/desi_50k_big/             → la v1 (baseline)
 ```
+
+Evidencia vigente y alcance de las pruebas: [lote 5](docs/BATCH_5.md).
 
 Hay un solo "cerebro", definido en `model.py`. Los demás archivos lo alimentan, lo entrenan, lo miden o lo sirven.
 
