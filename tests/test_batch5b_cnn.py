@@ -70,3 +70,25 @@ print('blocked both')
     r=subprocess.run([sys.executable,'-c',program],capture_output=True,text=True)
     assert r.returncode==0,r.stderr
     assert r.stdout.strip()=='blocked both'
+
+
+def test_audit_blocks_hardlink_and_open_descriptor_aliases(tmp_path):
+    import os
+    root=tmp_path/'data';(root/'test').mkdir(parents=True);(root/'train').mkdir()
+    source=root/'test/invented.npy';source.write_bytes(b'invented forbidden bytes')
+    alias=root/'train/hardlink.npy';os.link(source,alias)
+    program='''import importlib.util, os, pathlib
+spec=importlib.util.spec_from_file_location('guard',PATH)
+m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+fd=os.open(ALIAS,os.O_RDONLY)
+m.deny_test_open(ROOT)
+for target in (ALIAS,fd):
+    try:
+        with open(target,'rb',closefd=False) if isinstance(target,int) else open(target,'rb') as stream:
+            stream.read()
+    except PermissionError:continue
+    raise AssertionError('Forbidden inode alias was read')
+os.close(fd)
+'''.replace('PATH',repr(str(ROOT/'scripts/check_batch5b_cnn.py'))).replace('ROOT',repr(str(root))).replace('ALIAS',repr(str(alias)))
+    result=subprocess.run([sys.executable,'-c',program],capture_output=True,text=True)
+    assert result.returncode==0,result.stderr
