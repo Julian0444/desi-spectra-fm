@@ -28,10 +28,26 @@ def record(path):
 def deny_test_open(data_root):
     """Process-wide open audit: even a direct NumPy read of test is forbidden."""
     test=os.path.realpath(str(Path(data_root)/'test'))
+    # Metadata only: aliases/hardlinks can refer to a forbidden file from outside
+    # its pathname. The frozen test tree must not change after this inventory.
+    forbidden=set()
+    for directory,_,files in os.walk(test):
+        for name in files:
+            identity=os.stat(os.path.join(directory,name))
+            forbidden.add((identity.st_dev,identity.st_ino))
     def hook(event,args):
-        if event=='open' and isinstance(args[0],(str,bytes,os.PathLike)):
-            target=os.path.realpath(os.fsdecode(args[0]))
-            if target==test or target.startswith(test+os.sep):
+        if event=='open':
+            value=args[0]
+            if isinstance(value,(str,bytes,os.PathLike)):
+                target=os.path.realpath(os.fsdecode(value))
+                if target==test or target.startswith(test+os.sep):
+                    raise PermissionError('5B-2 test access is forbidden')
+                try:identity=os.stat(value)
+                except (FileNotFoundError,NotADirectoryError):return
+            elif isinstance(value,int):
+                identity=os.fstat(value)
+            else:return
+            if (identity.st_dev,identity.st_ino) in forbidden:
                 raise PermissionError('5B-2 test access is forbidden')
     sys.addaudithook(hook)
 
