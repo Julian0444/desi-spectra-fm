@@ -40,6 +40,7 @@ from pydantic import BaseModel, Field
 from .predict import load_model_from_checkpoint, predict_spectra_batch, predict_spectrum, model_identity
 from .inputs import read_npz, SpectrumInputError
 from .assets import download_asset
+from . import __version__
 
 MODEL_REPO = "jirustaroure/desi-spectra-fm"
 CHECKPOINT_FILE = "checkpoint_last.pt"
@@ -48,7 +49,7 @@ MAX_SPECTRA_PER_REQUEST = 32  # keep worst-case CPU latency of one request bound
 
 app = FastAPI(
     title="desi-fm API",
-    version="0.2.0",
+    version=__version__,
     description=(
         "Redshift prediction for DESI spectra "
         "(DESI multitask transformer v2.1). Official prediction: `z_pred_map` "
