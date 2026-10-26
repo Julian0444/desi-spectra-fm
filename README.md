@@ -1,5 +1,10 @@
 # DESI Spectra Foundation Model
 
+**5C (cierre económico):** clave inválida reemplazada por Julian; piloto repetido
+y puntuado mecánicamente: low11/11 pasa la puerta operativa. Puerta completa pendiente de verificación final. Aceptación sin abrir;
+exactitud científica y aceptación global pendientes. [Informe](docs/BATCH_5C_REPORT.md).
+
+
 [![ci](https://github.com/Julian0444/desi-spectra-fm/actions/workflows/ci.yml/badge.svg)](https://github.com/Julian0444/desi-spectra-fm/actions/workflows/ci.yml)
 [![Model on HF](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg)](https://huggingface.co/jirustaroure/desi-spectra-fm)
 [![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm.svg)](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)
