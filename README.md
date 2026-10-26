@@ -25,6 +25,16 @@ not establish transfer to other tasks or instruments.
 
 ---
 
+## Local 0.3.0 release preparation
+
+The current package, local Gradio app, API and Copilot integration have been
+checked from installed wheels. See the [tested quick start](docs/BATCH_5C_REPRODUCE.md),
+[5C status](docs/BATCH_5C_REPORT.md) and [saved A/B figures](docs/BATCH_5C_AB.md).
+These checks do not update the public services or establish scientific acceptance.
+v2.1 remains the default; CNN-17 is experimental. The historical agent result
+remains **139/150 model successes versus 119/150 agent successes**.
+
+
 ## Results: diagnosing and fixing a real failure mode
 
 The v1 baseline predicted redshift with a scalar regression head — and regressed to the mean:

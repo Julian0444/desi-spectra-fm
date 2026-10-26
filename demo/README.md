@@ -24,7 +24,8 @@ reconstruction**, the self-supervised task the model was trained on.
 
 - Pick one of the four examples or upload your own `.npz` with `flux` and
   `wavelength` (Å) arrays; optional `ivar`, `mask` and `z_true` are used if
-  present (a multi-row file shows its first spectrum).
+  present. Current single-spectrum tools reject multi-row files; use batch
+  Python, CLI or REST for multiple spectra.
 - Move the slider to hide a fraction of the input tokens before the forward
   pass and watch the model fill the shaded regions in.
 - When `z_true` is in the file, the panel prints `|Δz|/(1+z)` and flags
@@ -86,3 +87,14 @@ Model checkpoint: <https://huggingface.co/jirustaroure/desi-spectra-fm> ·
 REST API: <https://jirustaroure-desi-fm-api.hf.space/api/docs>
 
 Batch 2 input, validity, inference and evaluation semantics: [INPUT_CONTRACT.md](../docs/INPUT_CONTRACT.md). Single-spectrum files are required; multirow files use batch Python, CLI or REST.
+
+
+## Local installed demo 0.3.0
+
+The verified local entry point is `python -I -B -m desi_fm.demo`, with
+`DESI_FM_CKPT` set to a verified local checkpoint. It binds 127.0.0.1, share=false,
+requires a single spectrum and uses no Hub download or ZeroGPU dependency.
+Upload/predict, masking 0/0.35 and invalid-support rejection were checked through
+the real local Gradio HTTP API. Versions, hashes and commands are in the
+[5C reproduction guide](../docs/BATCH_5C_REPRODUCE.md). The Space configuration
+above is historical hosting configuration; this work did not redeploy it.

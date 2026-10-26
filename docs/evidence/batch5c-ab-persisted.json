@@ -1,0 +1,66 @@
+{
+  "schema": "batch5c-ab-persisted-v1",
+  "sources": {
+    "final-test/A-17.npz": "38e6b694dadb3c73570a15718a414a963c204b922ef070b93cf4d124a7ec63a2",
+    "final-test/B-17.npz": "012db784df37da2c66dd7f3095b8a468b686c955f1fa665d8b006eb779dfe741",
+    "final-test/A-42.npz": "93206d83726019845aa46f09afc54fab6ec5ac56f8289ddef81b60b57b62d8e7",
+    "final-test/B-42.npz": "7891fb947a57dc30d32c9b38b835799f59c5df89cec19eb2eca96bf85139f38e",
+    "final-test/A-101.npz": "47d864325ea33b22a24b59d6d905d26a8ee614759b4a77430fce4456afc42f4b",
+    "final-test/B-101.npz": "453a283e363991489cce0dba038d1dfa85c3e4077f108f7410ea11c2a0ac54f2"
+  },
+  "rows": [
+    {
+      "seed": 17,
+      "A": {
+        "n": 10000,
+        "outliers": 1835,
+        "eta15": 0.1835,
+        "mae_normalized": 0.1613456715089787
+      },
+      "B": {
+        "n": 10000,
+        "outliers": 1956,
+        "eta15": 0.1956,
+        "mae_normalized": 0.12276934127659297
+      },
+      "delta_eta_pp": -1.21,
+      "delta_mae_normalized": 0.038576330232385714
+    },
+    {
+      "seed": 42,
+      "A": {
+        "n": 10000,
+        "outliers": 1489,
+        "eta15": 0.1489,
+        "mae_normalized": 0.10224232959948402
+      },
+      "B": {
+        "n": 10000,
+        "outliers": 2221,
+        "eta15": 0.2221,
+        "mae_normalized": 0.24658895265567302
+      },
+      "delta_eta_pp": -7.3199999999999985,
+      "delta_mae_normalized": -0.144346623056189
+    },
+    {
+      "seed": 101,
+      "A": {
+        "n": 10000,
+        "outliers": 1997,
+        "eta15": 0.1997,
+        "mae_normalized": 0.18778893798462346
+      },
+      "B": {
+        "n": 10000,
+        "outliers": 2302,
+        "eta15": 0.2302,
+        "mae_normalized": 0.16125849522395047
+      },
+      "delta_eta_pp": -3.05,
+      "delta_mae_normalized": 0.026530442760672984
+    }
+  ],
+  "inference_calls": 0,
+  "interpretation": "Conditional on three previously selected pairs. Negative favors A; MAE worsens for two seeds. No new selection, physical independence or CNN/v2.1 superiority claim."
+}

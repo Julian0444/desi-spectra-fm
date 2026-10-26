@@ -128,3 +128,19 @@ The `faiss/` pair powers the `find_similar_spectra` semantic-search tool in
 ## License and data attribution
 
 Code: MIT. DESI data: CC BY 4.0, with EDR citation, modification notice and acknowledgments in [ATTRIBUTIONS.md](ATTRIBUTIONS.md). These corrections await publication.
+
+
+## Local package verification, 5C
+
+Software version 0.3.0 packages the current input contract and local demo.
+Installed-wheel checks cover imports/resources, CLI, API upload/JSON/rejection,
+Gradio upload/predict and all five Copilot MCP tools. They do not change weights
+or the validation populations above. The local demo requires an explicit local
+checkpoint and performs no download. [Reproduction](docs/BATCH_5C_REPRODUCE.md).
+
+A/B figures were regenerated from saved predictions, with no test inference:
+A lowers outliers in all three frozen pairs, while normalized MAE worsens for
+seeds 17 and 101. [Evidence and limits](docs/BATCH_5C_AB.md). The historical name
+does not establish a foundation model; physical independence and CNN/v2.1
+superiority remain unproven. Scientific acceptance and publication are separate
+from local software checks; [current status](docs/BATCH_5C_REPORT.md).

@@ -129,3 +129,13 @@ Interactive demo:
 <https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo>
 
 Both the REST API and Gradio tester retain mask/ivar and follow [the shared input contract](../docs/INPUT_CONTRACT.md). `/healthz` identifies the loaded model with config and checkpoint SHA-256; prediction responses include this identity and coverage. JSON supports `wavelength_unit` (`angstrom` by default, or explicit `nm`).
+
+
+## Installed 0.3.0 verification
+
+The local installed package reports API version 0.3.0. The 5C checks passed
+healthz, NPZ upload, JSON prediction, invalid-input 422 and version metadata
+using verified local v2.1 assets and development inputs. Run
+`python -I -B -m uvicorn desi_fm.api:app --host 127.0.0.1 --port 8000`
+from the installed environment; [reproduction and limits](../docs/BATCH_5C_REPRODUCE.md).
+These local checks did not deploy or verify the public Space.
