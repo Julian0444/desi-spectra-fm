@@ -27,6 +27,9 @@ not establish transfer to other tasks or instruments.
 
 ## Local 0.3.0 release preparation
 
+The pilot stopped with unknown usage; acceptance was not opened. The AI review
+procedure remains blocked by two P2 findings. See [remaining work](docs/BATCH_5C_REMAINING.md).
+
 The current package, local Gradio app, API and Copilot integration have been
 checked from installed wheels. See the [tested quick start](docs/BATCH_5C_REPRODUCE.md),
 [5C status](docs/BATCH_5C_REPORT.md) and [saved A/B figures](docs/BATCH_5C_AB.md).
