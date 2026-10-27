@@ -20,12 +20,12 @@ for protocols, denominators, the ridge baseline and the limits of these claims.
 
 ## Install and run locally
 
-The 0.3.0 release is being prepared; the commands below use a source checkout.
+The commands below install the 0.3.0 source release.
 Weights are separate from the Python package. Use a local v2.1 checkpoint from
 [the model repository](https://huggingface.co/jirustaroure/desi-spectra-fm).
 
 ```bash
-git clone https://github.com/Julian0444/desi-spectra-fm.git
+git clone --branch v0.3.0 https://github.com/Julian0444/desi-spectra-fm.git
 cd desi-spectra-fm
 python3 -m venv .venv
 source .venv/bin/activate

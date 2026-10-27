@@ -60,8 +60,8 @@ split are in the
 ## Usage
 
 ```bash
-# Source installation while 0.3.0 publication is pending.
-pip install "desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm.git"
+# Install from the GitHub release tag; desi-fm is not on PyPI.
+pip install "desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm.git@v0.3.0"
 pip install huggingface_hub
 ```
 
