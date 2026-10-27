@@ -69,7 +69,8 @@ pip install huggingface_hub
 from huggingface_hub import hf_hub_download
 from desi_fm.predict import predict_spectrum
 
-ckpt = hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt")
+ckpt = hf_hub_download("jirustaroure/desi-spectra-fm", "checkpoint_last.pt",
+                       revision="40ff2ed09e5e1584303052e1a5dfe218a4a396b3")
 result = predict_spectrum(flux=flux, wavelength=wavelength_angstrom,
                           checkpoint_path=ckpt)
 result["z_pred_map"]                   # predicted redshift (official, posterior argmax)
@@ -128,59 +129,18 @@ The `faiss/` pair powers the `find_similar_spectra` semantic-search tool in
 
 ## License and data attribution
 
-Code: MIT. DESI data: CC BY 4.0, with EDR citation, modification notice and acknowledgments in [ATTRIBUTIONS.md](ATTRIBUTIONS.md). These corrections await publication.
+Code: MIT. DESI data: CC BY 4.0, with EDR citation, modification notice and acknowledgments in [ATTRIBUTIONS.md](https://github.com/Julian0444/desi-spectra-fm/blob/v0.3.0/ATTRIBUTIONS.md).
 
+## Evaluation and local use
 
-## Local package verification, 5C
+Software 0.3.0 passed mechanical acceptance (127/128 completed); scientific
+accuracy and global acceptance remain pending human adjudication of the AI
+annotations. Opus and Haiku share a provider. The controlled A/B experiment
+met its aggregate criterion, but worsened normalized MAE in two pairs and the
+warning stratum; it does not establish superiority over historical v2.1.
+See [EVALUATION.md](docs/EVALUATION.md) for protocols, results and limits,
+[REPRODUCE.md](docs/REPRODUCE.md) for verified public downloads and a local
+historical example, and [DEPLOYMENT.md](docs/DEPLOYMENT.md) for hosted apps,
+whose code is not updated by this release and whose FM dependency is unpinned.
 
-Software version 0.3.0 packages the current input contract and local demo.
-Installed-wheel checks cover imports/resources, CLI, API upload/JSON/rejection,
-Gradio upload/predict and all five Copilot MCP tools. They do not change weights
-or the validation populations above. The local demo requires an explicit local
-checkpoint and performs no download. [Reproduction](docs/BATCH_5C_REPRODUCE.md).
-
-A/B figures were regenerated from saved predictions, with no test inference:
-A lowers outliers in all three frozen pairs, while normalized MAE worsens for
-seeds 17 and 101. [Evidence and limits](docs/BATCH_5C_AB.md). The historical name
-does not establish a foundation model; physical independence and CNN/v2.1
-superiority remain unproven. Scientific acceptance and publication are separate
-from local software checks; [current status](docs/BATCH_5C_REPORT.md).
-
-
-## Evaluation and deployment status
-
-The controlled A/B experiment met its aggregate criterion on the three frozen
-checkpoint pairs, but reconstruction worsened normalized MAE in two pairs and
-worsened the warning stratum. CNN and ridge are practical baselines; v2.1 was
-not evaluated on that test. CNN-17 remains experimental. [Full protocol and
-limits](docs/EVALUATION.md).
-
-The completed 5C pilot selected low effort, with 11/11 valid reports passing
-the operational gate. The unique low-effort acceptance is sealed: 128 requested
-(80 real, 48 synthetic), 126 calls, zero retries, US$0.1086672 certified cost.
-Mechanical checks passed: completion 127/128 (79/80 real, 48/48 synthetic),
-model_z 122/122 eligible, prediction coverage 122/128 requested, evidence 909/909
-and required abstention 18/18. One incomplete explanation remains in the result.
-The corrected procedure and evaluated identity passed independent review with
-zero P1/P2 before execution. Both new AI annotations are complete and were
-hash-registered before either was read by the coordinator or labels opened.
-Their 894 claim disagreements and 122 incomplete inventories leave all 128
-cases semantically pending. The complete adjudication package has no human
-decisions. Semantic review is by AI; Opus and Haiku share a provider. C_pair=0/0
-is N/A, never 100% support. Procedure deviations and validator limits are
-reported in [Evaluation](docs/EVALUATION.md).
-Scientific accuracy and global acceptance remain pending human adjudication.
-The earlier failed first call is preserved as an integration interruption with
-no behavioral evidence. [Current 5C state](docs/BATCH_5C_REPORT.md).
-
-Software 0.3.0 and the hosted apps are separate artifacts. This release edits
-no Space app.py or requirements file. Both Spaces install desi-fm from GitHub's
-unpinned default branch; after publication, a rebuild can install 0.3.0 under
-the existing app.py, retain a cached dependency, or fail. A Space README commit
-triggers rebuild/restart. No unchanged runtime or updated demo code is claimed.
-The built-in demo wording predates this evaluation; its claims of unseen
-examples and foundation-model capability are superseded by the limits here.
-
-Development and audits used AI assistants (Codex and Claude), with decisions and
-verifications recorded in docs. This does not describe personal contributions;
-H-18 remains pending.
+Development and audits used AI coding assistants (Codex and Claude); decisions and verification records are in docs/.

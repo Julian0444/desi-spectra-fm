@@ -1,5 +1,7 @@
 # Evaluation
 
+For a local functional demonstration with fixed public assets, use [REPRODUCE.md](REPRODUCE.md). It is not a blind evaluation.
+
 This is the canonical overview of results for DESI Spectra FM and Spectra
 Copilot. The historical technical records linked below retain their protocols,
 artifacts and chronology. Software delivery, measured behavior, mechanical

@@ -21,8 +21,8 @@ for protocols, denominators, the ridge baseline and the limits of these claims.
 ## Install and run locally
 
 The commands below install the 0.3.0 source release.
-Weights are separate from the Python package. Use a local v2.1 checkpoint from
-[the model repository](https://huggingface.co/jirustaroure/desi-spectra-fm).
+Weights are separate from the Python package. Follow [REPRODUCE.md](docs/REPRODUCE.md)
+for downloads fixed by revision and SHA-256 and a public example requiring no private files.
 
 ```bash
 git clone --branch v0.3.0 https://github.com/Julian0444/desi-spectra-fm.git
@@ -71,18 +71,9 @@ pilot, acceptance execution, semantic review and human adjudication.
 - [Architecture and decisions](docs/DECISIONS.md)
 - [Documentation index and process history](docs/README.md)
 - [Model card](model_card.md), [data attribution](ATTRIBUTIONS.md), [license](LICENSE)
-- [Local installed-package reproduction](docs/BATCH_5C_REPRODUCE.md) and [release notes](docs/RELEASE_0_3_0.md)
+- [Public reproduction guide](docs/REPRODUCE.md) and [release notes](docs/RELEASE_0_3_0.md)
 - [Hosted demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo) and [hosted API](https://jirustaroure-desi-fm-api.hf.space/api/docs)
 
-The hosted app.py files are outside this release's edit scope. Both Spaces
-install desi-fm from GitHub's unpinned default branch, so a later rebuild can
-change their installed package. A Space README commit triggers rebuild/restart;
-cache reuse or build failure is possible. No unchanged runtime or updated demo
-is claimed. The app's built-in wording predates this evaluation; its claims of
-unseen examples and foundation-model capability are superseded by the limits
-above. CI runs the documented quick tests; installed-package checks and frozen
-scientific artifacts are separate evidence.
+The hosted demo and API application code is not updated by this release; their FM dependency is unpinned. Updates are separate work; see [deployment](docs/DEPLOYMENT.md).
 
-Development and audits used AI assistants (Codex and Claude), with decisions and
-verifications recorded in `docs/`. This statement does not assign personal
-contributions; the H-18 account remains pending.
+Development and audits used AI coding assistants (Codex and Claude); decisions and verification records are in docs/.
