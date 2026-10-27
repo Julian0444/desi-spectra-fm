@@ -58,8 +58,11 @@ not been established.
 
 The historical agent reduced successes from 139/150 to 119/150 under its original
 protocol. The later 5C pilot selected low effort and passed the operational gate
-with 11/11 valid reports. That is neither scientific acceptance nor evidence of
-improved redshift accuracy. [Evaluation](docs/EVALUATION.md) distinguishes the
+with 11/11 valid reports. The unique 128-case acceptance then passed mechanical
+checks with 127/128 completed (79/80 real, 48/48 synthetic), at US$0.1086672
+certified cost. Both AI annotations are complete; 894 claim disagreements leave
+semantic review pending in 128/128 cases. Scientific accuracy and global
+acceptance await human adjudication; no improved redshift accuracy is claimed. [Evaluation](docs/EVALUATION.md) distinguishes the
 pilot, acceptance execution, semantic review and human adjudication.
 
 ## Documentation and services
@@ -68,7 +71,7 @@ pilot, acceptance execution, semantic review and human adjudication.
 - [Architecture and decisions](docs/DECISIONS.md)
 - [Documentation index and process history](docs/README.md)
 - [Model card](model_card.md), [data attribution](ATTRIBUTIONS.md), [license](LICENSE)
-- [Local installed-package reproduction](docs/BATCH_5C_REPRODUCE.md) and [release preparation](docs/RELEASE_0_3_0.md)
+- [Local installed-package reproduction](docs/BATCH_5C_REPRODUCE.md) and [release notes](docs/RELEASE_0_3_0.md)
 - [Hosted demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo) and [hosted API](https://jirustaroure-desi-fm-api.hf.space/api/docs)
 
 The hosted services run their existing Space code. Local package changes do not

@@ -12,7 +12,8 @@ tags:
 # DESI Spectra FM — multitask transformer (26M)
 
 **[▶ Live demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** —
-try the model on real held-out DESI spectra (or your own) in the browser.
+try the model on historical DESI examples (or your own) in the browser. The
+historical examples are not an independent validation population.
 
 Encoder-only transformer (8 layers, `d_model=512`, 8 heads, ~26M parameters)
 trained with masked-token prediction on DESI EDR/SV3 spectra
@@ -155,9 +156,19 @@ not evaluated on that test. CNN-17 remains experimental. [Full protocol and
 limits](docs/EVALUATION.md).
 
 The completed 5C pilot selected low effort, with 11/11 valid reports passing
-the operational gate. Acceptance has not opened during closure preparation;
-the corrected review procedure and final identity still require independent
-verification. Semantic review is by AI, with Opus and Haiku sharing a provider.
+the operational gate. The unique low-effort acceptance is sealed: 128 requested
+(80 real, 48 synthetic), 126 calls, zero retries, US$0.1086672 certified cost.
+Mechanical checks passed: completion 127/128 (79/80 real, 48/48 synthetic),
+model_z 122/122 eligible, prediction coverage 122/128 requested, evidence 909/909
+and required abstention 18/18. One incomplete explanation remains in the result.
+The corrected procedure and evaluated identity passed independent review with
+zero P1/P2 before execution. Both new AI annotations are complete and were
+hash-registered before either was read by the coordinator or labels opened.
+Their 894 claim disagreements and 122 incomplete inventories leave all 128
+cases semantically pending. The complete adjudication package has no human
+decisions. Semantic review is by AI; Opus and Haiku share a provider. C_pair=0/0
+is N/A, never 100% support. Procedure deviations and validator limits are
+reported in [Evaluation](docs/EVALUATION.md).
 Scientific accuracy and global acceptance remain pending human adjudication.
 The earlier failed first call is preserved as an integration interruption with
 no behavioral evidence. [Current 5C state](docs/BATCH_5C_REPORT.md).

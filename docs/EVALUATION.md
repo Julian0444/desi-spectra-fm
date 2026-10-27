@@ -114,19 +114,62 @@ cost was **US$0.0280614**, certified, for 29 calls. Including the earlier debite
 reservation, pilot accounting was US$0.031632. This does not certify the first
 attempt's bill. No new pilot is authorized or needed by the current corrections.
 
-**Closure preparation, 2026-10-27:** acceptance has not opened. The corrected
-review procedure and final installed identity require independent verification
-before the single authorized low-effort run: 128 cases, 80 real and 48 synthetic,
-ceiling US$12.80. Failures and pending cases stay in denominators. These are
-planned denominators and a cap, not measured acceptance results.
+**Execution, 2026-10-27:** after the corrected review procedure and build-02
+identity passed independent review with zero P1/P2, the single low-effort
+acceptance run attempted all 128 cases (80 real and 48 synthetic). It made 126
+calls with no retries, at certified cost **US$0.1086672** (US$0.0008489625 per
+requested case), below its US$12.80 ceiling. Execution states were 72 ambiguous,
+49 insufficient-data, six invalid-input and one incomplete explanation. No case
+remained pending; no timeout or technical-error state was recorded. The incomplete
+explanation is retained and will not be rerun. Wall latency p50/p95/maximum was
+5.40/6.85/8.77 seconds, including all 128 cases.
 
-The semantic protocol uses two new blinded AI sessions, Astra and Opus; Opus and
-the evaluated Haiku share a provider. Both annotations must be saved and hashed
-before either is read by the coordinator. Disputes go to Julian without
-automatic adjudication. Scientific accuracy and global acceptance remain
-pending human adjudication. Zero emitted claim–citation pairs mean N/A, not
-100% support, and leave global acceptance pending. Mechanical fidelity is not
-scientific accuracy; public synthetic recipes are mechanism checks.
+Outputs and the external seal were registered before labels. After both new AI
+annotations were saved and hash-registered, scoring passed the mechanical checks:
+
+| Measurement | Global | Real | Synthetic |
+|---|---:|---:|---:|
+| Completed / requested | 127/128 | 79/80 | 48/48 |
+| Official model_z preserved / eligible | 122/122 | 80/80 | 42/42 |
+| Faithful template-evidence units | 909/909 | 621/621 | 288/288 |
+| Tool-faithful valid-input cases | 122/122 | 80/80 | 42/42 |
+| Required abstentions | 18/18 | N/A (0/0) | 18/18 |
+| Valid emitted citation-ID mentions | 3/3 | 3/3 | N/A (0/0) |
+
+Prediction coverage is 122/122 eligible inputs and **122/128 requested cases**.
+Invalid-input rejections remain in N; the incomplete explanation is a completion
+failure. The global and stratum latency/cost checks pass. Citation-ID membership
+is not scientific support. [Aggregate derivative with all strata and intervals](evidence/batch5c-acceptance-score-public.json).
+
+The two new blinded AI sessions, Astra and Opus, annotated equivalent packets
+independently; Opus and the evaluated Haiku share a provider. Both annotations
+were saved and hash-registered before either was read by the coordinator or
+labels opened. Their validated union has 2,194 provisional claims from 2,191
+seeds and three additions. There are **894 claim disagreements**, incomplete
+inventories in 122 cases, and semantic review pending in **128/128 cases**.
+The private adjudication package includes every case, both original annotations,
+all disputes and empty human decision fields. No human adjudication was made.
+
+Scientific judgments provisionally count 783 agreed-correct claims against a
+1,673 denominator; unsupported claims count six against 2,194. Both rates are
+**null**, not scientific accuracy estimates or threshold passes. Six agreed-unmet
+evidence obligations remain recorded; nine cases have obligation disagreements.
+Zero agreed critical-error flags is not proof of no critical errors. C_pair=0/0
+is N/A and leaves global acceptance pending. Excluding three quoted excerpts
+from the factual denominator gives 6/2,191, also pending; this descriptive
+sensitivity does not change the rubric or threshold.
+
+Procedure limits remain: execution retained custody order and partial real/
+synthetic blinding; session identities are declared by orchestration. Opus
+posted content-bearing progress in its isolated annotation thread despite the
+counts-only instruction. The coordinator read that thread only after both
+hashes were registered; no exposure of the other annotator was observed. The
+trace is retained, and annotations were not repeated. Validator limits are
+disclosed in the remaining-work record and the human instructions.
+
+Scientific accuracy and global acceptance remain pending human adjudication
+and any protocol limits still applicable. Mechanical fidelity is not scientific
+accuracy; public synthetic recipes are mechanism checks.
 
 [5C report](BATCH_5C_REPORT.md), [semantic procedure](BATCH_5C_AI_REVIEW.md),
 [remaining work](BATCH_5C_REMAINING.md), [human actions](BATCH_5C_HUMAN_ACTIONS.md).
@@ -137,7 +180,9 @@ Versioned documents record protocols, source commits and hashes. Frozen
 checkpoints, predictions and private custody artifacts are separate from source
 packages. [Installed reproduction](BATCH_5C_REPRODUCE.md) and the documentation
 [index](README.md) identify the technical records. Local preservation is not an
-independent backup. A reproduction bundle is being prepared without upload.
+independent backup. A local reproduction bundle contains 84 payload files (2,352,766,193 bytes),
+with manifests and hashes; total directory size is 2,352,794,036 bytes. It has not
+been uploaded and excludes raw training data and private acceptance labels.
 Development and audits used Codex and Claude; decisions and verifications are
 recorded in the documentation. Personal contributions remain an unanswered H-18
 item, not a conclusion inferred from these records.
