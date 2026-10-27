@@ -45,7 +45,7 @@ Individual original ID/raw evidence covers 150 exported objects; all 100,000 IDs
 Reproduce from disk to a new destination (source imports; same recorded environment):
 
 ```sh
-sh "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/scripts/reproduce_batch3.sh" "/Users/jirustaroure/.local/state/spectra-consolidation/lote-3-20261009/my-new-run"
+sh "<fm-repo>/scripts/reproduce_batch3.sh" "<private-state>/lote-3-20261009/my-new-run"
 ```
 
 The script refuses an existing destination and blocks sockets. It produces CSV, NPZ, figures, exclusions, metrics and a complete/incomplete manifest. Compare runs with `scripts/compare_historical_runs.py`. Dataset/weights/index/results remain outside Git; light copies of manifests/summaries are versioned. No new wheel was built.

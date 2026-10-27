@@ -223,7 +223,7 @@ The original independent mixed-device reproduction now fails at freeze with
 Only synthetic data were used for these regressions.
 
 Private evidence and the initial Git-state record:
-`/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-preparation-20261010/`.
+`<private-state>/lote-4b-preparation-20261010/`.
 Both originals started on the expected batch-4A commits and now use
 `codex/lote-4b`. The sole pre-existing FM change was the untracked historical
 CSV; Copilot was clean and needs no implementation change.
@@ -232,7 +232,7 @@ CSV; Copilot was clean and needs no implementation change.
 ## Artefactos, verificación y reproducción
 
 Corridas, pesos, predicciones y matrices permanecen fuera de Git:
-`/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/`.
+`<private-state>/lote-4b-01/`.
 El inventario identifica **641 archivos / 6.059.400.278 bytes** de ejecución
 (excluye el propio subdirectorio de informe y los logs de preparación).
 [Inventario](evidence/batch4b-artifacts.json) contiene rutas, tamaños y SHA-256,
@@ -255,11 +255,11 @@ Para regenerar **solo** resultados y figuras desde lo ya persistido, usar un
 nuevo directorio de salida:
 
 ```sh
-cd "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING"
-PYTHONPATH=src /Users/jirustaroure/.local/state/spectra-consolidation/lote-2-20261009/wheel-env/bin/python \
+cd "<fm-repo>"
+PYTHONPATH=src <private-state>/lote-2-20261009/wheel-env/bin/python \
   scripts/report_batch4b.py report \
-  --runs /Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01 \
-  --validation-review /Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01/validation-review.json \
+  --runs <private-state>/lote-4b-01 \
+  --validation-review <private-state>/lote-4b-01/validation-review.json \
   --output /ruta/nueva/para/el/informe
 ```
 

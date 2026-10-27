@@ -11,12 +11,12 @@ needed. No profile weights were reused.
 ## Start the fixed nine-run series
 
 ```sh
-cd "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING"
-export SPECTRA_PYTHON="/Users/jirustaroure/.local/state/spectra-consolidation/lote-2-20261009/wheel-env/bin/python"
-export PYTHONPATH="/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/src"
+cd "<fm-repo>"
+export SPECTRA_PYTHON="<private-state>/lote-2-20261009/wheel-env/bin/python"
+export PYTHONPATH="<fm-repo>/src"
 export HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1
-export SPECTRA_BATCH4_DATA="/Users/jirustaroure/.local/share/spectra-data/batch4a-v1"
-export SPECTRA_BATCH4_RUNS="/Users/jirustaroure/.local/state/spectra-consolidation/lote-4b-01"
+export SPECTRA_BATCH4_DATA="<local-home>/.local/share/spectra-data/batch4a-v1"
+export SPECTRA_BATCH4_RUNS="<private-state>/lote-4b-01"
 sh scripts/run_batch4b.sh "$SPECTRA_BATCH4_RUNS"
 ```
 
@@ -108,10 +108,10 @@ rejects more than 200 profile updates and can only load train.
 ```sh
 "$SPECTRA_PYTHON" scripts/batch4.py profile \
   --data "$SPECTRA_BATCH4_DATA" --config configs/batch4-profile.json \
-  --variant A --seed 17 --output /Users/jirustaroure/.local/state/spectra-consolidation/profile-A-new \
+  --variant A --seed 17 --output <private-state>/profile-A-new \
   --device mps --updates 32 --evaluation-objects 128
 "$SPECTRA_PYTHON" scripts/check_batch4_resume.py \
-  --output /Users/jirustaroure/.local/state/spectra-consolidation/resume-check-new
+  --output <private-state>/resume-check-new
 ```
 
 The CPU/MPS resume check uses small synthetic arrays and does not open real

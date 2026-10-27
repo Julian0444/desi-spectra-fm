@@ -7,10 +7,9 @@ tags:
   - masked-modeling
   - redshift
   - pytorch
-  - self-supervised-learning
 ---
 
-# DESI Spectra Foundation Model (26M)
+# DESI Spectra FM — multitask transformer (26M)
 
 **[▶ Live demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** —
 try the model on real held-out DESI spectra (or your own) in the browser.
@@ -19,9 +18,9 @@ Encoder-only transformer (8 layers, `d_model=512`, 8 heads, ~26M parameters)
 trained with masked-token prediction on DESI EDR/SV3 spectra
 ([Multimodal Universe](https://github.com/MultimodalUniverse/MultimodalUniverse)).
 The redshift token is **always masked** and a prediction head is trained
-**jointly** with reconstruction, so redshift enters the representation space
-from step one — the redesign of AION-1's redshift handling that this course
-project asked for.
+**jointly** with reconstruction, so supervised redshift learning is part of
+the representation from the start. The historical repository name does not
+establish foundation-model capabilities or transfer.
 
 **Current checkpoint: v2.1** — a **fine-tune of the v1 encoder** (not a from-scratch
 model) with a new classification head over 100 `log(1+z)` bins: cross-entropy
@@ -30,7 +29,7 @@ training labels, 1:1 loss weighting with reconstruction, and a split excluded fr
 is **`z_pred_map`** (posterior argmax); `z_pred` (`expm1(E[log(1+z)])`) is kept for
 backward compatibility.
 
-## Validation metrics (canonical held-out split)
+## Historical validation metrics (not an independent test)
 
 Historical measurement on the same 2,000 valid-label DESI EDR/SV3 objects after
 the first 80,000 valid rows. These objects were excluded from v2.1 fine-tuning,
@@ -41,8 +40,8 @@ Both evaluations randomly hide 50% of spectral tokens without a fixed seed.
 v1 uses scalar z; v2.1 uses MAP from `checkpoint_last.pt` at step 30,000.
 Best and last have identical tensors; 15.15% versus 14.95% comes from different
 masks, not different model quality. This difference is not an uncertainty interval.
-[Protocol, hashes and recalculation](docs/HISTORICAL_EVIDENCE.md)
-are prepared locally for the next publication.
+[Evaluation](docs/EVALUATION.md) is the canonical results overview;
+[historical evidence](docs/HISTORICAL_EVIDENCE.md) records hashes and recalculation.
 
 | metric | v1 (50k, regression head) | **v2.1 (fine-tune, 100-bin classification)** |
 |---|---|---|
@@ -60,7 +59,8 @@ split are in the
 ## Usage
 
 ```bash
-pip install "desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm"
+# Source installation while 0.3.0 publication is pending.
+pip install "desi-fm @ git+https://github.com/Julian0444/desi-spectra-fm.git"
 pip install huggingface_hub
 ```
 
@@ -117,7 +117,7 @@ superiority. No physical denoising claim is supported.
 | `faiss/spectra_meta.npz` | catalog redshift per indexed row |
 
 The `faiss/` pair powers the `find_similar_spectra` semantic-search tool in
-[spectra-copilot](https://github.com/Julian0444/spectra-copilot#semantic-search-embeddings--faiss).
+[spectra-copilot](https://github.com/Julian0444/spectra-copilot/blob/main/docs/DECISIONS.md).
 
 ## Links
 
@@ -144,3 +144,28 @@ seeds 17 and 101. [Evidence and limits](docs/BATCH_5C_AB.md). The historical nam
 does not establish a foundation model; physical independence and CNN/v2.1
 superiority remain unproven. Scientific acceptance and publication are separate
 from local software checks; [current status](docs/BATCH_5C_REPORT.md).
+
+
+## Evaluation and deployment status
+
+The controlled A/B experiment met its aggregate criterion on the three frozen
+checkpoint pairs, but reconstruction worsened normalized MAE in two pairs and
+worsened the warning stratum. CNN and ridge are practical baselines; v2.1 was
+not evaluated on that test. CNN-17 remains experimental. [Full protocol and
+limits](docs/EVALUATION.md).
+
+The completed 5C pilot selected low effort, with 11/11 valid reports passing
+the operational gate. Acceptance has not opened during closure preparation;
+the corrected review procedure and final identity still require independent
+verification. Semantic review is by AI, with Opus and Haiku sharing a provider.
+Scientific accuracy and global acceptance remain pending human adjudication.
+The earlier failed first call is preserved as an integration interruption with
+no behavioral evidence. [Current 5C state](docs/BATCH_5C_REPORT.md).
+
+Software 0.3.0 is being prepared locally. The hosted demo and API run their
+existing Space code; publication of package or model-card text does not update
+that code. No updated demo is claimed.
+
+Development and audits used AI assistants (Codex and Claude), with decisions and
+verifications recorded in docs. This does not describe personal contributions;
+H-18 remains pending.
