@@ -1,6 +1,14 @@
-# DESI Spectra Foundation Model
+# DESI Spectra FM
 
 > Versión en español del [README.md](README.md). El README en inglés es la referencia; ante cualquier diferencia, prevalece el inglés.
+
+> Estado del cierre 5C (2026-10-27): mecánica aprobada, 127/128 completados
+> (79/80 reales y 48/48 sintéticos), US$0,1086672 certificados. Anotaciones IA
+> terminadas, 894 desacuerdos y 128/128 casos semánticamente pendientes.
+> Exactitud científica y aceptación global esperan adjudicación humana. Véanse
+> [Evaluation](docs/EVALUATION.md) e [informe 5C](docs/BATCH_5C_REPORT.md).
+> Los Spaces usan una dependencia sin fijar: una reconstrucción puede cambiar
+> su paquete instalado aunque no se edite app.py. No se afirma runtime idéntico.
 
 [![ci](https://github.com/Julian0444/desi-spectra-fm/actions/workflows/ci.yml/badge.svg)](https://github.com/Julian0444/desi-spectra-fm/actions/workflows/ci.yml)
 [![Model on HF](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg)](https://huggingface.co/jirustaroure/desi-spectra-fm)
@@ -80,7 +88,7 @@ usado por el copiloto.
 CI ejecuta pruebas unitarias; no cubre los wrappers de Spaces, Docker ni el checkpoint real:
 
 - **[Demo en vivo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo)** (Gradio en
-  HF Spaces): espectros held-out reales, enmascarado interactivo, subí tu propio `.npz`. (Los
+  HF Spaces): espectros históricos de validación (no independientes), enmascarado interactivo, subí tu propio `.npz`. (Los
   cuatro espectros de ejemplo viven en `examples/`, que acá está gitignored; ver
   [Estructura del repositorio](#estructura-del-repositorio).)
 - **[API REST](https://jirustaroure-desi-fm-api.hf.space/api/docs)** (FastAPI servida en Space Gradio; Dockerfile para uso local):
@@ -332,11 +340,11 @@ tests/                Tests unitarios y de regresión (shapes, sin fuga, aislami
 demo/                 app Gradio desplegada en el Space de HF en vivo (jirustaroure/desi-spectra-fm-demo)
 api/                  app de la API desplegada en el Space de HF en vivo (jirustaroure/desi-fm-api)
 Dockerfile            imagen de contenedor solo CPU para la API REST
-examples/             4 espectros held-out reales para la demo (.npz) — NO están en git (gitignored);
+examples/             4 espectros históricos de validación (no independientes) para la demo (.npz) — NO están en git (gitignored);
                       se regeneran con scripts/make_demo_examples.py. Copilot solo tiene 3 de los 4
                       (falta heldout_z083.npz); el Space tiene sus propias copias.
 scripts/
-  make_demo_examples.py    exporta los espectros held-out reales de ejemplo de la demo (examples/)
+  make_demo_examples.py    exporta los espectros históricos de validación (no independientes) de ejemplo de la demo (examples/)
   estimate_z_histogram.py  estima el histograma de etiquetas de entrenamiento (pesos de clase de v2.1)
   plot_scatter_v1_v2.py    regenera el scatter held-out v1 vs v2.1 del README
 notebooks/

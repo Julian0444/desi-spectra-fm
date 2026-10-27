@@ -173,9 +173,13 @@ Scientific accuracy and global acceptance remain pending human adjudication.
 The earlier failed first call is preserved as an integration interruption with
 no behavioral evidence. [Current 5C state](docs/BATCH_5C_REPORT.md).
 
-Software 0.3.0 is being prepared locally. The hosted demo and API run their
-existing Space code; publication of package or model-card text does not update
-that code. No updated demo is claimed.
+Software 0.3.0 and the hosted apps are separate artifacts. This release edits
+no Space app.py or requirements file. Both Spaces install desi-fm from GitHub's
+unpinned default branch; after publication, a rebuild can install 0.3.0 under
+the existing app.py, retain a cached dependency, or fail. A Space README commit
+triggers rebuild/restart. No unchanged runtime or updated demo code is claimed.
+The built-in demo wording predates this evaluation; its claims of unseen
+examples and foundation-model capability are superseded by the limits here.
 
 Development and audits used AI assistants (Codex and Claude), with decisions and
 verifications recorded in docs. This does not describe personal contributions;

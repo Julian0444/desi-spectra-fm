@@ -180,7 +180,7 @@ Al terminar: re-ejecutar el notebook con el checkpoint nuevo → los gráficos *
 ### 1.1 Git + limpieza del repo
 
 ```bash
-cd "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING"
+cd "<fm-source>"
 git init -b main
 ```
 

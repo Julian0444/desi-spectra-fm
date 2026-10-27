@@ -142,7 +142,9 @@ failure. The global and stratum latency/cost checks pass. Citation-ID membership
 is not scientific support. [Aggregate derivative with all strata and intervals](evidence/batch5c-acceptance-score-public.json).
 
 The two new blinded AI sessions, Astra and Opus, annotated equivalent packets
-independently; Opus and the evaluated Haiku share a provider. Both annotations
+independently; each assembled per-claim judgments with its own scripts after
+reading the cases. This is not independent human validation. Opus and the
+evaluated Haiku share a provider. Both annotations
 were saved and hash-registered before either was read by the coordinator or
 labels opened. Their validated union has 2,194 provisional claims from 2,191
 seeds and three additions. There are **894 claim disagreements**, incomplete

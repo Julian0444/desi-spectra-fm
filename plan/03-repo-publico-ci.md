@@ -17,7 +17,7 @@ Convertir la carpeta local en un repo público limpio, clonable y con CI. Es el 
 ### 1. Sacar lo que no va al repo público
 
 ```bash
-cd "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING"
+cd "<fm-source>"
 mkdir -p ~/Documents/PHYS303-privado
 mv docs.zip "docs to finish omnicursor.zip" PHYS303_Final-Project_20266.docx ~/Documents/PHYS303-privado/
 mv PHYS303_Final-Project_20266.pdf ~/Documents/PHYS303-privado/   # material del profesor: fuera del repo público

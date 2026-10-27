@@ -74,9 +74,14 @@ pilot, acceptance execution, semantic review and human adjudication.
 - [Local installed-package reproduction](docs/BATCH_5C_REPRODUCE.md) and [release notes](docs/RELEASE_0_3_0.md)
 - [Hosted demo](https://huggingface.co/spaces/jirustaroure/desi-spectra-fm-demo) and [hosted API](https://jirustaroure-desi-fm-api.hf.space/api/docs)
 
-The hosted services run their existing Space code. Local package changes do not
-update those services. CI runs the documented quick tests; installed-package
-checks and frozen scientific artifacts are separate evidence.
+The hosted app.py files are outside this release's edit scope. Both Spaces
+install desi-fm from GitHub's unpinned default branch, so a later rebuild can
+change their installed package. A Space README commit triggers rebuild/restart;
+cache reuse or build failure is possible. No unchanged runtime or updated demo
+is claimed. The app's built-in wording predates this evaluation; its claims of
+unseen examples and foundation-model capability are superseded by the limits
+above. CI runs the documented quick tests; installed-package checks and frozen
+scientific artifacts are separate evidence.
 
 Development and audits used AI assistants (Codex and Claude), with decisions and
 verifications recorded in `docs/`. This statement does not assign personal

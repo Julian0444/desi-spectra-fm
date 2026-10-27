@@ -142,7 +142,7 @@ Se está ejecutando **`plan/02R-reentrenamiento-v2-calibrado.md`** (la revisión
 ### Primera acción para esta noche — reanudar en Fase 4.5 (comando exacto)
 
 ```bash
-cd "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING"
+cd "<fm-source>"
 python3 -m desi_fm.evaluate \
   --checkpoint runs/desi_50k_big/checkpoint_last.pt \
   --data-dir edr_sv3 --max-examples 2000 --skip-examples 80000 \
@@ -393,7 +393,7 @@ El trap v1 llevaba ruido blanco (σ=0.03) y `identify_spectral_lines_impl` **det
 ### Tareas pendientes (en orden)
 
 1. **Aplicar el fix del trap** + regenerar + verificar (sección de arriba).
-2. **`tests/test_agent.py` offline** (sin API key; CI no la necesita): `SYSTEM` contiene los hechos v2.1 (`z_pred_map`, `0.3`, `3.5`); `agent.identify_spectral_lines.call({"npz_path": ..., "z": 0.2036})` devuelve JSON con verdict `consistent` sobre `heldout_z020.npz`; `estimate_cost_usd` reproduce tarifas (1M in + 1M out → haiku $6, opus-4-8 $30, modelo desconocido → None); `request_kwargs` (haiku → `{}`, opus → adaptive); ambigüedad del trap (solo la tool de líneas, sin modelo). Correr la suite con `DESI_FM_CKPT="/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING/runs/desi_80k_classhead_v21/checkpoint_last.pt"` (comillas: la ruta tiene espacios) y `.venv/bin/python -m pytest`.
+2. **`tests/test_agent.py` offline** (sin API key; CI no la necesita): `SYSTEM` contiene los hechos v2.1 (`z_pred_map`, `0.3`, `3.5`); `agent.identify_spectral_lines.call({"npz_path": ..., "z": 0.2036})` devuelve JSON con verdict `consistent` sobre `heldout_z020.npz`; `estimate_cost_usd` reproduce tarifas (1M in + 1M out → haiku $6, opus-4-8 $30, modelo desconocido → None); `request_kwargs` (haiku → `{}`, opus → adaptive); ambigüedad del trap (solo la tool de líneas, sin modelo). Correr la suite con `DESI_FM_CKPT="<fm-source>/runs/desi_80k_classhead_v21/checkpoint_last.pt"` (comillas: la ruta tiene espacios) y `.venv/bin/python -m pytest`.
 3. **Corridas del agente** (anotar el `[usage]` de cada una — es el número de la DoD): iterar con `--model claude-haiku-4-5` (~US$ 0.02/análisis) sobre `heldout_z020` y el trap hasta que el reporte cumpla formato + citas + ambigüedad reconocida; después las finales con el default `claude-opus-4-8` (~US$ 0.10/análisis) sobre los 4 casos (`heldout_z020`, `heldout_lowconf_z157`, `heldout_z287`, `trap_single_line`) con `--save-transcript eval/transcripts/<caso>.json`. Total estimado ~US$ 0.5–0.6 < US$ 1.
 4. **README de spectra-copilot**: sección del agente (uso, modelos y costo medido por análisis, reporte de ejemplo pegado — DoD — y el reporte del caso trampa), actualizar el conteo de tests, y quitar la línea final "The agent (Claude API) and the MCP server land next" (queda solo el MCP → plan 09).
 5. **Commit + push** en `Julian0444/spectra-copilot` y **CI verde** (los transcripts en `eval/transcripts/` se commitean: insumo del plan 11).

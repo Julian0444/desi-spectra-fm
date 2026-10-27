@@ -99,7 +99,7 @@ permanece válida.
 ### Paso 0.1 — Confirmar que no hay entrenamiento real activo
 
 ```bash
-cd "/Users/jirustaroure/Desktop/FINAL PROJECT DEEP LEARNING"
+cd "<fm-source>"
 pgrep -af 'python.*-m desi_fm\.train' || true
 ```
 
